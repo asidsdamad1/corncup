@@ -13,28 +13,7 @@ const goals = [
 export const PlansAndSavings: React.FC<PlansAndSavingsProps> = () => {
   return (
     <div className="text-ink-primary overflow-x-hidden min-h-screen bg-background-main">
-      {/* Sidebar */}
-      <nav className="hidden md:flex flex-col h-screen p-stack-md bg-background-main border-r border-ink-primary/10 w-64 fixed left-0 top-0 z-40">
-        <div className="mb-stack-lg">
-          <h1 className="font-headline-md text-headline-md font-bold text-ink-primary">Duyên</h1>
-          <p className="font-label-md text-label-md opacity-70">Our Sanctuary</p>
-        </div>
-        <div className="space-y-2 flex-grow">
-          {[{ href: "/emotions", icon: "mood", label: "Emotion Engine" }, { href: "/memories", icon: "timeline", label: "Memory Timeline" }, { href: "/dates", icon: "event_note", label: "Date Planner" }].map((item) => (
-            <a key={item.href} href={item.href} className="flex items-center gap-3 text-ink-primary/70 px-4 py-3 font-label-md text-label-md hover:bg-surface-accent/50 rounded-xl transition-all">
-              <span className="material-symbols-outlined">{item.icon}</span>{item.label}
-            </a>
-          ))}
-          <a href="/plans" className="flex items-center gap-3 bg-surface-accent text-ink-primary rounded-xl px-4 py-3 font-label-md text-label-md shadow-sm">
-            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>savings</span>Shared Future
-          </a>
-        </div>
-        <button className="mb-stack-md w-full py-3 bg-ink-primary text-white rounded-xl font-label-md flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all">
-          <span className="material-symbols-outlined text-sm">add</span>Add New Memory
-        </button>
-      </nav>
-
-      <main className="md:ml-64 min-h-screen pb-24 md:pb-8">
+      <main className="lg:ml-64 min-h-screen pb-24 md:pb-8">
         {/* Top Bar */}
         <header className="sticky top-0 z-30 bg-background-main flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4">
           <div className="flex items-center gap-4">
@@ -137,15 +116,7 @@ export const PlansAndSavings: React.FC<PlansAndSavingsProps> = () => {
         </div>
       </main>
 
-      {/* Mobile Bottom Nav */}
-      <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe pt-2 md:hidden bg-background-main border-t border-ink-primary/5 shadow-[0_-4px_15px_rgba(37,53,88,0.08)]">
-        {[{ href: "/emotions", icon: "mood", label: "Cảm xúc" }, { href: "/memories", icon: "timeline", label: "Kỷ niệm" }, { href: "/plans", icon: "savings", label: "Tiết kiệm", active: true }, { href: "/dates", icon: "event_note", label: "Kế hoạch" }].map((item) => (
-          <a key={item.href} href={item.href} className={`flex flex-col items-center justify-center py-2 ${item.active ? "text-ink-primary relative after:content-[''] after:w-1.5 after:h-1.5 after:bg-surface-accent after:rounded-full after:mt-1" : "text-ink-primary/60"}`}>
-            <span className="material-symbols-outlined" style={item.active ? { fontVariationSettings: "'FILL' 1" } : undefined}>{item.icon}</span>
-            <span className="font-label-sm text-label-sm mt-1">{item.label}</span>
-          </a>
-        ))}
-      </nav>
+      <NavBar activeHref="/savings" />
     </div>
   );
 };

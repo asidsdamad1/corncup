@@ -23,38 +23,10 @@ export const SecretBoxManagement: React.FC<SecretBoxManagementProps> = () => {
 
   return (
     <div className="min-h-screen bg-background-main font-body-md text-ink-primary overflow-x-hidden">
-      {/* Sidebar */}
-      <aside className="h-screen w-64 fixed left-0 top-0 bg-background-main border-r border-on-primary-container/10 hidden md:flex flex-col py-stack-lg z-50">
-        <div className="px-6 mb-10">
-          <h1 className="font-headline-lg text-headline-lg text-ink-primary">Duyên</h1>
-          <p className="font-label-md text-label-md opacity-70">Digital Sanctuary</p>
-        </div>
-        <nav className="flex-1 flex flex-col gap-1">
-          {[
-            { href: "/", icon: "home", label: "Home" },
-            { href: "/emotions", icon: "favorite", label: "Emotion Engine" },
-            { href: "/memories", icon: "timeline", label: "Memory Timeline" },
-            { href: "/plans", icon: "calendar_month", label: "Date Planner" },
-          ].map((item) => (
-            <a key={item.href} href={item.href} className="flex items-center gap-3 text-on-primary-container hover:bg-surface-variant/50 px-4 py-3 mx-2 rounded-xl transition-colors">
-              <span className="material-symbols-outlined">{item.icon}</span>
-              <span className="font-label-md text-label-md">{item.label}</span>
-            </a>
-          ))}
-          <a href="/secrets" className="flex items-center gap-3 bg-secondary-container text-on-secondary-container rounded-xl px-4 py-3 mx-2">
-            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>savings</span>
-            <span className="font-label-md text-label-md">Secret Capsule</span>
-          </a>
-        </nav>
-        <div className="mt-auto px-2 flex flex-col gap-1">
-          <button className="bg-primary text-on-primary rounded-xl py-3 mx-2 mb-6 font-label-md flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
-            <span className="material-symbols-outlined text-[20px]">add</span>New Memory
-          </button>
-        </div>
-      </aside>
+
 
       {/* Main */}
-      <main className="md:ml-64 min-h-screen px-margin-mobile md:px-margin-desktop py-10 pb-24 md:pb-10">
+      <main className="lg:ml-64 min-h-screen px-margin-mobile md:px-margin-desktop py-10 pb-24 md:pb-10">
         <header className="flex justify-between items-end mb-12">
           <div>
             <h2 className="font-headline-lg text-headline-lg text-ink-primary">Hộp thư bí mật</h2>

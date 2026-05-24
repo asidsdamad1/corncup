@@ -24,28 +24,8 @@ export const EmotionPulse: React.FC<EmotionPulseProps> = ({ userName = "Duyên" 
 
   return (
     <div className="min-h-screen bg-background-main font-body-md text-ink-primary overflow-x-hidden">
-      {/* Desktop Sidebar */}
-      <nav className="hidden md:flex h-screen w-64 fixed left-0 top-0 flex-col p-margin-desktop bg-background-main border-r border-on-surface/10 z-50">
-        <div className="text-headline-md font-headline-md text-ink-primary mb-8">Duyên</div>
-        <div className="space-y-2 flex-grow">
-          <a href="/emotions" className="flex items-center gap-3 bg-surface-accent text-ink-primary rounded-lg px-4 py-3 scale-[0.98] transition-transform">
-            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>mood</span>
-            <span className="text-label-md font-label-md">Emotion Engine</span>
-          </a>
-          {[{ href: "/memories", icon: "timeline", label: "Memory Timeline" }, { href: "/plans", icon: "account_balance_wallet", label: "Shared Future" }, { href: "/dates", icon: "event", label: "Date Planner" }, { href: "/secrets", icon: "key", label: "Secret Notes" }].map((item) => (
-            <a key={item.href} href={item.href} className="flex items-center gap-3 text-ink-primary/70 hover:bg-surface-container-high rounded-lg px-4 py-3 transition-colors">
-              <span className="material-symbols-outlined">{item.icon}</span>
-              <span className="text-label-md font-label-md">{item.label}</span>
-            </a>
-          ))}
-        </div>
-        <button className="mt-auto w-full py-3 bg-ink-primary text-white rounded-xl font-label-md hover:bg-primary transition-colors flex items-center justify-center gap-2 shadow-sm">
-          <span className="material-symbols-outlined text-[18px]">add</span>New Memory
-        </button>
-      </nav>
-
       {/* Top Bar */}
-      <header className="fixed top-0 left-0 md:left-64 right-0 z-40 bg-transparent flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4">
+      <header className="fixed top-0 left-0 lg:left-64 right-0 z-40 bg-transparent flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4">
         <h1 className="text-headline-lg font-headline-lg text-ink-primary">Duyên</h1>
         <div className="flex gap-4 items-center">
           <button className="hover:opacity-80 transition-opacity active:scale-95">
@@ -58,7 +38,7 @@ export const EmotionPulse: React.FC<EmotionPulseProps> = ({ userName = "Duyên" 
         </div>
       </header>
 
-      <main className="pt-24 pb-32 md:pb-12 md:pl-64 min-h-screen">
+      <main className="pt-24 pb-32 md:pb-12 lg:pl-64 min-h-screen">
         <div className="max-w-4xl mx-auto px-margin-mobile md:px-margin-desktop">
           {/* Segmented Control */}
           <div className="relative flex p-1 mb-stack-lg bg-surface-text-container/50 rounded-full border border-ink-primary/10 overflow-hidden">
@@ -207,21 +187,7 @@ export const EmotionPulse: React.FC<EmotionPulseProps> = ({ userName = "Duyên" 
         </div>
       </main>
 
-      {/* Mobile Bottom Nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-4 pt-2 bg-background-main shadow-sm rounded-t-xl">
-        {[
-          { href: "/", icon: "home", label: "Home" },
-          { href: "/emotions", icon: "mood", label: "Emotions", active: true },
-          { href: "/memories", icon: "auto_stories", label: "Memory" },
-          { href: "/dates", icon: "calendar_today", label: "Planner" },
-          { href: "/secrets", icon: "lock", label: "Secret" },
-        ].map((item) => (
-          <a key={item.href} href={item.href} className={`flex flex-col items-center justify-center px-4 py-1 rounded-lg ${item.active ? "text-ink-primary relative after:content-[''] after:w-1 after:h-1 after:bg-surface-accent after:rounded-full after:mt-1" : "text-on-primary-container opacity-60"}`}>
-            <span className="material-symbols-outlined" style={item.active ? { fontVariationSettings: "'FILL' 1" } : undefined}>{item.icon}</span>
-            <span className="text-label-sm font-label-sm">{item.label}</span>
-          </a>
-        ))}
-      </nav>
+      <NavBar activeHref="/emotions" />
     </div>
   );
 };

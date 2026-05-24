@@ -19,35 +19,9 @@ export const CreateSecretBox: React.FC<CreateSecretBoxProps> = () => {
 
   return (
     <div className="min-h-screen text-ink-primary font-body-md overflow-x-hidden bg-background-main">
-      {/* Sidebar */}
-      <aside className="hidden md:flex flex-col h-screen fixed left-0 top-0 p-6 gap-stack-md bg-background-main border-r border-ink-primary/10 w-64 z-50">
-        <div className="flex items-center gap-3 px-4 mb-8">
-          <div className="w-10 h-10 rounded-full bg-surface-accent flex items-center justify-center">
-            <span className="material-symbols-outlined text-ink-primary" style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
-          </div>
-          <div>
-            <h1 className="text-headline-md font-headline-md text-ink-primary">Duyên</h1>
-            <p className="text-label-sm text-on-surface-variant">Our Sanctuary</p>
-          </div>
-        </div>
-        <nav className="flex flex-col gap-2">
-          {[{ href: "/emotions", icon: "favorite", label: "Emotions" }, { href: "/memories", icon: "timeline", label: "Timeline" }, { href: "/plans", icon: "savings", label: "Future" }, { href: "/dates", icon: "calendar_today", label: "Dates" }].map((item) => (
-            <a key={item.href} href={item.href} className="text-on-surface-variant hover:bg-surface-container-low rounded-xl px-4 py-3 flex items-center gap-3 transition-colors">
-              <span className="material-symbols-outlined">{item.icon}</span>
-              <span className="font-label-md">{item.label}</span>
-            </a>
-          ))}
-          <a href="/secrets" className="bg-surface-accent text-ink-primary rounded-xl px-4 py-3 flex items-center gap-3 scale-[0.98] transition-transform">
-            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>lock</span>
-            <span className="font-label-md">Secrets</span>
-          </a>
-        </nav>
-        <div className="mt-auto p-4 bg-surface-container-low rounded-2xl">
-          <p className="font-label-sm text-center italic text-on-surface-variant">&quot;Nơi lưu giữ duyên tình ta&quot;</p>
-        </div>
-      </aside>
 
-      <main className="md:ml-64 min-h-screen flex flex-col">
+
+      <main className="lg:ml-64 min-h-screen flex flex-col">
         {/* Top Bar */}
         <header className="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 bg-background-main z-40 sticky top-0">
           <div className="flex items-center gap-4">
@@ -142,21 +116,7 @@ export const CreateSecretBox: React.FC<CreateSecretBoxProps> = () => {
         </section>
       </main>
 
-      {/* Mobile Nav */}
-      <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-16 md:hidden bg-background-main">
-        {[
-          { href: "/emotions", icon: "favorite", label: "Emotions" },
-          { href: "/memories", icon: "timeline", label: "Timeline" },
-          { href: "/plans", icon: "savings", label: "Future" },
-          { href: "/dates", icon: "calendar_today", label: "Dates" },
-          { href: "/secrets", icon: "lock", label: "Secrets", active: true },
-        ].map((item) => (
-          <a key={item.href} href={item.href} className={`flex flex-col items-center justify-center ${item.active ? "text-ink-primary relative after:content-[''] after:w-1 after:h-1 after:bg-surface-accent after:rounded-full after:mt-1 translate-y-[-2px] transition-transform" : "text-on-surface-variant"}`}>
-            <span className="material-symbols-outlined" style={item.active ? { fontVariationSettings: "'FILL' 1" } : undefined}>{item.icon}</span>
-            <span className="font-label-sm text-label-sm">{item.label}</span>
-          </a>
-        ))}
-      </nav>
+      <NavBar activeHref="/secrets" />
 
       {/* Success Modal */}
       {showModal && (

@@ -17,44 +17,11 @@ export const SecretBoxUnlockSuccess: React.FC<SecretBoxUnlockSuccessProps> = () 
 
   return (
     <div className="relative flex min-h-screen w-full flex-col bg-background-main group/design-root overflow-x-hidden selection:bg-surface-accent selection:text-ink-primary">
-      <div className="layout-container flex h-full grow flex-col">
-        <div className="flex flex-1 justify-center py-5 px-4 md:px-40">
+      <div className="layout-container flex h-full grow flex-col lg:ml-64">
+        <div className="flex flex-1 justify-center py-5 px-4">
           <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
             <div className="flex flex-col md:flex-row gap-6 h-full">
-              {/* Sidebar Navigation (Desktop) */}
-              <aside className="hidden md:flex flex-col w-64 shrink-0 gap-4 bg-white/50 p-4 rounded-xl h-fit">
-                <div className="flex gap-3 mb-6">
-                  <div
-                    className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
-                    style={{
-                      backgroundImage:
-                        'url("https://lh3.googleusercontent.com/aida-public/AB6AXuA8VYrqK9ZkPC3MM1DMz8rZeu7_Lx_iPJgW3e_2HT7C5tHXiKLf2H6021iHMk-M9OUjB7K_6f9c-CPzoj9OgaYo-QhVN255FHOD5VO9bJAhZ4N0Ea-Ub8d4ywmtKFHrtwvdsybHSgTEqtSeniZiHPQg1we5nrGjr8c7c4gKaR97RemJ4f_SHYyQtA20WVvsFonQLBm348fbdO1psthIL3mRizyzz9HG7ipBah33cVEcC6FuN2iYazZuJbgMrd1XLnormBE6cXjC-fA")',
-                    }}
-                  />
-                  <div className="flex flex-col">
-                    <h1 className="text-ink-primary text-base font-bold leading-normal">Digital Sanctuary</h1>
-                    <p className="text-primary text-xs font-normal">Your private space</p>
-                  </div>
-                </div>
-                <nav className="flex flex-col gap-2">
-                  <a href="/" className="flex items-center gap-3 px-3 py-2 text-ink-primary hover:bg-surface-accent/20 rounded-lg cursor-pointer">
-                    <span className="material-symbols-outlined">house</span>
-                    <p className="text-sm font-medium">Trang chủ</p>
-                  </a>
-                  <a href="/memories" className="flex items-center gap-3 px-3 py-2 text-ink-primary hover:bg-surface-accent/20 rounded-lg cursor-pointer">
-                    <span className="material-symbols-outlined">map</span>
-                    <p className="text-sm font-medium">Hành trình</p>
-                  </a>
-                  <a href="/secrets" className="flex items-center gap-3 px-3 py-2 rounded-lg bg-surface-accent text-ink-primary">
-                    <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>lock_open</span>
-                    <p className="text-sm font-bold">Hộp bí mật</p>
-                  </a>
-                  <a href="/plans" className="flex items-center gap-3 px-3 py-2 text-ink-primary hover:bg-surface-accent/20 rounded-lg cursor-pointer">
-                    <span className="material-symbols-outlined">favorite</span>
-                    <p className="text-sm font-medium">Kỷ niệm</p>
-                  </a>
-                </nav>
-              </aside>
+
 
               {/* Main Content Area */}
               <main className="flex-1 flex flex-col gap-6">

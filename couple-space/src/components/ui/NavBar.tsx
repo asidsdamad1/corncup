@@ -9,43 +9,43 @@ export const NavBar: React.FC<NavBarProps> = ({ activeHref = "/" }) => {
   return (
     <>
       {/* Side Navigation Bar (Desktop) */}
-      <nav className="hidden lg:flex flex-col h-screen w-64 fixed left-0 top-0 bg-background-main border-r border-on-primary-fixed/10 p-stack-md space-y-stack-md z-50">
-        <div className="mb-stack-lg px-2 pt-4">
-          <h1 className="font-headline-md text-headline-md text-on-primary-fixed">Duyên</h1>
-          <p className="font-label-sm text-label-sm text-on-primary-fixed opacity-70">Digital Sanctuary</p>
+      <aside className="h-screen w-64 fixed left-0 top-0 bg-[rgba(255,255,255,0.2)] backdrop-blur-xl border-r border-white/40 shadow-[4px_0_32px_rgba(37,53,88,0.05)] rounded-r-[2.5rem] hidden lg:flex flex-col py-10 px-5 z-50 transition-all">
+        <div className="mb-12 px-3 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-surface-accent flex items-center justify-center shadow-sm">
+            <span className="material-symbols-outlined text-ink-primary" style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
+          </div>
+          <div>
+            <h1 className="font-headline-md text-headline-md font-bold text-ink-primary leading-tight">Duyên</h1>
+            <p className="font-label-sm text-[10px] uppercase tracking-wider text-ink-primary/60">Digital Sanctuary</p>
+          </div>
         </div>
-        <div className="flex flex-col space-y-2">
+        <nav className="flex-1 flex flex-col space-y-3">
           {navItems.map((item) => {
             const isActive = activeHref === item.href;
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+                className={`flex items-center space-x-3 px-4 py-3.5 rounded-2xl transition-all duration-300 ${
                   isActive
-                    ? "bg-surface-accent text-on-primary-fixed font-bold shadow-sm translate-x-1"
-                    : "text-on-primary-fixed/80 hover:bg-surface-accent/50"
+                    ? "bg-surface-accent text-ink-primary font-bold shadow-sm scale-100"
+                    : "text-ink-primary/70 hover:bg-surface-accent/30 hover:text-ink-primary hover:scale-[1.02]"
                 }`}
               >
-                <span className="material-symbols-outlined">{item.icon}</span>
+                <span className="material-symbols-outlined" style={{ fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0" }}>{item.icon}</span>
                 <span className="font-label-md text-label-md">{item.label}</span>
               </Link>
             );
           })}
-        </div>
-        <div className="mt-auto flex items-center gap-3 p-2 bg-surface-container-low rounded-xl">
-          <div className="w-10 h-10 rounded-full bg-surface-accent flex items-center justify-center">
-            <span className="material-symbols-outlined text-primary">diversity_1</span>
-          </div>
-          <div className="overflow-hidden">
-            <p className="font-label-md text-label-md truncate">Chúng mình</p>
-            <p className="text-[10px] opacity-60">Couple Avatar</p>
-          </div>
-        </div>
-      </nav>
+        </nav>
+        <button className="mt-auto bg-ink-primary text-white py-4 px-4 rounded-2xl font-label-md text-label-md hover:opacity-90 hover:-translate-y-1 transition-all shadow-lg shadow-ink-primary/20 flex items-center justify-center space-x-2">
+          <span className="material-symbols-outlined">add_circle</span>
+          <span>Add New Memory</span>
+        </button>
+      </aside>
 
       {/* Bottom Navigation Bar (Mobile) */}
-      <nav className="lg:hidden fixed bottom-0 left-0 w-full bg-background-main flex justify-around items-center py-3 px-4 z-50">
+      <nav className="lg:hidden fixed bottom-0 left-0 w-full bg-background-main flex justify-around items-center py-3 px-4 z-50 border-t border-ink-primary/5">
         {navItems.map((item) => {
           const isActive = activeHref === item.href;
           return (
@@ -53,7 +53,7 @@ export const NavBar: React.FC<NavBarProps> = ({ activeHref = "/" }) => {
               key={item.href}
               href={item.href}
               className={`flex flex-col items-center gap-1 ${
-                isActive ? "text-on-primary-fixed font-bold relative after:content-[''] after:block after:w-1 after:h-1 after:bg-surface-accent after:rounded-full after:mt-0.5" : "text-on-primary-fixed opacity-70"
+                isActive ? "text-ink-primary font-bold relative after:content-[''] after:block after:w-1.5 after:h-1.5 after:bg-surface-accent after:rounded-full after:mt-0.5" : "text-on-primary-fixed opacity-70"
               }`}
             >
               <span className="material-symbols-outlined" style={{ fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0" }}>{item.icon}</span>

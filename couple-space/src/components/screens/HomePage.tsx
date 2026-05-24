@@ -24,38 +24,7 @@ export const HomePage: React.FC<HomePageProps> = ({ userName = "Anh Thư" }) => 
 
   return (
     <div className="min-h-screen bg-background-main selection:bg-surface-accent/30 font-body-md text-on-background">
-      <aside className="h-screen w-64 fixed left-0 top-0 bg-background-main hidden lg:flex flex-col py-8 px-4 z-50">
-        <div className="mb-12 px-4">
-          <h1 className="font-headline-md text-headline-md font-bold text-ink-primary">Duyên</h1>
-          <p className="font-label-sm text-label-sm text-ink-primary/60">Our Digital Sanctuary</p>
-        </div>
-        <nav className="flex-1 flex flex-col space-y-2">
-          <a href="/" className="flex items-center space-x-3 px-4 py-3 rounded-lg text-ink-primary font-bold border-r-4 border-surface-accent bg-surface-container-low transition-colors">
-            <span className="material-symbols-outlined">home</span>
-            <span className="font-label-md text-label-md">Home</span>
-          </a>
-          <a href="/emotions" className="flex items-center space-x-3 px-4 py-3 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors">
-            <span className="material-symbols-outlined">favorite</span>
-            <span className="font-label-md text-label-md">Our Journey</span>
-          </a>
-          <a href="/plans" className="flex items-center space-x-3 px-4 py-3 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors">
-            <span className="material-symbols-outlined">account_balance_wallet</span>
-            <span className="font-label-md text-label-md">Finances</span>
-          </a>
-          <a href="/dates" className="flex items-center space-x-3 px-4 py-3 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors">
-            <span className="material-symbols-outlined">calendar_month</span>
-            <span className="font-label-md text-label-md">Date Night</span>
-          </a>
-          <a href="/memories" className="flex items-center space-x-3 px-4 py-3 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors">
-            <span className="material-symbols-outlined">auto_stories</span>
-            <span className="font-label-md text-label-md">Memories</span>
-          </a>
-        </nav>
-        <button className="mt-auto mx-4 bg-ink-primary text-white py-3 px-4 rounded-xl font-label-md text-label-md hover:opacity-90 transition-opacity flex items-center justify-center space-x-2">
-          <span className="material-symbols-outlined">add_circle</span>
-          <span>Add New Memory</span>
-        </button>
-      </aside>
+
 
       <main className="lg:ml-64 min-h-screen px-margin-mobile lg:px-margin-desktop py-stack-lg pb-24 lg:pb-8">
         <header className="flex justify-between items-center mb-10">

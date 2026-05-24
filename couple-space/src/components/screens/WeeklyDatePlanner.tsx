@@ -34,37 +34,10 @@ export const WeeklyDatePlanner: React.FC<WeeklyDatePlannerProps> = () => {
 
   return (
     <div className="min-h-screen bg-background-main font-body-md text-ink-primary">
-      {/* Sidebar */}
-      <aside className="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 bg-background-main border-r border-on-primary-container/10 py-stack-lg z-50">
-        <div className="px-6 mb-10">
-          <h1 className="font-headline-lg text-headline-lg text-ink-primary">Duyên</h1>
-          <p className="font-label-md text-label-md text-on-primary-container/60">Digital Sanctuary</p>
-        </div>
-        <nav className="flex-1 space-y-2">
-          {[{ href: "/", icon: "home", label: "Home" }, { href: "/emotions", icon: "favorite", label: "Emotion Engine" }, { href: "/memories", icon: "timeline", label: "Memory Timeline" }].map((item) => (
-            <a key={item.href} href={item.href} className="flex items-center gap-3 text-on-primary-container hover:bg-surface-variant/50 px-4 py-3 mx-2 rounded-xl transition-colors">
-              <span className="material-symbols-outlined">{item.icon}</span>
-              <span className="font-label-md text-label-md">{item.label}</span>
-            </a>
-          ))}
-          <a href="/dates" className="flex items-center gap-3 bg-secondary-container text-on-secondary-container rounded-xl px-4 py-3 mx-2">
-            <span className="material-symbols-outlined">calendar_month</span>
-            <span className="font-label-md text-label-md">Date Planner</span>
-          </a>
-          <a href="/plans" className="flex items-center gap-3 text-on-primary-container hover:bg-surface-variant/50 px-4 py-3 mx-2 rounded-xl transition-colors">
-            <span className="material-symbols-outlined">savings</span>
-            <span className="font-label-md text-label-md">Shared Future</span>
-          </a>
-        </nav>
-        <div className="mt-auto px-2 space-y-1">
-          <button className="w-full flex items-center gap-3 px-4 py-3 mb-4 bg-ink-primary text-white rounded-xl font-label-md text-label-md">
-            <span className="material-symbols-outlined">add</span>New Memory
-          </button>
-        </div>
-      </aside>
+
 
       {/* Top Bar */}
-      <header className="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop h-16 md:ml-64 sticky top-0 z-40 bg-background-main/80 backdrop-blur-md">
+      <header className="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop h-16 lg:ml-64 sticky top-0 z-40 bg-background-main/80 backdrop-blur-md">
         <div className="flex items-center gap-4">
           <span className="md:hidden material-symbols-outlined text-ink-primary">menu</span>
           <span className="font-headline-md text-headline-md font-bold text-ink-primary">Kế hoạch Hẹn hò</span>
@@ -75,7 +48,7 @@ export const WeeklyDatePlanner: React.FC<WeeklyDatePlannerProps> = () => {
         </div>
       </header>
 
-      <main className="md:ml-64 px-margin-mobile md:px-margin-desktop py-stack-lg pb-24 md:pb-8">
+      <main className="lg:ml-64 px-margin-mobile md:px-margin-desktop py-stack-lg pb-24 md:pb-8">
         {/* Week Grid */}
         <section className="mb-stack-lg">
           <div className="flex items-center justify-between mb-stack-md">
