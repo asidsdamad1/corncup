@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id            String       @id @default(uuid())
+  name          String
+  email         String       @unique
+  coupleSpaceId String?
+  coupleSpace   CoupleSpace? @relation(fields: [coupleSpaceId], references: [id])
+  emotions      DailyEmotion[]
+  secretNotes   SecretNote[]
+}
+
+model CoupleSpace {
+  id            String               @id @default(uuid())
+  createdAt     DateTime             @default(now())
+  users         User[]
+  memories      MemoryTimelineNode[]
+  sharedNotes   SecretNote[]
+  dailyEmotions DailyEmotion[]
+}
+
+model MemoryTimelineNode {
+  id             String       @id @default(uuid())
+  title          String
+  date           DateTime
+  specialNotes   String?
+  impressions    String?
+  mediaGallery   String     // Array of URLs (comma separated)
+  coupleSpaceId  String
+  coupleSpace    CoupleSpace  @relation(fields: [coupleSpaceId], references: [id], onDelete: Cascade)
+}
+
+model DailyEmotion {
+  id             String       @id @default(uuid())
+  date           DateTime     @default(now())
+  emotionType    String       // e.g., "HAPPY", "SAD"
+  note           String?
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  coupleSpaceId  String
+  coupleSpace    CoupleSpace  @relation(fields: [coupleSpaceId], references: [id], onDelete: Cascade)
+  sharedState    String       @default("FOR_ME") // "FOR_ME", "FOR_YOU", "FOR_US"
+}
+
+model SecretNote {
+  id             String       @id @default(uuid())
+  content        String
+  passcode       String       // Simple passcode for prototype
+  isUnlocked     Boolean      @default(false)
+  unlockDate     DateTime?
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  coupleSpaceId  String
+  coupleSpace    CoupleSpace  @relation(fields: [coupleSpaceId], references: [id], onDelete: Cascade)
+}

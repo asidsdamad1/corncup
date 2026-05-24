@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Duyên - Kế hoạch Hẹn hò</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-container": "#445479",
+                        "on-primary": "#ffffff",
+                        "surface-variant": "#e2e2e2",
+                        "surface-accent": "#f5c7c7",
+                        "tertiary-container": "#b9c9f4",
+                        "surface-container": "#eeeeee",
+                        "primary-fixed-dim": "#afc9e9",
+                        "on-secondary-container": "#795656",
+                        "on-secondary-fixed-variant": "#5e3e3f",
+                        "on-primary-fixed-variant": "#2f4963",
+                        "inverse-primary": "#afc9e9",
+                        "on-primary-fixed": "#001d35",
+                        "secondary": "#785556",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "surface-bright": "#f9f9f9",
+                        "surface-dim": "#dadada",
+                        "on-tertiary-fixed-variant": "#36466a",
+                        "inverse-surface": "#2f3131",
+                        "on-tertiary-fixed": "#081a3c",
+                        "surface-container-high": "#e8e8e8",
+                        "surface": "#f9f9f9",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed": "#d9e2ff",
+                        "primary-container": "#b2ccec",
+                        "ink-primary": "#253558",
+                        "secondary-fixed": "#ffdad9",
+                        "primary-fixed": "#d0e4ff",
+                        "background-main": "#b2ccec",
+                        "on-secondary-fixed": "#2d1415",
+                        "on-surface-variant": "#43474d",
+                        "tertiary-fixed-dim": "#b6c6f1",
+                        "on-error-container": "#93000a",
+                        "surface-text-container": "#f2f2f2",
+                        "surface-container-low": "#f3f3f3",
+                        "outline": "#73777e",
+                        "inverse-on-surface": "#f1f1f1",
+                        "on-error": "#ffffff",
+                        "on-primary-container": "#3d5772",
+                        "primary": "#47607c",
+                        "on-surface": "#1a1c1c",
+                        "secondary-container": "#fdcfcf",
+                        "background": "#f9f9f9",
+                        "tertiary": "#4e5e83",
+                        "surface-container-highest": "#e2e2e2",
+                        "surface-tint": "#47607c",
+                        "secondary-fixed-dim": "#e9bcbc",
+                        "on-background": "#1a1c1c",
+                        "error": "#ba1a1a",
+                        "outline-variant": "#c3c6ce",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-sm": "0.5rem",
+                        "stack-md": "1rem",
+                        "gutter": "1rem",
+                        "stack-lg": "2rem",
+                        "margin-mobile": "1.25rem",
+                        "margin-desktop": "2.5rem"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"],
+                        "body-sm": ["Be Vietnam Pro"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "label-sm": ["Be Vietnam Pro"],
+                        "label-md": ["Be Vietnam Pro"],
+                        "body-md": ["Be Vietnam Pro"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "headline-md": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg-mobile": ["26px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "label-md": ["14px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #b2ccec;
+            font-family: 'Be Vietnam Pro', sans-serif;
+            color: #253558;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .rating-heart.active {
+            font-variation-settings: 'FILL' 1;
+            color: #785556;
+        }
+        .soft-shadow {
+            box-shadow: 0 4px 15px rgba(37, 53, 88, 0.08);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+<!-- SideNavBar (Authority: JSON) -->
+<aside class="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 bg-background-main dark:bg-ink-primary border-r border-on-primary-container/10 py-stack-lg z-50">
+<div class="px-6 mb-10">
+<h1 class="font-headline-lg text-headline-lg text-ink-primary dark:text-primary-fixed">Duyên</h1>
+<p class="font-label-md text-label-md text-on-primary-container/60">Digital Sanctuary</p>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-3 text-on-primary-container hover:bg-surface-variant/50 px-4 py-3 mx-2 rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-md text-label-md">Home</span>
+</a>
+<a class="flex items-center gap-3 text-on-primary-container hover:bg-surface-variant/50 px-4 py-3 mx-2 rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="favorite">favorite</span>
+<span class="font-label-md text-label-md">Emotion Engine</span>
+</a>
+<a class="flex items-center gap-3 text-on-primary-container hover:bg-surface-variant/50 px-4 py-3 mx-2 rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="timeline">timeline</span>
+<span class="font-label-md text-label-md">Memory Timeline</span>
+</a>
+<a class="flex items-center gap-3 bg-secondary-container text-on-secondary-container rounded-xl px-4 py-3 mx-2" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+<span class="font-label-md text-label-md">Date Planner</span>
+</a>
+<a class="flex items-center gap-3 text-on-primary-container hover:bg-surface-variant/50 px-4 py-3 mx-2 rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="savings">savings</span>
+<span class="font-label-md text-label-md">Shared Future</span>
+</a>
+</nav>
+<div class="mt-auto px-2 space-y-1">
+<button class="w-full flex items-center gap-3 px-4 py-3 mb-4 bg-ink-primary text-white rounded-xl font-label-md text-label-md">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+                New Memory
+            </button>
+<a class="flex items-center gap-3 text-on-primary-container hover:bg-surface-variant/50 px-4 py-3 rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</div>
+</aside>
+<!-- TopAppBar (Authority: JSON) -->
+<header class="flex justify-between items-center w-full px-margin-desktop h-16 md:ml-64 sticky top-0 z-40 bg-background-main/80 backdrop-blur-md">
+<div class="flex items-center gap-4">
+<span class="md:hidden material-symbols-outlined text-ink-primary">menu</span>
+<span class="font-headline-md text-headline-md font-bold text-ink-primary">Kế hoạch Hẹn hò</span>
+</div>
+<div class="flex items-center gap-6">
+<span class="material-symbols-outlined text-ink-primary cursor-pointer hover:opacity-70" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined text-ink-primary cursor-pointer hover:opacity-70" data-icon="favorite">favorite</span>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-white/20">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="A close-up high-quality portrait of a smiling woman with warm, soft lighting, reflecting a calm and intimate atmosphere. The background is softly blurred with hints of pastel blue and cream, aligning with a modern and sophisticated digital sanctuary aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgjou473H9dQEuErnZIlFI5YxDENJp6lHjjq40R-jsJrSTWF1twtzCK6PG7O-eVw4vhMb-b2KsoRBTqKpWiwD38GvzsKWSJA2HG4e49DroQRJz6-hqScj20n-gir4PoUuP2l0sEMCfAyKH0m0a2uG1mFTM4Vz2gAr4aK60KxjRnCNepXfv_N5vlbfl1qaX7rKTxDxK1b3oQSzTOKthdnxmwuAyafCvr-P1ClBWx_2ugR9dasV4QBBfRC9OKxzF8WOiB7NSPgTBxBk"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="md:ml-64 px-margin-mobile md:px-margin-desktop py-stack-lg">
+<!-- Weekly Planner View -->
+<section class="mb-stack-lg">
+<div class="flex items-center justify-between mb-stack-md">
+<h2 class="font-headline-sm text-headline-sm text-ink-primary">Tuần này của chúng mình</h2>
+<div class="flex gap-2">
+<button class="p-2 rounded-full hover:bg-white/20 transition-colors"><span class="material-symbols-outlined">chevron_left</span></button>
+<button class="p-2 rounded-full hover:bg-white/20 transition-colors"><span class="material-symbols-outlined">chevron_right</span></button>
+</div>
+</div>
+<div class="grid grid-cols-7 gap-3 overflow-x-auto no-scrollbar pb-2">
+<!-- Days of week -->
+<div class="flex flex-col items-center gap-2 p-4 bg-white/20 rounded-2xl min-w-[80px]">
+<span class="font-label-sm text-label-sm opacity-60">Thứ 2</span>
+<span class="font-headline-sm text-headline-sm">12</span>
+</div>
+<div class="flex flex-col items-center gap-2 p-4 bg-white/20 rounded-2xl min-w-[80px]">
+<span class="font-label-sm text-label-sm opacity-60">Thứ 3</span>
+<span class="font-headline-sm text-headline-sm">13</span>
+</div>
+<div class="flex flex-col items-center gap-2 p-4 bg-white/20 rounded-2xl min-w-[80px]">
+<span class="font-label-sm text-label-sm opacity-60">Thứ 4</span>
+<span class="font-headline-sm text-headline-sm">14</span>
+</div>
+<div class="flex flex-col items-center gap-2 p-4 bg-surface-accent text-ink-primary rounded-2xl min-w-[80px] soft-shadow ring-2 ring-surface-accent">
+<span class="font-label-sm text-label-sm">Thứ 5</span>
+<span class="font-headline-sm text-headline-sm">15</span>
+<div class="w-1.5 h-1.5 bg-ink-primary rounded-full mt-1"></div>
+</div>
+<div class="flex flex-col items-center gap-2 p-4 bg-white/20 rounded-2xl min-w-[80px]">
+<span class="font-label-sm text-label-sm opacity-60">Thứ 6</span>
+<span class="font-headline-sm text-headline-sm">16</span>
+</div>
+<div class="flex flex-col items-center gap-2 p-4 bg-white/20 rounded-2xl min-w-[80px]">
+<span class="font-label-sm text-label-sm opacity-60">Thứ 7</span>
+<span class="font-headline-sm text-headline-sm">17</span>
+</div>
+<div class="flex flex-col items-center gap-2 p-4 bg-white/20 rounded-2xl min-w-[80px]">
+<span class="font-label-sm text-label-sm opacity-60">CN</span>
+<span class="font-headline-sm text-headline-sm">18</span>
+</div>
+</div>
+</section>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Left Column: Active Date Card -->
+<div class="lg:col-span-8 space-y-gutter">
+<article class="bg-surface-accent rounded-[2rem] p-8 soft-shadow relative overflow-hidden">
+<div class="absolute top-0 right-0 p-8 opacity-10">
+<span class="material-symbols-outlined text-[8rem]" style="font-variation-settings: 'FILL' 1;">restaurant</span>
+</div>
+<div class="relative z-10">
+<div class="flex items-center gap-3 mb-4">
+<span class="px-4 py-1.5 bg-ink-primary text-white rounded-full font-label-sm text-label-sm uppercase tracking-wider">Hôm nay</span>
+<span class="font-label-md text-label-md text-ink-primary opacity-60">15 Tháng 5, 2024</span>
+</div>
+<h3 class="font-headline-lg text-headline-lg text-ink-primary mb-6">Ăn Phở &amp; Cà phê sáng</h3>
+<!-- Details -->
+<div class="flex flex-wrap gap-stack-md mb-8">
+<div class="flex items-center gap-2 bg-white/30 backdrop-blur-sm px-4 py-2 rounded-xl">
+<span class="material-symbols-outlined text-ink-primary">schedule</span>
+<span class="font-body-md text-body-md">08:30 AM</span>
+</div>
+<div class="flex items-center gap-2 bg-white/30 backdrop-blur-sm px-4 py-2 rounded-xl">
+<span class="material-symbols-outlined text-ink-primary">location_on</span>
+<span class="font-body-md text-body-md">Phở Thìn Lò Đúc</span>
+</div>
+</div>
+<!-- Review Section -->
+<div class="bg-white/40 backdrop-blur-md rounded-2xl p-6 mb-gutter">
+<h4 class="font-headline-sm text-headline-sm text-ink-primary mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined">rate_review</span>
+                                Đánh giá trải nghiệm
+                            </h4>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<span class="font-body-md text-body-md">Chất lượng món ăn</span>
+<div class="flex gap-1 text-ink-primary">
+<span class="material-symbols-outlined rating-heart active cursor-pointer">favorite</span>
+<span class="material-symbols-outlined rating-heart active cursor-pointer">favorite</span>
+<span class="material-symbols-outlined rating-heart active cursor-pointer">favorite</span>
+<span class="material-symbols-outlined rating-heart active cursor-pointer">favorite</span>
+<span class="material-symbols-outlined rating-heart cursor-pointer">favorite</span>
+</div>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-body-md text-body-md">Giá cả</span>
+<div class="flex gap-1 text-ink-primary">
+<span class="material-symbols-outlined rating-heart active cursor-pointer">favorite</span>
+<span class="material-symbols-outlined rating-heart active cursor-pointer">favorite</span>
+<span class="material-symbols-outlined rating-heart active cursor-pointer">favorite</span>
+<span class="material-symbols-outlined rating-heart cursor-pointer">favorite</span>
+<span class="material-symbols-outlined rating-heart cursor-pointer">favorite</span>
+</div>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-body-md text-body-md">Không gian (Vibe)</span>
+<div class="flex gap-1 text-ink-primary">
+<span class="material-symbols-outlined rating-heart active cursor-pointer">favorite</span>
+<span class="material-symbols-outlined rating-heart active cursor-pointer">favorite</span>
+<span class="material-symbols-outlined rating-heart active cursor-pointer">favorite</span>
+<span class="material-symbols-outlined rating-heart active cursor-pointer">favorite</span>
+<span class="material-symbols-outlined rating-heart active cursor-pointer">favorite</span>
+</div>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label-md text-label-md text-ink-primary opacity-60">Lời nhắn cho buổi hẹn</label>
+<div class="bg-surface-text-container rounded-xl p-4 min-h-[100px] border border-ink-primary/5">
+<textarea class="w-full bg-transparent border-none focus:ring-0 font-body-md text-body-md p-0 resize-none placeholder:text-ink-primary/30" placeholder="Chúng mình đã có một buổi sáng thật tuyệt..."></textarea>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-8 pt-8 border-t border-ink-primary/10">
+<h4 class="font-headline-sm text-headline-sm text-ink-primary mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined">mood</span>
+        Cảm xúc sau buổi hẹn
+    </h4>
+<div class="flex gap-10">
+<div class="flex flex-col items-center gap-3">
+<div class="relative">
+<div class="w-16 h-16 rounded-full border-2 border-white/50 overflow-hidden bg-white/20">
+<img alt="Your avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgjou473H9dQEuErnZIlFI5YxDENJp6lHjjq40R-jsJrSTWF1twtzCK6PG7O-eVw4vhMb-b2KsoRBTqKpWiwD38GvzsKWSJA2HG4e49DroQRJz6-hqScj20n-gir4PoUuP2l0sEMCfAyKH0m0a2uG1mFTM4Vz2gAr4aK60KxjRnCNepXfv_N5vlbfl1qaX7rKTxDxK1b3oQSzTOKthdnxmwuAyafCvr-P1ClBWx_2ugR9dasV4QBBfRC9OKxzF8WOiB7NSPgTBxBk"/>
+</div>
+<div class="absolute -bottom-1 -right-1 w-7 h-7 bg-white rounded-full flex items-center justify-center text-lg soft-shadow border border-ink-primary/5">
+                    🥰
+                </div>
+</div>
+<span class="font-label-md text-label-md text-ink-primary opacity-60">Của bạn</span>
+</div>
+<div class="flex flex-col items-center gap-3">
+<div class="relative">
+<div class="w-16 h-16 rounded-full border-2 border-white/50 overflow-hidden bg-white/20">
+<div class="w-full h-full flex items-center justify-center bg-ink-primary/5">
+<span class="material-symbols-outlined text-ink-primary opacity-40">person</span>
+</div>
+</div>
+<div class="absolute -bottom-1 -right-1 w-7 h-7 bg-white rounded-full flex items-center justify-center text-lg soft-shadow border border-ink-primary/5">
+                    ✨
+                </div>
+</div>
+<span class="font-label-md text-label-md text-ink-primary opacity-60">Của người ấy</span>
+</div>
+</div>
+</div><button class="w-full md:w-auto px-10 py-4 bg-ink-primary text-white rounded-full font-label-md text-label-md transition-transform active:scale-95">
+                            Lưu đánh giá
+                        </button>
+</div>
+</article>
+<!-- Next Date Preview -->
+<div class="bg-white/40 rounded-3xl p-6 border border-white/50 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-ink-primary">
+<span class="material-symbols-outlined">movie</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-ink-primary/60">SẮP TỚI - Thứ 7</p>
+<p class="font-headline-sm text-headline-sm">Xem phim &amp; Ăn tối</p>
+</div>
+</div>
+<button class="p-3 bg-white rounded-full text-ink-primary soft-shadow">
+<span class="material-symbols-outlined">edit</span>
+</button>
+</div>
+</div>
+<!-- Right Column: History List -->
+<div class="lg:col-span-4">
+<section class="bg-ink-primary rounded-[2rem] p-8 text-white h-full soft-shadow">
+<h3 class="font-headline-sm text-headline-sm mb-8 flex items-center gap-3">
+<span class="material-symbols-outlined">history</span>
+                        Lịch sử hẹn hò
+                    </h3>
+<div class="space-y-6">
+<!-- History Item 1 -->
+<div class="group cursor-pointer">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h5 class="font-label-md text-label-md group-hover:text-surface-accent transition-colors">Đi dạo Hồ Tây</h5>
+<p class="font-body-sm text-body-sm opacity-50">10 Tháng 5</p>
+</div>
+<div class="flex items-center gap-1 bg-white/10 px-2 py-1 rounded-lg">
+<span class="font-label-sm text-label-sm">4.8</span>
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+</div>
+<div class="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+<div class="bg-surface-accent h-full w-[96%]"></div>
+</div>
+</div>
+<!-- History Item 2 -->
+<div class="group cursor-pointer">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h5 class="font-label-md text-label-md group-hover:text-surface-accent transition-colors">Triển lãm Nghệ thuật</h5>
+<p class="font-body-sm text-body-sm opacity-50">03 Tháng 5</p>
+</div>
+<div class="flex items-center gap-1 bg-white/10 px-2 py-1 rounded-lg">
+<span class="font-label-sm text-label-sm">4.5</span>
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+</div>
+<div class="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+<div class="bg-surface-accent h-full w-[90%]"></div>
+</div>
+</div>
+<!-- History Item 3 -->
+<div class="group cursor-pointer">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h5 class="font-label-md text-label-md group-hover:text-surface-accent transition-colors">Cooking Class tại gia</h5>
+<p class="font-body-sm text-body-sm opacity-50">28 Tháng 4</p>
+</div>
+<div class="flex items-center gap-1 bg-white/10 px-2 py-1 rounded-lg">
+<span class="font-label-sm text-label-sm">5.0</span>
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+</div>
+<div class="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+<div class="bg-surface-accent h-full w-full"></div>
+</div>
+</div>
+<!-- History Item 4 -->
+<div class="group cursor-pointer">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h5 class="font-label-md text-label-md group-hover:text-surface-accent transition-colors">Camping Ba Vì</h5>
+<p class="font-body-sm text-body-sm opacity-50">15 Tháng 4</p>
+</div>
+<div class="flex items-center gap-1 bg-white/10 px-2 py-1 rounded-lg">
+<span class="font-label-sm text-label-sm">4.2</span>
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+</div>
+<div class="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+<div class="bg-surface-accent h-full w-[84%]"></div>
+</div>
+</div>
+</div>
+<div class="mt-12 rounded-2xl overflow-hidden aspect-square border-2 border-white/10">
+<img alt="Couple memory" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" data-alt="A vintage-style film photograph of a happy couple laughing together in a cozy, dimly lit cafe. The lighting is warm and nostalgic with soft bokeh from fairy lights in the background. The mood is intimate and evocative, fitting the digital sanctuary and romantic memory theme of the app." src="https://lh3.googleusercontent.com/aida-public/AB6AXuANnSjdw2itKW6qvJOk_6ykcfeteb2wMcgB2weK3T5h0DoJDYMcN0ro2uxjc9ehvOCvElw6bjQenyMP5-MqKgBtNiXFWiciEWLd6x9SqO_cU7M-8NKiCrW8AuoJ6O02ZfmWvR8xCMxxcGfQMLMkpH6tHLjGVQKODMj17e_19lbc7Sv9cUu4gJ7A9GrXip8BN8mDfv3Au7wSmNeWvXM-4ja3h8wYkgTPjKrSS1zlTCD8yRTLLS2bhWAQJt1Fw66jxirFxr_Vg1RnFIM"/>
+</div>
+<p class="mt-6 text-center font-body-sm text-body-sm opacity-40 italic">"Mỗi buổi hẹn là một mảnh ghép của hạnh phúc."</p>
+</section>
+</div>
+</div>
+</main>
+<!-- Floating Action Button (As per guidance: suppressed on details/transactional, but this is a planner dashboard) -->
+<button class="fixed bottom-8 right-8 w-14 h-14 bg-surface-accent text-ink-primary rounded-full soft-shadow flex items-center justify-center transition-transform hover:scale-110 active:scale-95 z-50">
+<span class="material-symbols-outlined text-[32px]">calendar_add_on</span>
+</button>
+<script>
+        // Simple Interaction for Rating
+        document.querySelectorAll('.rating-heart').forEach(heart => {
+            heart.addEventListener('click', function() {
+                const container = this.parentElement;
+                const hearts = Array.from(container.children);
+                const index = hearts.indexOf(this);
+                
+                hearts.forEach((h, i) => {
+                    if(i <= index) {
+                        h.style.fontVariationSettings = "'FILL' 1";
+                        h.classList.add('text-secondary');
+                    } else {
+                        h.style.fontVariationSettings = "'FILL' 0";
+                        h.classList.remove('text-secondary');
+                    }
+                });
+            });
+        });
+    </script>
+</body></html>

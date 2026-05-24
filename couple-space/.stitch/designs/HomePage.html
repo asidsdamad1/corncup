@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Duyên - Trang chủ</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#eeeeee",
+                        "secondary": "#785556",
+                        "on-tertiary-fixed": "#081a3c",
+                        "surface-bright": "#f9f9f9",
+                        "secondary-fixed": "#ffdad9",
+                        "outline": "#73777e",
+                        "primary-fixed": "#d0e4ff",
+                        "background-main": "#b2ccec",
+                        "on-tertiary-container": "#445479",
+                        "surface": "#f9f9f9",
+                        "tertiary-container": "#b9c9f4",
+                        "primary-container": "#b2ccec",
+                        "on-secondary-fixed-variant": "#5e3e3f",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed-dim": "#e9bcbc",
+                        "tertiary": "#4e5e83",
+                        "on-tertiary-fixed-variant": "#36466a",
+                        "surface-container-highest": "#e2e2e2",
+                        "surface-dim": "#dadada",
+                        "primary": "#47607c",
+                        "tertiary-fixed-dim": "#b6c6f1",
+                        "surface-container-lowest": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-primary-fixed-variant": "#2f4963",
+                        "surface-accent": "#f5c7c7",
+                        "on-tertiary": "#ffffff",
+                        "inverse-surface": "#2f3131",
+                        "surface-variant": "#e2e2e2",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed": "#001d35",
+                        "error": "#ba1a1a",
+                        "on-secondary-container": "#795656",
+                        "outline-variant": "#c3c6ce",
+                        "primary-fixed-dim": "#afc9e9",
+                        "on-surface-variant": "#43474d",
+                        "on-surface": "#1a1c1c",
+                        "on-error-container": "#93000a",
+                        "on-background": "#1a1c1c",
+                        "inverse-primary": "#afc9e9",
+                        "on-primary-container": "#3d5772",
+                        "background": "#f9f9f9",
+                        "surface-container-low": "#f3f3f3",
+                        "inverse-on-surface": "#f1f1f1",
+                        "tertiary-fixed": "#d9e2ff",
+                        "secondary-container": "#fdcfcf",
+                        "surface-text-container": "#f2f2f2",
+                        "surface-tint": "#47607c",
+                        "on-secondary-fixed": "#2d1415",
+                        "surface-container-high": "#e8e8e8",
+                        "on-error": "#ffffff",
+                        "ink-primary": "#253558"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-lg": "2rem",
+                        "stack-md": "1rem",
+                        "gutter": "1rem",
+                        "stack-sm": "0.5rem",
+                        "margin-mobile": "1.25rem",
+                        "margin-desktop": "2.5rem"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Be Vietnam Pro"],
+                        "body-md": ["Be Vietnam Pro"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "body-sm": ["Be Vietnam Pro"],
+                        "label-md": ["Be Vietnam Pro"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", {"lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["26px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #b2ccec;
+            color: #253558;
+            font-family: 'Be Vietnam Pro', sans-serif;
+            overflow-x: hidden;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #25355820;
+            border-radius: 10px;
+        }
+        .glass-card {
+            background: rgba(242, 242, 242, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(37, 53, 88, 0.05);
+        }
+        .shadow-soft {
+            box-shadow: 0 4px 15px rgba(37, 53, 88, 0.08);
+        }
+    </style>
+</head>
+<body class="bg-background-main selection:bg-surface-accent selection:text-ink-primary">
+<!-- Sidebar Navigation -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-background-main flex flex-col h-full py-8 px-4 z-50">
+<div class="mb-12 px-4">
+<h1 class="font-headline-md text-headline-md font-bold text-ink-primary">Duyên</h1>
+<p class="font-label-sm text-label-sm text-ink-primary/60">Our Digital Sanctuary</p>
+</div>
+<nav class="flex-1 flex flex-col space-y-2">
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-ink-primary font-bold border-r-4 border-surface-accent bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-md text-label-md">Home</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors transition-transform active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined">favorite</span>
+<span class="font-label-md text-label-md">Our Journey</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors transition-transform active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="font-label-md text-label-md">Finances</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors transition-transform active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-label-md text-label-md">Date Night</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors transition-transform active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined">auto_stories</span>
+<span class="font-label-md text-label-md">Memories</span>
+</a>
+</nav>
+<button class="mt-auto mx-4 bg-ink-primary text-white py-3 px-4 rounded-xl font-label-md text-label-md hover:opacity-90 transition-opacity flex items-center justify-center space-x-2">
+<span class="material-symbols-outlined">add_circle</span>
+<span>Add New Memory</span>
+</button>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 min-h-screen px-margin-desktop py-stack-lg max-w-[1400px]">
+<!-- Header Section -->
+<header class="flex justify-between items-center mb-10 animate-fade-in">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-ink-primary mb-1">Chào buổi sáng, Anh Thư</h2>
+<p class="font-body-md text-body-md text-primary opacity-80">Hôm nay là một ngày tuyệt vời để cùng nhau viết tiếp chương mới.</p>
+</div>
+<div class="flex items-center space-x-4">
+<button class="w-12 h-12 flex items-center justify-center rounded-full bg-surface-container-low text-ink-primary hover:bg-surface-accent transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="w-12 h-12 flex items-center justify-center rounded-full bg-surface-container-low text-ink-primary hover:bg-surface-accent transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<img alt="Couple's shared profile photo" class="w-12 h-12 rounded-full border-2 border-white shadow-soft object-cover" data-alt="A warm, soft-focus close-up portrait of a woman with a gentle smile, illuminated by golden hour sunlight. The image has a romantic, airy feel with a shallow depth of field, reflecting a high-fidelity and intimate aesthetic. The colors are natural and warm, blending perfectly with the digital sanctuary theme of the app." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBx3oaGVpX1aNvYNNls5xsHYVT4ZqvkPuUVmrId9Qe0XXUg6Kv0gTOYzPizURLSd_6c1H-_roXFQ_URA9Gtpr1PLnUo89exVb4NOF-H9onBbUdyld2NiGO8zdz5c2HWF5kM8DfiqTD-IElTQk-bHN5uYSD8HNquKQ3mrMwaUxYMu8wnc3tcSaw8C6JnvRQ78c152ORFN4fvD45dOBfDaqe6ajYz7KNGj-5k_b9jA75Gk3-bQeKkF5S6Io0kM56W756NHzG7n7XppJE"/>
+</div>
+</header>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-gutter">
+<!-- Daily Emotion Engine -->
+<section class="col-span-12 lg:col-span-7 bg-white/40 backdrop-blur-md rounded-[24px] p-stack-md shadow-soft">
+<div class="flex items-center justify-between mb-6">
+<h3 class="font-headline-sm text-headline-sm text-ink-primary">Emotion Engine</h3>
+<div class="flex bg-surface-container-low p-1 rounded-full">
+<button class="emotion-tab px-4 py-1.5 rounded-full font-label-md text-label-md text-ink-primary bg-surface-accent transition-all" onclick="switchEmotionTab(this)">Riêng tôi</button>
+<button class="emotion-tab px-4 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant transition-all" onclick="switchEmotionTab(this)">Riêng bạn</button>
+<button class="emotion-tab px-4 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant transition-all" onclick="switchEmotionTab(this)">Với đối phương</button>
+</div>
+</div>
+<div class="flex flex-col items-center py-4">
+<p class="font-body-lg text-body-lg text-ink-primary mb-8">Hôm nay bạn thấy thế nào?</p>
+<div class="flex flex-wrap justify-center gap-6">
+<button class="group flex flex-col items-center space-y-2">
+<div class="w-16 h-16 rounded-full bg-surface-accent/20 flex items-center justify-center text-ink-primary group-hover:bg-surface-accent transition-all duration-300">
+<span class="material-symbols-outlined !text-3xl" style="font-variation-settings: 'FILL' 1;">sentiment_very_satisfied</span>
+</div>
+<span class="font-label-sm text-label-sm">Hạnh phúc</span>
+</button>
+<button class="group flex flex-col items-center space-y-2">
+<div class="w-16 h-16 rounded-full bg-surface-container-low flex items-center justify-center text-ink-primary group-hover:bg-surface-accent transition-all duration-300">
+<span class="material-symbols-outlined !text-3xl">sentiment_satisfied</span>
+</div>
+<span class="font-label-sm text-label-sm">Bình yên</span>
+</button>
+<button class="group flex flex-col items-center space-y-2">
+<div class="w-16 h-16 rounded-full bg-surface-container-low flex items-center justify-center text-ink-primary group-hover:bg-surface-accent transition-all duration-300">
+<span class="material-symbols-outlined !text-3xl">favorite</span>
+</div>
+<span class="font-label-sm text-label-sm">Được yêu</span>
+</button>
+<button class="group flex flex-col items-center space-y-2">
+<div class="w-16 h-16 rounded-full bg-surface-container-low flex items-center justify-center text-ink-primary group-hover:bg-surface-accent transition-all duration-300">
+<span class="material-symbols-outlined !text-3xl">self_care</span>
+</div>
+<span class="font-label-sm text-label-sm">Cần nghỉ</span>
+</button>
+<button class="group flex flex-col items-center space-y-2">
+<div class="w-16 h-16 rounded-full bg-surface-container-low flex items-center justify-center text-ink-primary group-hover:bg-surface-accent transition-all duration-300">
+<span class="material-symbols-outlined !text-3xl">mood_bad</span>
+</div>
+<span class="font-label-sm text-label-sm">Mệt mỏi</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Shared Savings Dashboard -->
+<section class="col-span-12 lg:col-span-5 bg-surface-text-container rounded-[24px] p-stack-md shadow-soft relative overflow-hidden">
+<div class="relative z-10">
+<div class="flex justify-between items-start mb-6">
+<div class="bg-surface-accent/20 p-2 rounded-lg">
+<span class="material-symbols-outlined text-ink-primary">savings</span>
+</div>
+<span class="font-label-md text-label-md text-primary bg-white/50 px-3 py-1 rounded-full">Tiết kiệm chung</span>
+</div>
+<div class="mb-8">
+<p class="font-body-sm text-body-sm text-primary mb-1">Hiện tại</p>
+<h4 class="font-headline-lg text-headline-lg text-ink-primary">15.000.000đ</h4>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between font-label-md text-label-md text-ink-primary">
+<span>Chuyến đi Đà Lạt</span>
+<span>75%</span>
+</div>
+<div class="w-full bg-outline-variant/30 h-3 rounded-full overflow-hidden">
+<div class="bg-surface-accent h-full rounded-full transition-all duration-1000" style="width: 75%;"></div>
+</div>
+<div class="flex justify-between font-label-sm text-label-sm text-on-surface-variant">
+<span>Đã góp: 15.000.000đ</span>
+<span>Mục tiêu: 20.000.000đ</span>
+</div>
+</div>
+</div>
+<!-- Decorative background shape -->
+<div class="absolute -bottom-10 -right-10 w-40 h-40 bg-surface-accent/10 rounded-full blur-3xl"></div>
+</section>
+<!-- Date Night Planner -->
+<section class="col-span-12 lg:col-span-4 bg-white/40 backdrop-blur-md rounded-[24px] p-stack-md shadow-soft flex flex-col">
+<div class="flex items-center space-x-2 mb-6">
+<span class="material-symbols-outlined text-ink-primary">calendar_today</span>
+<h3 class="font-headline-sm text-headline-sm text-ink-primary">Hẹn hò tuần này</h3>
+</div>
+<div class="flex-1 bg-surface-container-low rounded-xl p-4 border border-ink-primary/5">
+<div class="flex items-start space-x-4">
+<div class="bg-surface-accent text-ink-primary w-12 h-14 rounded-lg flex flex-col items-center justify-center font-bold">
+<span class="text-xs uppercase">Th7</span>
+<span class="text-xl">18</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-ink-primary">Nhà hàng Ý Pasta del Sol</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">19:00 • Quận 1, TP.HCM</p>
+<div class="mt-4 flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-white bg-surface-accent flex items-center justify-center font-bold text-[10px] text-ink-primary">AT</div>
+<div class="w-8 h-8 rounded-full border-2 border-white bg-primary-fixed flex items-center justify-center font-bold text-[10px] text-ink-primary">DH</div>
+</div>
+</div>
+</div>
+</div>
+<button class="mt-4 w-full py-2 font-label-md text-label-md text-ink-primary border border-ink-primary/20 rounded-lg hover:bg-surface-accent transition-colors">
+                    Chi tiết lịch trình
+                </button>
+</section>
+<!-- Memory Spotlight -->
+<section class="col-span-12 lg:col-span-5 bg-surface-text-container rounded-[24px] overflow-hidden shadow-soft group">
+<div class="relative h-48 overflow-hidden">
+<img alt="Hà Giang Trip" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="A breathtaking cinematic landscape of Hà Giang, Vietnam, featuring mist-covered limestone karsts and winding emerald rivers under a soft, diffused morning light. The atmosphere is nostalgic and serene, with a romantic color palette dominated by deep greens and muted teals, perfectly capturing a precious shared memory." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmGZOIJuXayxaoC_cqksAufZucXAxKfjrb9dHF7o8_7uyqWp8IciWXR9_0xXW4agqWo7lYMfkTrvgQJJPLx9tlO6Hy1jN2sYIUDO-OMEobSCZelWyh3dovCIAtxiVjGWwGys3xobFJOuAET-jgLEQXz_wXZqM8jSA-5Vc1fq32oBGanOwDfolHsraiPEkULsaAvTC-Fl1UQfWoYINxx_cWqiz-Eh4-8NHqdCE0lnjj0TN4wqDIbWF8ylzGC334tfCwjt3rrR5wryY"/>
+<div class="absolute inset-0 bg-gradient-to-t from-ink-primary/60 to-transparent"></div>
+<div class="absolute bottom-4 left-4 right-4">
+<span class="bg-surface-accent text-ink-primary font-label-sm text-label-sm px-2 py-1 rounded-md">Kỷ niệm hôm nay</span>
+</div>
+</div>
+<div class="p-stack-md">
+<p class="font-body-md text-body-md italic text-ink-primary leading-relaxed">
+                        "Giữa mây ngàn Hà Giang, ta thấy cả thế giới trong mắt nhau."
+                    </p>
+<div class="mt-4 flex justify-between items-center text-on-surface-variant font-label-sm">
+<span>Chuyến đi Hà Giang, 2023</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-ink-primary">share</span>
+</div>
+</div>
+</section>
+<!-- Secret Note Teaser -->
+<section class="col-span-12 lg:col-span-3 bg-on-tertiary-fixed rounded-[24px] p-stack-md shadow-soft flex flex-col items-center justify-center text-center relative overflow-hidden group">
+<!-- Particle effect background -->
+<div class="absolute inset-0 opacity-20 pointer-events-none">
+<div class="absolute top-2 left-10 w-1 h-1 bg-white rounded-full"></div>
+<div class="absolute top-10 right-5 w-2 h-2 bg-surface-accent rounded-full"></div>
+<div class="absolute bottom-8 left-4 w-1.5 h-1.5 bg-primary-fixed rounded-full"></div>
+</div>
+<div class="relative z-10 mb-4 transform group-hover:scale-110 transition-transform duration-300">
+<div class="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center">
+<span class="material-symbols-outlined !text-3xl text-surface-accent" style="font-variation-settings: 'FILL' 1;">lock</span>
+</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-white mb-2 relative z-10">Hộp bí mật</h3>
+<p class="font-body-sm text-body-sm text-primary-fixed opacity-70 mb-6 relative z-10">Cần 3 ngày nữa để mở khóa lá thư từ quá khứ.</p>
+<div class="w-full bg-white/5 h-2 rounded-full overflow-hidden relative z-10 mb-2">
+<div class="bg-surface-accent h-full rounded-full w-[80%]"></div>
+</div>
+<p class="text-[10px] text-white/40 uppercase tracking-widest relative z-10">Tiến trình: 80%</p>
+</section>
+</div>
+<!-- Footer / Bottom Navigation spacer -->
+<footer class="mt-stack-lg py-8 flex justify-center border-t border-ink-primary/5">
+<p class="font-label-sm text-label-sm text-on-surface-variant opacity-60">© 2024 Duyên - Gìn giữ những khoảnh khắc quý giá.</p>
+</footer>
+</main>
+<!-- Floating Action Button for adding something new -->
+<button class="fixed bottom-10 right-10 w-14 h-14 bg-ink-primary text-white rounded-full shadow-lg flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50">
+<span class="material-symbols-outlined !text-3xl">add</span>
+</button>
+<script>
+        function switchEmotionTab(btn) {
+            const tabs = document.querySelectorAll('.emotion-tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('bg-surface-accent', 'text-ink-primary');
+                tab.classList.add('text-on-surface-variant');
+            });
+            btn.classList.add('bg-surface-accent', 'text-ink-primary');
+            btn.classList.remove('text-on-surface-variant');
+        }
+
+        // Add a subtle parallax effect to the main background on mouse move
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            
+            // Subtle color shift
+            // document.body.style.backgroundColor = `hsl(${215 + x * 5}, 55%, ${81 + y * 2}%)`;
+        });
+
+        // Initialize progress bars animation
+        window.onload = () => {
+            document.querySelectorAll('.transition-all').forEach(el => {
+                // Trigger initial animations if any
+            });
+        };
+    </script>
+</body></html>

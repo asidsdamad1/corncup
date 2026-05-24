@@ -1,0 +1,419 @@
+<!DOCTYPE html><html lang="vi"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Duyên - Daily Emotion Engine</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container": "#eeeeee",
+                    "surface-text-container": "#f2f2f2",
+                    "on-error-container": "#93000a",
+                    "secondary-fixed": "#ffdad9",
+                    "on-surface": "#1a1c1c",
+                    "on-secondary": "#ffffff",
+                    "secondary": "#785556",
+                    "inverse-on-surface": "#f1f1f1",
+                    "background-main": "#b2ccec",
+                    "on-error": "#ffffff",
+                    "secondary-container": "#fdcfcf",
+                    "on-surface-variant": "#43474d",
+                    "tertiary-fixed": "#d9e2ff",
+                    "on-tertiary-container": "#445479",
+                    "inverse-primary": "#afc9e9",
+                    "on-primary-fixed-variant": "#2f4963",
+                    "outline-variant": "#c3c6ce",
+                    "primary-container": "#b2ccec",
+                    "background": "#f9f9f9",
+                    "primary-fixed-dim": "#afc9e9",
+                    "on-secondary-fixed": "#2d1415",
+                    "error-container": "#ffdad6",
+                    "on-tertiary-fixed": "#081a3c",
+                    "on-background": "#1a1c1c",
+                    "outline": "#73777e",
+                    "surface-container-high": "#e8e8e8",
+                    "surface": "#f9f9f9",
+                    "tertiary-fixed-dim": "#b6c6f1",
+                    "surface-accent": "#f5c7c7",
+                    "tertiary-container": "#b9c9f4",
+                    "on-secondary-fixed-variant": "#5e3e3f",
+                    "ink-primary": "#253558",
+                    "inverse-surface": "#2f3131",
+                    "secondary-fixed-dim": "#e9bcbc",
+                    "surface-bright": "#f9f9f9",
+                    "primary-fixed": "#d0e4ff",
+                    "on-primary": "#ffffff",
+                    "surface-container-low": "#f3f3f3",
+                    "on-tertiary-fixed-variant": "#36466a",
+                    "tertiary": "#4e5e83",
+                    "on-primary-container": "#3d5772",
+                    "surface-tint": "#47607c",
+                    "surface-container-highest": "#e2e2e2",
+                    "on-secondary-container": "#795656",
+                    "surface-dim": "#dadada",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-fixed": "#001d35",
+                    "error": "#ba1a1a",
+                    "surface-variant": "#e2e2e2",
+                    "primary": "#47607c"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-desktop": "2.5rem",
+                    "gutter": "1rem",
+                    "stack-sm": "0.5rem",
+                    "stack-md": "1rem",
+                    "stack-lg": "2rem",
+                    "margin-mobile": "1.25rem"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "headline-sm": ["Plus Jakarta Sans"],
+                    "body-lg": ["Be Vietnam Pro"],
+                    "label-md": ["Be Vietnam Pro"],
+                    "headline-lg-mobile": ["Plus Jakarta Sans"],
+                    "body-sm": ["Be Vietnam Pro"],
+                    "body-md": ["Be Vietnam Pro"],
+                    "label-sm": ["Be Vietnam Pro"],
+                    "headline-md": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["26px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .emotion-chart-bar {
+            transition: height 1s ease-out;
+        }
+        .active-tab-indicator {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-panel {
+            background: rgba(242, 242, 242, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(37, 53, 88, 0.1);
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #25355820;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-background-main text-ink-primary font-body-md overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 md:left-64 right-0 z-40 bg-transparent flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4">
+<h1 class="text-headline-lg font-headline-lg text-ink-primary">Duyên</h1>
+<div class="flex gap-4 items-center">
+<button class="hover:opacity-80 transition-opacity active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-ink-primary">lock</span>
+</button>
+<button class="hover:opacity-80 transition-opacity active:scale-95 transition-transform relative">
+<span class="material-symbols-outlined text-ink-primary">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-surface-accent rounded-full border border-background-main"></span>
+</button>
+<img alt="User profile" class="w-8 h-8 rounded-full border-2 border-surface-accent object-cover" data-alt="A close-up portrait of a serene young woman with a soft smile, set against a blurred background of a tranquil blue room. The lighting is soft and warm, highlighting the gentle textures of her hair and the subtle pastel pink tones of her clothing. The overall aesthetic is minimalist, intimate, and professional, reflecting a sense of peace and digital sanctuary." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpcgo8QpOH5S-OV17eOiGfnzgz9cqhC1iWnWczC4PXWvtT_qsF4SpsmWLr6X-LEMpTUEYB6ESV1cY-F6bw0V4p8zZML1aHoG-bNF4emdlbTtR775mNj89mon9YY_GqfRLnC3-zRXUH6__wdEzeaItUOQCgI027ViQK0izNhbJO8XLPupPa_xRnJXZf7EN5p3l4ytM_TydgXl4bMupE77jcKX3ImzYEs5BTv_PiICCgtz8203i8I_plM64eVED5mazXX05Bh7bFRw8">
+</div>
+</header>
+<!-- SideNavBar (Desktop Only) -->
+<nav class="hidden md:flex h-screen w-64 fixed left-0 top-0 flex flex-col p-margin-desktop bg-background-main border-r border-on-surface/10 z-50">
+<div class="text-headline-md font-headline-md text-ink-primary mb-8">Duyên</div>
+<div class="space-y-2 flex-grow">
+<a class="flex items-center gap-3 bg-surface-accent text-ink-primary rounded-lg px-4 py-3 scale-[0.98] transition-transform" href="#">
+<span class="material-symbols-outlined" data-weight="fill" style="font-variation-settings: &quot;FILL&quot; 1;">mood</span>
+<span class="text-label-md font-label-md">Emotion Engine</span>
+</a>
+<a class="flex items-center gap-3 text-ink-primary/70 hover:bg-surface-container-high rounded-lg px-4 py-3 transition-colors" href="#">
+<span class="material-symbols-outlined">timeline</span>
+<span class="text-label-md font-label-md">Memory Timeline</span>
+</a>
+<a class="flex items-center gap-3 text-ink-primary/70 hover:bg-surface-container-high rounded-lg px-4 py-3 transition-colors" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="text-label-md font-label-md">Shared Future</span>
+</a>
+<a class="flex items-center gap-3 text-ink-primary/70 hover:bg-surface-container-high rounded-lg px-4 py-3 transition-colors" href="#">
+<span class="material-symbols-outlined">event</span>
+<span class="text-label-md font-label-md">Date Planner</span>
+</a>
+<a class="flex items-center gap-3 text-ink-primary/70 hover:bg-surface-container-high rounded-lg px-4 py-3 transition-colors" href="#">
+<span class="material-symbols-outlined">key</span>
+<span class="text-label-md font-label-md">Secret Notes</span>
+</a>
+</div>
+<button class="mt-auto w-full py-3 bg-ink-primary text-white rounded-xl font-label-md hover:bg-primary transition-colors flex items-center justify-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-[18px]">add</span>
+            New Memory
+        </button>
+</nav>
+<!-- Main Content Canvas -->
+<main class="pt-24 pb-32 md:pb-12 md:pl-64 min-h-screen">
+<div class="max-w-4xl mx-auto px-margin-mobile md:px-margin-desktop">
+<!-- Segmented Control (Tabs) -->
+<div class="relative flex p-1 mb-stack-lg bg-surface-text-container/50 rounded-full border border-ink-primary/10 overflow-hidden">
+<div class="absolute h-[calc(100%-8px)] top-1 left-1 bg-surface-accent rounded-full active-tab-indicator" id="tab-slider" style="width: 32%;"></div>
+<button class="relative z-10 flex-1 py-3 text-label-md font-label-md text-ink-primary transition-colors text-center" onclick="switchTab(0)">Riêng tôi</button>
+<button class="relative z-10 flex-1 py-3 text-label-md font-label-md text-ink-primary/60 transition-colors text-center" onclick="switchTab(1)">Riêng bạn</button>
+<button class="relative z-10 flex-1 py-3 text-label-md font-label-md text-ink-primary/60 transition-colors text-center" onclick="switchTab(2)">Với đối phương</button>
+</div>
+<!-- Tab Content Area -->
+<div class="space-y-stack-lg" id="tab-content">
+<!-- SECTION 1: Riêng tôi (For Me) - Active by default -->
+<div class="space-y-stack-lg animate-in fade-in slide-in-from-bottom-4 duration-500" id="pane-0">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
+<!-- Mood Selector -->
+<div class="bg-surface-text-container p-6 rounded-[2rem] shadow-sm flex flex-col gap-4 border border-ink-primary/5">
+<h2 class="text-headline-sm font-headline-sm text-ink-primary">Hôm nay thế nào?</h2>
+<div class="grid grid-cols-5 gap-2">
+<button class="w-full aspect-square bg-background-main/30 rounded-2xl flex items-center justify-center text-2xl hover:bg-surface-accent transition-colors">😊</button>
+<button class="w-full aspect-square bg-surface-accent rounded-2xl flex items-center justify-center text-2xl shadow-sm ring-2 ring-ink-primary/5">🥰</button>
+<button class="w-full aspect-square bg-background-main/30 rounded-2xl flex items-center justify-center text-2xl hover:bg-surface-accent transition-colors">😴</button>
+<button class="w-full aspect-square bg-background-main/30 rounded-2xl flex items-center justify-center text-2xl hover:bg-surface-accent transition-colors">😌</button>
+<button class="w-full aspect-square bg-background-main/30 rounded-2xl flex items-center justify-center text-2xl hover:bg-surface-accent transition-colors">🤒</button>
+</div>
+</div>
+<!-- Private Note Card -->
+<div class="bg-surface-accent/60 p-6 rounded-[2rem] shadow-sm flex flex-col gap-3 border border-ink-primary/5 backdrop-blur-sm">
+<div class="flex items-center gap-2 text-ink-primary/70">
+<span class="material-symbols-outlined text-[18px]">lock</span>
+<span class="text-label-sm font-label-sm">Ghi chú riêng tư</span>
+</div>
+<textarea class="w-full flex-grow bg-transparent border-none focus:ring-0 text-body-md font-body-md text-ink-primary placeholder:text-ink-primary/40 resize-none min-h-[100px]" placeholder="Điều gì làm bạn suy nghĩ..."></textarea>
+<button class="self-end px-6 py-2 bg-ink-primary text-white rounded-full text-label-md font-label-md hover:opacity-90 transition-opacity">Lưu tâm sự</button>
+</div>
+</div>
+<!-- Daily Prompt -->
+<div class="bg-surface-text-container p-8 rounded-[2.5rem] border border-ink-primary/5 shadow-sm relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-surface-accent/20 rounded-full -mr-16 -mt-16 blur-3xl"></div>
+<div class="relative z-10 flex flex-col gap-2">
+<span class="text-surface-accent text-headline-sm">✨</span>
+<h3 class="text-headline-sm font-headline-sm text-ink-primary">Suy ngẫm hôm nay</h3>
+<p class="text-body-md font-body-md text-ink-primary/70 italic">"Ba điều bạn cảm thấy biết ơn về đối phương trong ngày hôm nay là gì?"</p>
+</div>
+</div>
+</div>
+<!-- SECTION 2: Riêng bạn (For You) - Partner Status (Hidden by default) -->
+<div class="hidden space-y-stack-lg animate-in fade-in slide-in-from-bottom-4 duration-500" id="pane-1">
+<div class="bg-surface-text-container p-8 rounded-[2.5rem] border border-ink-primary/5 shadow-sm"><div class="flex flex-col md:flex-row items-center gap-8 mb-8">
+  <div class="relative">
+    <img class="w-32 h-32 rounded-full border-4 border-surface-accent p-1 object-cover" data-alt="A stylized portrait of a man looking thoughtful and calm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAplZ0gOcwyTLTfJEfakgCdMG2sBaef0ZFoT5ZvSfuYvBxfA4Yu4E_QdYfiZqhN9QsUqmcLKAMvVjU-fx26FEGW9lyTb7OvN6V4kNYMTWmYXSXdjAkYYopYOxmtntY0g21oTP137k_4_XruPG0lMt4cxEBexUqcJhgnu7E6YzhkGO2QxXvL8xS1OpeN-ZEDRjqzpaXitQfdOulXksKB8z-Tcas4T3szDrVVr8weDAvP0GzlVsOpRUW43O5vtUfTSlT-YWcZ-gk4U8Y">
+    <span class="absolute bottom-1 right-1 bg-green-500 w-6 h-6 rounded-full border-4 border-surface-text-container"></span>
+  </div>
+  <div class="flex-grow text-center md:text-left">
+    <div class="flex items-center justify-center md:justify-start gap-2 mb-2">
+      <h2 class="text-headline-md font-headline-md text-ink-primary">Duy đang cảm thấy</h2>
+      <span class="text-3xl">✨ Yên bình</span>
+    </div>
+    <p class="text-body-md font-body-md text-ink-primary/60 mb-6 italic">"Vừa hoàn thành một dự án lớn, cảm thấy thật nhẹ nhõm...""</p>
+    <div class="flex flex-wrap gap-3 justify-center md:justify-start">
+      <button class="px-4 py-2 bg-surface-accent rounded-full text-ink-primary text-label-md font-label-md flex items-center gap-2 hover:scale-105 transition-transform">
+        <span class="material-symbols-outlined text-[18px]">favorite</span> Gửi yêu thương
+      </button>
+    </div>
+  </div>
+</div>
+<div class="bg-background-main/20 p-6 rounded-2xl border border-ink-primary/5">
+  <div class="flex items-center gap-2 text-ink-primary/70 mb-3">
+    <span class="material-symbols-outlined text-[18px]">visibility</span>
+    <span class="text-label-sm font-label-sm uppercase tracking-wider">Ghi chú từ đối phương</span>
+  </div>
+  <p class="text-body-md font-body-md text-ink-primary/80">Hôm nay mình thấy rất thoải mái, muốn dành thời gian buổi tối để xem phim cùng nhau...</p>
+</div></div>
+</div>
+<!-- SECTION 3: Với đối phương (For Us) - Shared space (Hidden by default) -->
+<div class="hidden space-y-stack-lg animate-in fade-in slide-in-from-bottom-4 duration-500" id="pane-2">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
+<!-- Combined Vibe Score -->
+<div class="bg-ink-primary p-8 rounded-[2.5rem] shadow-xl flex flex-col items-center justify-center text-center relative overflow-hidden group">
+<div class="absolute inset-0 bg-gradient-to-br from-surface-accent/20 to-transparent opacity-50"></div>
+<div class="relative z-10">
+<span class="text-surface-accent text-label-md font-label-md uppercase tracking-widest mb-4 block">Vibe của chúng mình</span>
+<div class="text-8xl font-headline-lg text-white mb-2 group-hover:scale-110 transition-transform duration-500">92</div>
+<div class="flex gap-1 mb-4 justify-center">
+<span class="material-symbols-outlined text-surface-accent" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+<span class="material-symbols-outlined text-surface-accent" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+<span class="material-symbols-outlined text-surface-accent" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+<span class="material-symbols-outlined text-surface-accent" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+<span class="material-symbols-outlined text-surface-accent" style="font-variation-settings: &quot;FILL&quot; 1;">star_half</span>
+</div>
+<p class="text-white/80 font-body-sm">Đang ở trạng thái kết nối rất tốt!</p>
+</div>
+</div>
+<!-- Shared Goal -->
+<div class="bg-surface-text-container p-8 rounded-[2.5rem] border border-ink-primary/5 shadow-sm flex flex-col">
+<h3 class="text-headline-sm font-headline-sm text-ink-primary mb-4">Mục tiêu chung</h3>
+<div class="flex-grow flex flex-col gap-4">
+<div class="flex items-start gap-4 bg-background-main/20 p-4 rounded-2xl">
+<div class="bg-surface-accent w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-ink-primary">restaurant</span>
+</div>
+<div>
+<p class="text-label-md font-label-md text-ink-primary">Nấu ăn cùng nhau</p>
+<p class="text-body-sm font-body-sm text-ink-primary/60">Hôm nay, 19:00</p>
+</div>
+<div class="ml-auto">
+<span class="material-symbols-outlined text-surface-accent" style="font-variation-settings: &quot;FILL&quot; 1;">check_circle</span>
+</div>
+</div>
+<div class="flex items-start gap-4 bg-background-main/20 p-4 rounded-2xl opacity-60">
+<div class="bg-ink-primary/10 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-ink-primary">park</span>
+</div>
+<div>
+<p class="text-label-md font-label-md text-ink-primary">Đi dạo hồ Tây</p>
+<p class="text-body-sm font-body-sm text-ink-primary/60">Cuối tuần này</p>
+</div>
+<div class="ml-auto">
+<span class="material-symbols-outlined text-ink-primary/20">radio_button_unchecked</span>
+</div>
+</div>
+</div>
+<button class="mt-4 w-full py-2 border-2 border-dashed border-ink-primary/20 rounded-xl text-ink-primary/60 text-label-md font-label-md hover:border-surface-accent hover:text-ink-primary transition-all">
+                                + Thêm hoạt động
+                            </button>
+</div>
+</div>
+<div class="bg-surface-text-container p-8 rounded-[2.5rem] border border-ink-primary/5 shadow-sm">
+  <div class="flex justify-between items-center mb-4">
+    <div class="flex flex-col">
+      <h3 class="text-headline-sm font-headline-sm text-ink-primary">Không gian chung</h3>
+      <span class="text-label-sm font-label-sm text-ink-primary/50">Cả hai cùng có thể chỉnh sửa</span>
+    </div>
+    <button class="flex items-center gap-2 px-4 py-2 bg-surface-accent/30 text-ink-primary rounded-full text-label-md font-label-md hover:bg-surface-accent transition-colors">
+      <span class="material-symbols-outlined text-[18px]">edit</span> Sửa
+    </button>
+  </div>
+  <div class="bg-background-main/10 p-6 rounded-2xl border-2 border-dashed border-ink-primary/10 min-h-[150px] flex items-center justify-center">
+    <p class="text-body-md font-body-md text-ink-primary/40 italic">Chưa có nội dung thảo luận chung. Hãy bắt đầu xây dựng tương lai cùng nhau!</p>
+  </div>
+</div></div>
+<!-- Trends Chart (Common to all tabs) -->
+<div class="bg-surface-text-container/80 backdrop-blur-md p-8 rounded-[2.5rem] border border-ink-primary/5 shadow-sm">
+<div class="flex justify-between items-center mb-8">
+<div>
+<h3 class="text-headline-sm font-headline-sm text-ink-primary">Xu hướng cảm xúc</h3>
+<p class="text-body-sm font-body-sm text-ink-primary/60">Thống kê 7 ngày qua</p>
+</div>
+<span class="material-symbols-outlined text-ink-primary/40">more_horiz</span>
+</div>
+<div class="flex items-end justify-between h-40 gap-2 px-2">
+<!-- Bars -->
+<div class="flex flex-col items-center gap-2 w-full group">
+<div class="w-full bg-surface-accent rounded-t-lg h-[40%] opacity-40 group-hover:opacity-100 transition-opacity"></div>
+<span class="text-label-sm font-label-sm text-ink-primary/40">T2</span>
+</div>
+<div class="flex flex-col items-center gap-2 w-full group">
+<div class="w-full bg-surface-accent rounded-t-lg h-[65%] opacity-40 group-hover:opacity-100 transition-opacity"></div>
+<span class="text-label-sm font-label-sm text-ink-primary/40">T3</span>
+</div>
+<div class="flex flex-col items-center gap-2 w-full group">
+<div class="w-full bg-surface-accent rounded-t-lg h-[50%] opacity-40 group-hover:opacity-100 transition-opacity"></div>
+<span class="text-label-sm font-label-sm text-ink-primary/40">T4</span>
+</div>
+<div class="flex flex-col items-center gap-2 w-full group">
+<div class="w-full bg-surface-accent rounded-t-lg h-[85%] opacity-40 group-hover:opacity-100 transition-opacity"></div>
+<span class="text-label-sm font-label-sm text-ink-primary/40">T5</span>
+</div>
+<div class="flex flex-col items-center gap-2 w-full group">
+<div class="w-full bg-surface-accent rounded-t-lg h-[70%] opacity-40 group-hover:opacity-100 transition-opacity"></div>
+<span class="text-label-sm font-label-sm text-ink-primary/40">T6</span>
+</div>
+<div class="flex flex-col items-center gap-2 w-full group">
+<div class="w-full bg-surface-accent rounded-t-lg h-[95%] opacity-100 shadow-lg relative">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-ink-primary text-white text-[10px] px-2 py-1 rounded">Vui</div>
+</div>
+<span class="text-label-sm font-label-sm text-ink-primary font-bold">T7</span>
+</div>
+<div class="flex flex-col items-center gap-2 w-full group">
+<div class="w-full bg-surface-accent rounded-t-lg h-[60%] opacity-40 group-hover:opacity-100 transition-opacity"></div>
+<span class="text-label-sm font-label-sm text-ink-primary/40">CN</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-4 pt-2 bg-background-main shadow-sm rounded-t-xl">
+<button class="flex flex-col items-center justify-center text-on-primary-container opacity-60 hover:bg-surface-container-low transition-colors px-4 py-1 rounded-lg">
+<span class="material-symbols-outlined">home</span>
+<span class="text-label-sm font-label-sm">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-ink-primary relative after:content-[''] after:w-1 after:h-1 after:bg-surface-accent after:rounded-full after:mt-1 translate-y-[-2px] transition-all px-4 py-1 rounded-lg">
+<span class="material-symbols-outlined" data-weight="fill" style="font-variation-settings: &quot;FILL&quot; 1;">mood</span>
+<span class="text-label-sm font-label-sm">Emotions</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-primary-container opacity-60 hover:bg-surface-container-low transition-colors px-4 py-1 rounded-lg">
+<span class="material-symbols-outlined">auto_stories</span>
+<span class="text-label-sm font-label-sm">Memory</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-primary-container opacity-60 hover:bg-surface-container-low transition-colors px-4 py-1 rounded-lg">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="text-label-sm font-label-sm">Planner</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-primary-container opacity-60 hover:bg-surface-container-low transition-colors px-4 py-1 rounded-lg">
+<span class="material-symbols-outlined">lock</span>
+<span class="text-label-sm font-label-sm">Secret</span>
+</button>
+</nav>
+<script>
+        function switchTab(index) {
+            const slider = document.getElementById('tab-slider');
+            const buttons = document.querySelectorAll('.relative.z-10.flex-1');
+            const panes = [document.getElementById('pane-0'), document.getElementById('pane-1'), document.getElementById('pane-2')];
+
+            // Move slider
+            slider.style.left = `calc(${index * 33.33}% + 4px)`;
+            
+            // Update button styles
+            buttons.forEach((btn, i) => {
+                if(i === index) {
+                    btn.classList.remove('text-ink-primary/60');
+                    btn.classList.add('text-ink-primary');
+                } else {
+                    btn.classList.add('text-ink-primary/60');
+                    btn.classList.remove('text-ink-primary');
+                }
+            });
+
+            // Switch content panes
+            panes.forEach((pane, i) => {
+                if(i === index) {
+                    pane.classList.remove('hidden');
+                    pane.classList.add('animate-in', 'fade-in', 'slide-in-from-bottom-4');
+                } else {
+                    pane.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+
+
+</body></html>

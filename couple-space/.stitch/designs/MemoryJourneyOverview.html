@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Duyên - Tổng quan Hành trình</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Fonts: Be Vietnam Pro & Plus Jakarta Sans -->
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&amp;family=Plus+Jakarta+Sans:ital,wght@0,600;0,700;1,700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "outline-variant": "#c3c6ce",
+                    "tertiary-fixed": "#d9e2ff",
+                    "primary": "#47607c",
+                    "on-surface-variant": "#43474d",
+                    "primary-fixed": "#d0e4ff",
+                    "on-error-container": "#93000a",
+                    "tertiary-container": "#b9c9f4",
+                    "on-secondary": "#ffffff",
+                    "outline": "#73777e",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-variant": "#e2e2e2",
+                    "surface-container-highest": "#e2e2e2",
+                    "tertiary-fixed-dim": "#b6c6f1",
+                    "ink-primary": "#253558",
+                    "error": "#ba1a1a",
+                    "surface-container-high": "#e8e8e8",
+                    "surface": "#f9f9f9",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-fixed-variant": "#5e3e3f",
+                    "on-primary": "#ffffff",
+                    "secondary-fixed": "#ffdad9",
+                    "error-container": "#ffdad6",
+                    "on-secondary-fixed": "#2d1415",
+                    "secondary-fixed-dim": "#e9bcbc",
+                    "tertiary": "#4e5e83",
+                    "on-primary-container": "#3d5772",
+                    "surface-tint": "#47607c",
+                    "background-main": "#b2ccec",
+                    "on-tertiary-container": "#445479",
+                    "on-tertiary-fixed": "#081a3c",
+                    "background": "#f9f9f9",
+                    "primary-fixed-dim": "#afc9e9",
+                    "on-primary-fixed-variant": "#2f4963",
+                    "secondary-container": "#fdcfcf",
+                    "inverse-on-surface": "#f1f1f1",
+                    "surface-container": "#eeeeee",
+                    "on-secondary-container": "#795656",
+                    "on-tertiary-fixed-variant": "#36466a",
+                    "on-background": "#1a1c1c",
+                    "on-error": "#ffffff",
+                    "inverse-surface": "#2f3131",
+                    "secondary": "#785556",
+                    "surface-container-low": "#f3f3f3",
+                    "surface-text-container": "#f2f2f2",
+                    "surface-accent": "#f5c7c7",
+                    "primary-container": "#b2ccec",
+                    "surface-dim": "#dadada",
+                    "surface-bright": "#f9f9f9",
+                    "on-primary-fixed": "#001d35",
+                    "on-surface": "#1a1c1c",
+                    "inverse-primary": "#afc9e9"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-sm": "0.5rem",
+                    "margin-mobile": "1.25rem",
+                    "margin-desktop": "2.5rem",
+                    "gutter": "1rem",
+                    "stack-lg": "2rem",
+                    "stack-md": "1rem"
+            },
+            "fontFamily": {
+                    "label-md": ["Be Vietnam Pro"],
+                    "label-sm": ["Be Vietnam Pro"],
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "headline-lg-mobile": ["Plus Jakarta Sans"],
+                    "body-sm": ["Be Vietnam Pro"],
+                    "headline-sm": ["Plus Jakarta Sans"],
+                    "body-lg": ["Be Vietnam Pro"],
+                    "body-md": ["Be Vietnam Pro"]
+            },
+            "fontSize": {
+                    "label-md": ["14px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["26px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .soft-shadow {
+            shadow-color: rgba(37, 53, 88, 0.08);
+            box-shadow: 0 4px 15px 0 rgba(37, 53, 88, 0.08);
+        }
+        .active-dot::after {
+            content: '';
+            display: block;
+            width: 4px;
+            height: 4px;
+            background-color: #f5c7c7;
+            border-radius: 50%;
+            margin: 2px auto 0;
+        }
+        body {
+            background-color: #b2ccec;
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-background selection:bg-surface-accent/30">
+<!-- Top AppBar (Mobile) -->
+<header class="md:hidden flex justify-between items-center w-full px-margin-mobile py-4 bg-background-main sticky top-0 z-50">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-primary-fixed italic">Duyên</h1>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-on-primary-fixed">notifications</span>
+<span class="material-symbols-outlined text-on-primary-fixed">account_circle</span>
+</div>
+</header>
+<!-- Side Navigation Bar (Desktop) -->
+<nav class="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 bg-background-main border-r border-on-primary-fixed/10 p-stack-md space-y-stack-md z-50">
+<div class="mb-stack-lg px-2 pt-4">
+<h1 class="font-headline-md text-headline-md text-on-primary-fixed">Duyên</h1>
+<p class="font-label-sm text-label-sm text-on-primary-fixed opacity-70">Digital Sanctuary</p>
+</div>
+<div class="flex flex-col space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-fixed/80 hover:bg-surface-accent/50 rounded-xl transition-all duration-200" href="#">
+<span class="material-symbols-outlined">favorite</span>
+<span class="font-label-md text-label-md">Emotions</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-surface-accent text-on-primary-fixed rounded-xl font-bold shadow-sm translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">timeline</span>
+<span class="font-label-md text-label-md">Hành trình</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-fixed/80 hover:bg-surface-accent/50 rounded-xl transition-all duration-200" href="#">
+<span class="material-symbols-outlined">auto_awesome</span>
+<span class="font-label-md text-label-md">Future</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-fixed/80 hover:bg-surface-accent/50 rounded-xl transition-all duration-200" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-label-md text-label-md">Dates</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-fixed/80 hover:bg-surface-accent/50 rounded-xl transition-all duration-200" href="#">
+<span class="material-symbols-outlined">lock</span>
+<span class="font-label-md text-label-md">Secrets</span>
+</a>
+</div>
+<div class="mt-auto flex items-center gap-3 p-2 bg-surface-container-low rounded-xl">
+<div class="w-10 h-10 rounded-full bg-surface-accent flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">diversity_1</span>
+</div>
+<div class="overflow-hidden">
+<p class="font-label-md text-label-md truncate">Chúng mình</p>
+<p class="text-[10px] opacity-60">Couple Avatar</p>
+</div>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="md:ml-64 min-h-screen px-margin-mobile md:px-margin-desktop py-stack-lg">
+<!-- Header Section -->
+<header class="mb-stack-lg">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h2 class="font-headline-lg text-headline-lg md:text-headline-lg text-ink-primary">Hành trình tình yêu</h2>
+<p class="font-body-md text-body-md text-primary opacity-80 mt-1">Ghi dấu những bước chân ta cùng đi qua.</p>
+</div>
+<div class="inline-flex items-center gap-2 bg-surface-accent px-4 py-2 rounded-full soft-shadow">
+<span class="material-symbols-outlined text-ink-primary" style="font-variation-settings: 'FILL' 1;">explore</span>
+<span class="font-label-md text-label-md text-ink-primary">12 Chuyến đi</span>
+</div>
+</div>
+</header>
+<!-- Bento Grid / Cards -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- Trip Card 1: Hà Giang -->
+<article class="group bg-surface rounded-xl overflow-hidden soft-shadow transition-transform duration-300 hover:-translate-y-1">
+<div class="relative h-56 overflow-hidden">
+<img alt="Hà Giang Trip" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="A panoramic landscape of the rolling lush green mountains of Ha Giang, Vietnam during the golden hour. Soft misty clouds weave between the jagged peaks. The lighting is warm and ethereal, casting long shadows across the terraced fields. A winding road snakes through the valley, suggesting adventure and romantic solitude in a serene, natural sanctuary." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAB28tTLNTsC-54Q88lQ1-p3iUTQS_px3WaE8veFLiJT_Fc6jKe8wyQInuujnYyi0LRdGL0HAQmQWaoLK2bzWUCLb99aFvrGppCY-WYT3MvemtXd5-Qa4w1MaHlZthvvOOSiqqToY3NZrWOOWrn2Y9PtQaIoKj-61uGeqQvFsYYMNK-ppvp6rCH2iRphBJn9cQ9MkLaSfs38lz1gziBg6MFm5a32Z9d8Ct-9uI14ZeBz3pqfLzn78VSa1Dx89MC3oDM7qLMj0N7V-w"/>
+<div class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full">
+<span class="font-label-sm text-label-sm text-primary">04/2026</span>
+</div>
+</div>
+<div class="p-5 border-b border-outline-variant/10">
+<h3 class="font-headline-sm text-headline-sm text-ink-primary mb-2">Hà Giang</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant italic line-clamp-2 leading-relaxed">
+                        "Giữa mây trời Đông Bắc, mình tựa vai nhau ngắm những nương ngô xanh ngắt."
+                    </p>
+</div>
+<div class="p-4 bg-surface-container-low flex justify-between items-center">
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-primary-fixed overflow-hidden">
+<span class="material-symbols-outlined text-xs flex items-center justify-center h-full">person</span>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-secondary-fixed overflow-hidden">
+<span class="material-symbols-outlined text-xs flex items-center justify-center h-full">person_4</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-primary/40 group-hover:text-primary transition-colors">arrow_forward</span>
+</div>
+</article>
+<!-- Trip Card 2: Phú Quốc -->
+<article class="group bg-surface rounded-xl overflow-hidden soft-shadow transition-transform duration-300 hover:-translate-y-1">
+<div class="relative h-56 overflow-hidden">
+<img alt="Phú Quốc Trip" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="A wide-angle shot of a serene tropical beach in Phu Quoc at sunset. The sky is painted in soft pastel pinks and oranges, reflecting onto the calm turquoise water. Tall, slender palm trees lean towards the shore. The atmosphere is peaceful and romantic, with a soft-focus aesthetic that evokes a feeling of calm immersion in a digital sanctuary." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGiGYaKsl1yWkl9NBh7-pGCoY8XnXgqXuLN6C9-RhXMdnN_ZVoqOM-vuy0r-9Y3TvcFKFDxDDWdgo1pQNKcpRJVZdWrySHAfUL5E5itvMioyWbUJdYei7D1cfW4l22VznPgShGWhosi4w2Wda6VVwSEQkVuPPy7cR1o2RhriQSxogaZ6xONzRwRpDjg34F38AUY5WINaT3AtOo50RIwYsfxaAk7iQkdR9p3Jye6QWJqWHSEZ0rcnh2AoIA4l7NPxcs9pDINaFDDpI"/>
+<div class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full">
+<span class="font-label-sm text-label-sm text-primary">12/2025</span>
+</div>
+</div>
+<div class="p-5 border-b border-outline-variant/10">
+<h3 class="font-headline-sm text-headline-sm text-ink-primary mb-2">Phú Quốc</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant italic line-clamp-2 leading-relaxed">
+                        "Hoàng hôn nhuộm tím biển khơi, và đôi mắt em là cả một bầu trời."
+                    </p>
+</div>
+<div class="p-4 bg-surface-container-low flex justify-between items-center">
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-primary-fixed overflow-hidden">
+<span class="material-symbols-outlined text-xs flex items-center justify-center h-full">person</span>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-secondary-fixed overflow-hidden">
+<span class="material-symbols-outlined text-xs flex items-center justify-center h-full">person_4</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-primary/40 group-hover:text-primary transition-colors">arrow_forward</span>
+</div>
+</article>
+<!-- Trip Card 3: Đà Lạt -->
+<article class="group bg-surface rounded-xl overflow-hidden soft-shadow transition-transform duration-300 hover:-translate-y-1">
+<div class="relative h-56 overflow-hidden">
+<img alt="Đà Lạt Trip" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="A cozy, misty pine forest in Dalat, Vietnam. Soft, cool morning light filters through the tall trees, creating long, hazy rays. The ground is covered in a carpet of dry pine needles. The mood is nostalgic and intimate, using a palette of deep forest greens and soft light grays to emphasize structured elegance and quiet growth." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBo1xa7EHgqwvYw5z03ddfiqBKSIthtnBZ2qzjbkEGQR_m3lFnnLeNibohRVFp04n_E5c-W8rQLLrGZrfc3phKNiO549iKrXCXFCTfeG-w3Z2bD1Hh7PpUX8oJLOJ2x6UPMKyVzcdYPg8UzHf0GGgYbQJP0rcU30ZCZDcz04LAuF09MjQhY-Ozqniz-hVgYFwLwn3x84LhoVWHiUO5QtmnGgB6IhD3DjLm8Psau_lS9GWj8WHisyETKdgquHKSGccCarSgvws4yrQc"/>
+<div class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full">
+<span class="font-label-sm text-label-sm text-primary">08/2024</span>
+</div>
+</div>
+<div class="p-5 border-b border-outline-variant/10">
+<h3 class="font-headline-sm text-headline-sm text-ink-primary mb-2">Đà Lạt</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant italic line-clamp-2 leading-relaxed">
+                        "Những buổi sáng lạnh tê tái, chỉ cần một cái nắm tay là ấm cả lòng."
+                    </p>
+</div>
+<div class="p-4 bg-surface-container-low flex justify-between items-center">
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-primary-fixed overflow-hidden">
+<span class="material-symbols-outlined text-xs flex items-center justify-center h-full">person</span>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-secondary-fixed overflow-hidden">
+<span class="material-symbols-outlined text-xs flex items-center justify-center h-full">person_4</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-primary/40 group-hover:text-primary transition-colors">arrow_forward</span>
+</div>
+</article>
+<!-- Add New Memory Card (Interactive) -->
+<button class="group relative min-h-[300px] bg-white/20 border-2 border-dashed border-primary/30 rounded-xl flex flex-col items-center justify-center transition-all hover:bg-white/40 hover:border-primary/50 cursor-pointer">
+<div class="w-16 h-16 rounded-full bg-surface-accent flex items-center justify-center mb-4 transition-transform group-hover:scale-110">
+<span class="material-symbols-outlined text-ink-primary text-3xl">add</span>
+</div>
+<span class="font-headline-sm text-headline-sm text-ink-primary">Thêm kỷ niệm mới</span>
+<p class="font-body-sm text-body-sm text-primary mt-2 opacity-70">Ghi lại chương tiếp theo của chúng mình</p>
+</button>
+</section>
+<!-- Emotional Journey Progress (Bottom Section) -->
+<section class="mt-stack-lg bg-surface-text-container/80 backdrop-blur-md rounded-2xl p-6 border border-on-primary-fixed/5">
+<div class="flex items-center gap-4 mb-6">
+<div class="p-3 bg-secondary-container rounded-xl">
+<span class="material-symbols-outlined text-on-secondary-container" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm text-ink-primary">Tiến độ Hành trình</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Thành tựu cặp đôi tháng này</p>
+</div>
+</div>
+<div class="space-y-4">
+<div>
+<div class="flex justify-between mb-2">
+<span class="font-label-md text-label-md text-primary">Khám phá 63 tỉnh thành</span>
+<span class="font-label-md text-label-md text-primary">12/63</span>
+</div>
+<div class="h-3 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-surface-accent transition-all duration-1000" style="width: 19%;"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between mb-2">
+<span class="font-label-md text-label-md text-primary">Kho ảnh kỷ niệm</span>
+<span class="font-label-md text-label-md text-primary">840/1000</span>
+</div>
+<div class="h-3 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-surface-accent transition-all duration-1000" style="width: 84%;"></div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- FAB for Mobile -->
+<button class="md:hidden fixed bottom-24 right-6 w-14 h-14 bg-surface-accent text-ink-primary rounded-full shadow-lg flex items-center justify-center active:scale-90 transition-transform z-40">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+<!-- Bottom Navigation Bar (Mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-background-main flex justify-around items-center py-3 px-4 z-50">
+<a class="flex flex-col items-center gap-1 text-on-primary-fixed opacity-70" href="#">
+<span class="material-symbols-outlined">favorite</span>
+<span class="font-label-sm text-[10px]">Emotions</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-primary-fixed font-bold active-dot" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">timeline</span>
+<span class="font-label-sm text-[10px]">Hành trình</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-primary-fixed opacity-70" href="#">
+<span class="material-symbols-outlined">auto_awesome</span>
+<span class="font-label-sm text-[10px]">Future</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-primary-fixed opacity-70" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-label-sm text-[10px]">Dates</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-primary-fixed opacity-70" href="#">
+<span class="material-symbols-outlined">lock</span>
+<span class="font-label-sm text-[10px]">Secrets</span>
+</a>
+</nav>
+<script>
+        // Micro-interactions for cards
+        document.querySelectorAll('article').forEach(card => {
+            card.addEventListener('mousedown', () => {
+                card.style.transform = 'scale(0.98)';
+            });
+            card.addEventListener('mouseup', () => {
+                card.style.transform = '';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = '';
+            });
+        });
+
+        // Simple Fade-in for cards on load
+        window.addEventListener('DOMContentLoaded', () => {
+            const items = document.querySelectorAll('article, button.group');
+            items.forEach((item, index) => {
+                item.style.opacity = '0';
+                item.style.transform = 'translateY(20px)';
+                item.style.transition = `all 0.5s ease ${index * 0.1}s`;
+                
+                setTimeout(() => {
+                    item.style.opacity = '1';
+                    item.style.transform = 'translateY(0)';
+                }, 100);
+            });
+        });
+    </script>
+</body></html>

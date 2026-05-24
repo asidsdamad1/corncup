@@ -1,0 +1,85 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Be+Vietnam+Pro:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap");
+@import "tailwindcss";
+
+/* Fonts */
+
+@theme {
+  /* Brand Colors */
+  --color-background-main: #b2ccec;
+  --color-surface-accent: #f5c7c7;
+  --color-surface-text-container: #f2f2f2;
+  --color-ink-primary: #253558;
+  --color-primary: #47607c;
+  --color-primary-container: #b2ccec;
+  --color-primary-fixed: #d0e4ff;
+  --color-primary-fixed-dim: #afc9e9;
+  --color-on-primary: #ffffff;
+  --color-on-primary-fixed: #001d35;
+  --color-on-primary-container: #3d5772;
+  --color-secondary: #785556;
+  --color-secondary-container: #fdcfcf;
+  --color-tertiary: #4e5e83;
+  --color-tertiary-container: #b9c9f4;
+  --color-tertiary-fixed: #d9e2ff;
+  --color-on-tertiary: #ffffff;
+  --color-on-tertiary-fixed: #081a3c;
+  --color-on-tertiary-container: #445479;
+  --color-surface: #f9f9f9;
+  --color-surface-container: #eeeeee;
+  --color-surface-container-low: #f3f3f3;
+  --color-surface-container-high: #e8e8e8;
+  --color-surface-variant: #e2e2e2;
+  --color-on-surface: #1a1c1c;
+  --color-on-surface-variant: #43474d;
+  --color-outline: #73777e;
+  --color-outline-variant: #c3c6ce;
+  --color-error: #ba1a1a;
+
+  /* Spacing tokens */
+  --spacing-stack-lg: 2rem;
+  --spacing-stack-md: 1rem;
+  --spacing-gutter: 1rem;
+  --spacing-stack-sm: 0.5rem;
+  --spacing-margin-mobile: 1.25rem;
+  --spacing-margin-desktop: 2.5rem;
+}
+
+body {
+  background-color: var(--color-background-main);
+  color: var(--color-ink-primary);
+  font-family: "Be Vietnam Pro", sans-serif;
+  overflow-x: hidden;
+}
+
+.font-headline,
+.font-headline-lg,
+.font-headline-md,
+.font-headline-sm,
+.font-headline-lg-mobile {
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.font-body-md,
+.font-body-lg,
+.font-body-sm,
+.font-label-md,
+.font-label-sm {
+  font-family: "Be Vietnam Pro", sans-serif;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+  vertical-align: middle;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--color-outline-variant);
+  border-radius: 999px;
+}
