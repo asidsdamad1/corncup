@@ -9,7 +9,7 @@ export const NavBar: React.FC<NavBarProps> = ({ activeHref = "/" }) => {
   return (
     <>
       {/* Side Navigation Bar (Desktop) */}
-      <aside className="h-screen w-64 fixed left-0 top-0 bg-[rgba(255,255,255,0.2)] backdrop-blur-xl border-r border-white/40 shadow-[4px_0_32px_rgba(37,53,88,0.05)] rounded-r-[2.5rem] hidden lg:flex flex-col py-10 px-5 z-50 transition-all">
+      <aside className="h-screen w-64 fixed left-0 top-0 bg-[rgba(255, 255, 255, 0.2)] backdrop-blur-xl border-r border-white/40 shadow-[4px_0_32px_rgba(37,53,88,0.05)] rounded-r-[2.5rem] hidden lg:flex flex-col py-10 px-5 z-50 transition-all">
         <div className="mb-12 px-3 flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-surface-accent flex items-center justify-center shadow-sm">
             <span className="material-symbols-outlined text-ink-primary" style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
@@ -26,11 +26,10 @@ export const NavBar: React.FC<NavBarProps> = ({ activeHref = "/" }) => {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center space-x-3 px-4 py-3.5 rounded-2xl transition-all duration-300 ${
-                  isActive
-                    ? "bg-surface-accent text-ink-primary font-bold shadow-sm scale-100"
-                    : "text-ink-primary/70 hover:bg-surface-accent/30 hover:text-ink-primary hover:scale-[1.02]"
-                }`}
+                className={`flex items-center space-x-3 px-4 py-3.5 rounded-2xl transition-all duration-300 ${isActive
+                  ? "bg-surface-accent text-ink-primary font-bold shadow-sm scale-100"
+                  : "text-ink-primary/70 hover:bg-surface-accent/30 hover:text-ink-primary hover:scale-[1.02]"
+                  }`}
               >
                 <span className="material-symbols-outlined" style={{ fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0" }}>{item.icon}</span>
                 <span className="font-label-md text-label-md">{item.label}</span>
@@ -52,9 +51,8 @@ export const NavBar: React.FC<NavBarProps> = ({ activeHref = "/" }) => {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center gap-1 ${
-                isActive ? "text-ink-primary font-bold relative after:content-[''] after:block after:w-1.5 after:h-1.5 after:bg-surface-accent after:rounded-full after:mt-0.5" : "text-on-primary-fixed opacity-70"
-              }`}
+              className={`flex flex-col items-center gap-1 ${isActive ? "text-ink-primary font-bold relative after:content-[''] after:block after:w-1.5 after:h-1.5 after:bg-surface-accent after:rounded-full after:mt-0.5" : "text-on-primary-fixed opacity-70"
+                }`}
             >
               <span className="material-symbols-outlined" style={{ fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0" }}>{item.icon}</span>
               <span className="font-label-sm text-[10px]">{item.label}</span>
