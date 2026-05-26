@@ -28,7 +28,122 @@ export interface SecretNote {
   isLocked: boolean;
   progressPercent: number;
   category: string;
+  icon?: string;
+  coverImage?: string;
+  coverImageAlt?: string;
+  tags?: string[];
+  isTextOnly?: boolean;
 }
+
+export interface FeaturedCapsule {
+  title: string;
+  description: string;
+  countdownDays: number;
+  countdownHours: number;
+  countdownMinutes: number;
+}
+
+export const featuredCapsule: FeaturedCapsule = {
+  title: "Món quà kỷ niệm 5 năm",
+  description:
+    "Một bức thư tay và những tấm ảnh bí mật chúng mình chụp trong chuyến đi Phú Quốc, dành riêng cho Minh của năm 2026.",
+  countdownDays: 14,
+  countdownHours: 22,
+  countdownMinutes: 56,
+};
+
+// SECRET NOTES
+export const secretNotes: SecretNote[] = [
+  // Pending / Locked
+  {
+    id: "sn-1",
+    title: "Lời hứa cho tương lai",
+    previewText: "Gửi gắm một lời hứa nhỏ...",
+    unlockDate: "12.04.2024",
+    isLocked: true,
+    progressPercent: 80,
+    category: "Tình cảm",
+    icon: "favorite",
+  },
+  {
+    id: "sn-2",
+    title: "Chuyến đi trong mơ",
+    previewText: "Ước mơ về Thụy Sĩ cùng anh...",
+    unlockDate: "30.06.2024",
+    isLocked: true,
+    progressPercent: 40,
+    category: "Du lịch",
+    icon: "flight",
+  },
+  {
+    id: "sn-3",
+    title: "Ngôi nhà nhỏ",
+    previewText: "Màu sơn chúng mình từng chọn...",
+    unlockDate: "15.09.2024",
+    isLocked: true,
+    progressPercent: 60,
+    category: "Tương lai",
+    icon: "home",
+  },
+  // Unlocked memories
+  {
+    id: "sn-4",
+    title: "Valentine Đầu Tiên",
+    previewText:
+      "Anh nhớ mãi buổi tối hôm đó, cơn mưa bất chợt khiến chúng mình phải trú tạm dưới mái hiên cũ. Đó là lúc anh nhận ra...",
+    unlockDate: "14.02.2023",
+    isLocked: false,
+    progressPercent: 100,
+    category: "Đã mở",
+    coverImage:
+      "https://lh3.googleusercontent.com/aida-public/AB6AXuCgokIbzGBbwNPpFQYoLir7zjEuOPiI1knClUMCM6K3ZsJ864uWG5jgnuAyfvFCZjurBq5xJx5B-NNogE8a7P5bpgDHEiOvBQH-YDTnf_X5KSZKIaiKKlkAkKqj_na60suPI8nwZdrtNRrkKxoZe2pdARDewR0PXKzvyrofQEXeWJyyJWgwdDcCtxElgguZ0P9hcUkjfyPubngCrmwCKB10pcpWFxwzqv2aG0E51AejdL4S1XgBvW0w1DnrFhno1XomqmZBr9FusHI",
+    coverImageAlt: "A warm overhead shot of a polaroid photo next to a cup of coffee",
+  },
+  {
+    id: "sn-5",
+    title: "Lời chúc New Year",
+    previewText:
+      '"Năm nay sẽ là năm tuyệt vời nhất vì có em bên cạnh. Anh muốn chúng mình sẽ cùng nhau đi hết bản đồ Việt Nam này..."',
+    unlockDate: "01.01.2023",
+    isLocked: false,
+    progressPercent: 100,
+    category: "Đã mở",
+    isTextOnly: true,
+    tags: ["#Travel", "#NewYear"],
+  },
+  {
+    id: "sn-6",
+    title: "Kỷ niệm 1 năm",
+    previewText: "Bó hoa hồng 99 đóa và lời tỏ tình vụng về ở hồ Tây...",
+    unlockDate: "20.10.2022",
+    isLocked: false,
+    progressPercent: 100,
+    category: "Đã mở",
+    coverImage:
+      "https://lh3.googleusercontent.com/aida-public/AB6AXuD7e5cuhG3OX1TfSHdu8RNDdnn4tVKgR5cb6QwcV9iUyTGUxqnI7XTp1v7jXr3CNPZa2aNE_ZJPy8bi_9KxMcjlQodsJG9Ba3UiWIk9GUtK6dYrtorR3RHaj5_KZC-e1UzBQw5JTjm29yQLDau2257auqO5N3Aw90Kqwttxxmj80Xh5BMlsPYi2Zzh79O3cfutK0h5v1iZu2eZvJP5-4PfPZghGOCNXP2VocWt3hD8KF4GbiDhV9PoJ31xh2YtLNEd1bkVidfLw3Gg",
+    coverImageAlt: "A serene sunset beach with two silhouettes walking hand in hand",
+  },
+  {
+    id: "sn-7",
+    title: "Bài hát của đôi ta",
+    previewText: '"Cứ thế này thôi, bình yên qua những ngày bão giông..."',
+    unlockDate: "15.08.2022",
+    isLocked: false,
+    progressPercent: 100,
+    category: "Đã mở",
+    isTextOnly: true,
+    icon: "music_note",
+  },
+  {
+    id: "sn-8",
+    title: "Nhật ký bí mật #1",
+    previewText: "Lần đầu tiên em nấu ăn cho anh, dù mặn nhưng anh vẫn ăn hết sạch...",
+    unlockDate: "01.06.2022",
+    isLocked: false,
+    progressPercent: 100,
+    category: "Đã mở",
+  },
+];
 
 export interface DatePlan {
   id: string;
@@ -103,36 +218,7 @@ export const memories: Memory[] = [
   },
 ];
 
-// SECRET NOTES
-export const secretNotes: SecretNote[] = [
-  {
-    id: "sn-1",
-    title: "Thư gửi em mùa hè",
-    previewText: "Có điều anh chưa kịp nói hôm đó...",
-    unlockDate: "2026-06-21",
-    isLocked: true,
-    progressPercent: 80,
-    category: "Tình cảm",
-  },
-  {
-    id: "sn-2",
-    title: "Ngày đặc biệt nhất",
-    previewText: "Kỷ niệm mà em chưa biết...",
-    unlockDate: "2026-12-31",
-    isLocked: true,
-    progressPercent: 40,
-    category: "Bí mật",
-  },
-  {
-    id: "sn-3",
-    title: "Điều muốn nói lâu rồi",
-    previewText: "Nội dung đã được mở khóa",
-    unlockDate: "2026-01-01",
-    isLocked: false,
-    progressPercent: 100,
-    category: "Đã mở",
-  },
-];
+
 
 // DATE PLANS
 export const datePlans: DatePlan[] = [
