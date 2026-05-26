@@ -1,11 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import NavBar from "@/components/ui/NavBar";
 
-interface SecretBoxUnlockSuccessProps {}
+interface SecretBoxUnlockSuccessProps {
+  readonly onBack?: () => void;
+}
 
-export const SecretBoxUnlockSuccess: React.FC<SecretBoxUnlockSuccessProps> = () => {
+export const SecretBoxUnlockSuccess: React.FC<SecretBoxUnlockSuccessProps> = ({ onBack }) => {
   const [showOverlay, setShowOverlay] = useState(true);
 
   useEffect(() => {
@@ -16,11 +19,11 @@ export const SecretBoxUnlockSuccess: React.FC<SecretBoxUnlockSuccessProps> = () 
   }, []);
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col bg-background-main group/design-root overflow-x-hidden selection:bg-surface-accent selection:text-ink-primary">
-      <div className="layout-container flex h-full grow flex-col lg:ml-64">
-        <div className="flex flex-1 justify-center py-5 px-4">
+    <div className="relative flex h-full w-full flex-col bg-background-main/95 backdrop-blur-md group/design-root overflow-x-hidden overflow-y-auto selection:bg-surface-accent selection:text-ink-primary">
+      <div className="layout-container flex h-full grow flex-col">
+        <div className="flex flex-1 justify-center py-5 px-4 md:px-20 lg:px-40">
           <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
-            <div className="flex flex-col md:flex-row gap-6 h-full">
+            <div className="flex flex-col md:flex-row gap-6 h-full mt-10 md:mt-0">
 
 
               {/* Main Content Area */}
@@ -28,6 +31,9 @@ export const SecretBoxUnlockSuccess: React.FC<SecretBoxUnlockSuccessProps> = () 
                 {/* Top App Bar */}
                 <header className="flex items-center justify-between whitespace-nowrap bg-white/80 backdrop-blur-md rounded-xl px-6 py-4 shadow-sm border border-white/20">
                   <div className="flex items-center gap-4 text-ink-primary">
+                    <button onClick={onBack} className="text-primary hover:bg-surface-accent p-2 rounded-full transition-colors flex items-center justify-center">
+                      <span className="material-symbols-outlined">arrow_back</span>
+                    </button>
                     <div className="size-6 text-primary">
                       <span className="material-symbols-outlined">inventory_2</span>
                     </div>
@@ -115,7 +121,7 @@ export const SecretBoxUnlockSuccess: React.FC<SecretBoxUnlockSuccessProps> = () 
                         Chia sẻ
                       </button>
                     </div>
-                    <button className="flex items-center gap-2 text-primary hover:text-ink-primary font-medium text-sm py-2 px-4 transition-colors">
+                    <button onClick={onBack} className="flex items-center gap-2 text-primary hover:text-ink-primary font-medium text-sm py-2 px-4 transition-colors">
                       <span className="material-symbols-outlined text-lg">lock_reset</span>
                       Khóa lại vào hộp
                     </button>
@@ -133,16 +139,55 @@ export const SecretBoxUnlockSuccess: React.FC<SecretBoxUnlockSuccessProps> = () 
       </div>
 
       {/* Confetti unlock transition overlay */}
-      {showOverlay && (
-        <div className="fixed inset-0 bg-ink-primary z-[100] flex flex-col items-center justify-center pointer-events-none transition-opacity duration-1000">
-          <div className="text-surface-accent mb-4 scale-100 transition-transform duration-700 ease-out">
-            <span className="material-symbols-outlined text-8xl" style={{ fontVariationSettings: "'FILL' 1" }}>lock_open</span>
-          </div>
-          <h2 className="text-white text-2xl font-bold tracking-widest">BÍ MẬT ĐÃ MỞ</h2>
-        </div>
-      )}
+      <AnimatePresence>
+        {showOverlay && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+            className="fixed inset-0 bg-ink-primary z-[100] flex flex-col items-center justify-center pointer-events-none"
+          >
+            <motion.div
+              initial={{ scale: 0.5, rotate: -15, opacity: 0 }}
+              animate={{ scale: 1.2, rotate: 0, opacity: 1 }}
+              transition={{
+                type: "spring",
+                stiffness: 200,
+                damping: 10,
+                delay: 0.2
+              }}
+              className="text-surface-accent mb-4"
+            >
+              <span className="material-symbols-outlined text-8xl" style={{ fontVariationSettings: "'FILL' 1" }}>lock_open</span>
+            </motion.div>
+            
+            <motion.h2 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.5 }}
+              className="text-white text-2xl font-bold tracking-widest"
+            >
+              BÍ MẬT ĐÃ MỞ
+            </motion.h2>
 
-      <NavBar activeHref="/secrets" />
+            {/* Simulated Confetti / Sparks */}
+            {[...Array(12)].map((_, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
+                animate={{ 
+                  opacity: [0, 1, 0],
+                  scale: [0, 1.5, 0.5],
+                  x: (Math.random() - 0.5) * 400,
+                  y: (Math.random() - 0.5) * 400 - 100
+                }}
+                transition={{ duration: 1.2, ease: "easeOut", delay: 0.1 }}
+                className="absolute w-3 h-3 rounded-full bg-surface-accent"
+              />
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
