@@ -54,7 +54,7 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
   return (
     <div className="min-h-screen bg-background-main font-body-md text-ink-primary overflow-x-hidden">
       {/* Main Content */}
-      <main className="md:ml-64 min-h-screen px-margin-mobile md:px-margin-desktop py-10 pb-24 md:pb-10 w-[1400px]">
+      <main className="md:ml-64 min-h-screen px-margin-mobile md:px-margin-desktop py-10 pb-24 md:pb-10 flex-1">
 
         {/* Header Actions */}
         <header className="flex justify-between items-center mb-stack-lg">
