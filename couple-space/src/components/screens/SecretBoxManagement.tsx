@@ -3,8 +3,11 @@
 import { useState, useEffect } from "react";
 import { secretNotes, featuredCapsule } from "@/data/mockData";
 import NavBar from "@/components/ui/NavBar";
+import { Portal } from "@/components/ui/Portal";
 import { SecretBoxPasswordPopup } from "./SecretBoxPasswordPopup";
 import { SecretBoxUnlockSuccess } from "./SecretBoxUnlockSuccess";
+import { CreateSecretBoxPopup } from "./CreateSecretBoxPopup";
+import { SecretBoxDetailModal } from "./SecretBoxDetailModal";
 
 interface SecretBoxManagementProps {
   readonly onUnlockSuccess?: () => void;
@@ -13,8 +16,10 @@ interface SecretBoxManagementProps {
 export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> = ({ onUnlockSuccess }) => {
   const [localNotes, setLocalNotes] = useState(secretNotes);
   const [search, setSearch] = useState("");
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [isPasswordPopupOpen, setIsPasswordPopupOpen] = useState(false);
+  const [isCreatePopupOpen, setIsCreatePopupOpen] = useState(false);
   const [isUnlockSuccessOpen, setIsUnlockSuccessOpen] = useState(false);
+  const [selectedNote, setSelectedNote] = useState<(typeof localNotes)[0] | null>(null);
   const [countdown, setCountdown] = useState({
     days: featuredCapsule.countdownDays,
     hours: featuredCapsule.countdownHours,
@@ -58,7 +63,6 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
 
   const handleUnlockSave = () => {
     setIsUnlockSuccessOpen(false);
-    // Mock saving to masonry grid
     const newUnlockedNote = {
       id: `sn-new-${Date.now()}`,
       title: "Những điều anh chưa nói (Vừa mở)",
@@ -68,9 +72,10 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
       icon: "sentiment_very_satisfied" as const,
       tags: ["Mới mở khóa", "Kỷ niệm"],
       progressPercent: 100,
-      category: "Personal",
+      category: "Personal" as const,
     };
-    setLocalNotes([newUnlockedNote, ...localNotes]);
+    setLocalNotes((prev) => [newUnlockedNote, ...prev]);
+    setSelectedNote(newUnlockedNote);
   };
 
   const pad = (n: number) => String(n).padStart(2, "0");
@@ -112,11 +117,11 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
               {/* Decorative glow */}
               <div className="absolute top-0 right-0 w-1/3 h-full bg-surface-accent/10 blur-[100px] pointer-events-none" />
 
-              <div className="flex lg:flex-row gap-12 items-center relative z-10">
+              <div className="flex lg:flex-row gap-12 items-center relative">
                 {/* Lock Icon side */}
                 <div className="w-full lg:w-2/5 flex flex-col items-center">
                   <div
-                    onClick={() => setIsPopupOpen(true)}
+                    onClick={() => setIsPasswordPopupOpen(true)}
                     className="relative group cursor-pointer">
                     <div className="absolute inset-0 bg-surface-accent/20 rounded-full blur-2xl group-hover:blur-3xl transition-all duration-700" />
                     <div className="w-48 h-48 lg:w-64 lg:h-64 rounded-full flex items-center justify-center bg-white/5 backdrop-blur-md border border-white/10 relative transition-transform duration-500 hover:scale-105">
@@ -162,7 +167,7 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
                   </div>
 
                   <button
-                    onClick={() => setIsPopupOpen(true)}
+                    onClick={() => setIsCreatePopupOpen(true)}
                     className="bg-surface-accent text-on-secondary-container px-8 py-4 rounded-xl font-headline-sm flex items-center gap-3 transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-surface-accent/20"
                   >
                     <span className="material-symbols-outlined">add_circle</span>
@@ -186,6 +191,7 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
                   {lockedNotes.map((note) => (
                     <div
                       key={note.id}
+                      onClick={() => setSelectedNote(note)}
                       className="min-w-[280px] bg-white/40 backdrop-blur-sm p-5 rounded-2xl border border-white/20 flex flex-col gap-3 cursor-pointer hover:-translate-y-1 transition-transform duration-300"
                       style={{ boxShadow: "0 4px 15px rgba(37,53,88,0.08)" }}
                     >
@@ -243,6 +249,7 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
                 {unlockedNotes.map((note) => (
                   <div
                     key={note.id}
+                    onClick={() => setSelectedNote(note)}
                     className="masonry-item bg-surface-text-container rounded-2xl overflow-hidden hover:-translate-y-1 transition-transform duration-300 cursor-pointer"
                     style={{ boxShadow: "0 4px 15px rgba(37,53,88,0.08)" }}
                   >
@@ -369,23 +376,56 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
         `
       }} />
 
-      {isPopupOpen && (
-        <SecretBoxPasswordPopup
-          onClose={() => setIsPopupOpen(false)}
-          onSuccess={() => {
-            setIsPopupOpen(false);
-            setIsUnlockSuccessOpen(true);
-            if (onUnlockSuccess) {
-              onUnlockSuccess();
-            }
+      {isCreatePopupOpen && (
+        <CreateSecretBoxPopup
+          onClose={() => setIsCreatePopupOpen(false)}
+          onSuccess={(data) => {
+            setIsCreatePopupOpen(false);
+            const newNote = {
+              id: `sn-new-${Date.now()}`,
+              title: data.title,
+              previewText: data.content,
+              unlockDate: data.unlockDate || "Hôm nay",
+              isLocked: false,
+              icon: "sentiment_very_satisfied" as const,
+              tags: ["Mới", "Kỷ niệm"],
+              progressPercent: 100,
+              category: "Personal" as const,
+            };
+            setLocalNotes([newNote, ...localNotes]);
           }}
         />
       )}
 
+      {isPasswordPopupOpen && (
+        <Portal>
+          <SecretBoxPasswordPopup
+            noteTitle={featuredCapsule.title}
+            onClose={() => setIsPasswordPopupOpen(false)}
+            onSuccess={() => {
+              setIsPasswordPopupOpen(false);
+              setIsUnlockSuccessOpen(true);
+              if (onUnlockSuccess) {
+                onUnlockSuccess();
+              }
+            }}
+          />
+        </Portal>
+      )}
+
       {isUnlockSuccessOpen && (
-        <div className="fixed inset-0 z-50">
-          <SecretBoxUnlockSuccess onBack={handleUnlockSave} />
-        </div>
+        <Portal>
+          <div className="fixed inset-0 z-[200]">
+            <SecretBoxUnlockSuccess onBack={handleUnlockSave} />
+          </div>
+        </Portal>
+      )}
+
+      {selectedNote && (
+        <SecretBoxDetailModal
+          note={selectedNote}
+          onClose={() => setSelectedNote(null)}
+        />
       )}
     </div>
   );
