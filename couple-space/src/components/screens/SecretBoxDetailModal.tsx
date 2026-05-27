@@ -42,7 +42,7 @@ export const SecretBoxDetailModal: React.FC<Readonly<SecretBoxDetailModalProps>>
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.92, y: 24 }}
             transition={{ type: "spring", damping: 28, stiffness: 320 }}
-            className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-[2.5rem] bg-surface-text-container"
+            className="relative w-full max-w-2xl max-h-[90vh] rounded-[2.5rem] bg-surface-text-container"
             style={{ boxShadow: "0 25px 60px -12px rgba(37, 53, 88, 0.35)" }}
           >
             {/* Ambient decorations */}
