@@ -11,6 +11,7 @@ interface PortalProps {
  * Renders children directly into document.body via a React Portal,
  * bypassing any CSS stacking context created by ancestor elements
  * (e.g. Framer Motion transforms, filters, will-change).
+ * Also locks body scroll while mounted.
  */
 export const Portal: React.FC<Readonly<PortalProps>> = ({ children }) => {
   const mountRef = useRef<HTMLDivElement | null>(null);
@@ -22,8 +23,15 @@ export const Portal: React.FC<Readonly<PortalProps>> = ({ children }) => {
   useEffect(() => {
     const el = mountRef.current!;
     document.body.appendChild(el);
+
+    // Lock body scroll
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
     return () => {
       document.body.removeChild(el);
+      // Restore body scroll
+      document.body.style.overflow = prevOverflow;
     };
   }, []);
 
