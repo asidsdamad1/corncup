@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
 
 interface PortalProps {
@@ -9,19 +9,17 @@ interface PortalProps {
 
 /**
  * Renders children directly into document.body via a React Portal,
- * bypassing any CSS stacking context created by ancestor elements
- * (e.g. Framer Motion transforms, filters, will-change).
- * Also locks body scroll while mounted.
+ * bypassing any CSS stacking context created by ancestor elements.
+ * Safe for Server-Side Rendering (SSR).
  */
 export const Portal: React.FC<Readonly<PortalProps>> = ({ children }) => {
+  const [mounted, setMounted] = useState(false);
   const mountRef = useRef<HTMLDivElement | null>(null);
 
-  if (!mountRef.current) {
-    mountRef.current = document.createElement("div");
-  }
-
   useEffect(() => {
-    const el = mountRef.current!;
+    setMounted(true);
+    mountRef.current = document.createElement("div");
+    const el = mountRef.current;
     document.body.appendChild(el);
 
     // Lock body scroll
@@ -34,6 +32,10 @@ export const Portal: React.FC<Readonly<PortalProps>> = ({ children }) => {
       document.body.style.overflow = prevOverflow;
     };
   }, []);
+
+  if (!mounted || !mountRef.current) {
+    return null;
+  }
 
   return createPortal(children, mountRef.current);
 };

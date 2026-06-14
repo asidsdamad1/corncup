@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { secretNotes, featuredCapsule } from "@/data/mockData";
 import NavBar from "@/components/ui/NavBar";
 import { Portal } from "@/components/ui/Portal";
@@ -8,18 +9,21 @@ import { SecretBoxPasswordPopup } from "./SecretBoxPasswordPopup";
 import { SecretBoxUnlockSuccess } from "./SecretBoxUnlockSuccess";
 import { CreateSecretBoxPopup } from "./CreateSecretBoxPopup";
 import { SecretBoxDetailModal } from "./SecretBoxDetailModal";
+import { LockedNoteEditPopup } from "./LockedNoteEditPopup";
 
 interface SecretBoxManagementProps {
   readonly onUnlockSuccess?: () => void;
 }
 
 export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> = ({ onUnlockSuccess }) => {
+  const [mounted, setMounted] = useState(false);
   const [localNotes, setLocalNotes] = useState(secretNotes);
   const [search, setSearch] = useState("");
   const [isPasswordPopupOpen, setIsPasswordPopupOpen] = useState(false);
   const [isCreatePopupOpen, setIsCreatePopupOpen] = useState(false);
   const [isUnlockSuccessOpen, setIsUnlockSuccessOpen] = useState(false);
   const [selectedNote, setSelectedNote] = useState<(typeof localNotes)[0] | null>(null);
+  const [editingLockedNote, setEditingLockedNote] = useState<(typeof localNotes)[0] | null>(null);
   const [countdown, setCountdown] = useState({
     days: featuredCapsule.countdownDays,
     hours: featuredCapsule.countdownHours,
@@ -27,11 +31,22 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
     seconds: 0,
   });
 
+  const isCountdownDone =
+    countdown.days === 0 &&
+    countdown.hours === 0 &&
+    countdown.minutes === 0 &&
+    countdown.seconds === 0;
+
   // Live countdown
   useEffect(() => {
+    setMounted(true);
     const timer = setInterval(() => {
       setCountdown((prev) => {
         let { days, hours, minutes, seconds } = prev;
+        // Stop at zero
+        if (days === 0 && hours === 0 && minutes === 0 && seconds === 0) {
+          return prev;
+        }
         if (seconds > 0) {
           seconds--;
         } else {
@@ -78,6 +93,21 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
     setSelectedNote(newUnlockedNote);
   };
 
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-background-main font-body-md text-ink-primary overflow-x-hidden">
+        <div className="md:ml-64 min-h-screen px-margin-mobile md:px-margin-desktop py-10 pb-24 md:pb-10 flex-1">
+          <header className="flex justify-between items-center mb-stack-lg">
+            <div>
+              <h2 className="text-headline-md font-headline-md text-ink-primary">Secret Capsule Management</h2>
+              <p className="text-body-sm font-body-sm text-primary">Gửi gắm những điều chưa nói cho tương lai của chúng ta.</p>
+            </div>
+          </header>
+        </div>
+      </div>
+    );
+  }
+
   const pad = (n: number) => String(n).padStart(2, "0");
 
   return (
@@ -123,20 +153,55 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
                   <div
                     onClick={() => setIsPasswordPopupOpen(true)}
                     className="relative group cursor-pointer">
-                    <div className="absolute inset-0 bg-surface-accent/20 rounded-full blur-2xl group-hover:blur-3xl transition-all duration-700" />
-                    <div className="w-48 h-48 lg:w-64 lg:h-64 rounded-full flex items-center justify-center bg-white/5 backdrop-blur-md border border-white/10 relative transition-transform duration-500 hover:scale-105">
-                      <span
-                        className="material-symbols-outlined text-surface-accent"
-                        style={{ fontSize: "100px", fontVariationSettings: "'FILL' 1" }}
-                      >
-                        lock
-                      </span>
+                    <div className={`absolute inset-0 rounded-full blur-2xl group-hover:blur-3xl transition-all duration-700 ${isCountdownDone ? "bg-emerald-400/30" : "bg-surface-accent/20"}`} />
+                    <div className={`w-48 h-48 lg:w-64 lg:h-64 rounded-full flex items-center justify-center backdrop-blur-md border relative transition-all duration-500 hover:scale-105 ${isCountdownDone ? "bg-emerald-500/10 border-emerald-400/30" : "bg-white/5 border-white/10"}`}>
+                      <AnimatePresence mode="wait">
+                        {isCountdownDone ? (
+                          <motion.span
+                            key="unlocked"
+                            initial={{ scale: 0, rotate: -180, opacity: 0 }}
+                            animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                            transition={{ type: "spring", damping: 12, stiffness: 200 }}
+                            className="material-symbols-outlined text-emerald-400"
+                            style={{ fontSize: "100px", fontVariationSettings: "'FILL' 1" }}
+                          >
+                            lock_open
+                          </motion.span>
+                        ) : (
+                          <motion.span
+                            key="locked"
+                            exit={{ scale: 0, rotate: 180, opacity: 0 }}
+                            transition={{ duration: 0.4 }}
+                            className="material-symbols-outlined text-surface-accent"
+                            style={{ fontSize: "100px", fontVariationSettings: "'FILL' 1" }}
+                          >
+                            lock
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
                     </div>
                   </div>
                   <div className="mt-8 text-center">
-                    <span className="px-4 py-1.5 rounded-full bg-surface-accent/20 border border-surface-accent/30 text-surface-accent text-label-md font-label-md uppercase tracking-widest">
-                      Đang khóa
-                    </span>
+                    <AnimatePresence mode="wait">
+                      {isCountdownDone ? (
+                        <motion.span
+                          key="badge-open"
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="inline-block px-4 py-1.5 rounded-full bg-emerald-400/20 border border-emerald-400/30 text-emerald-300 text-label-md font-label-md uppercase tracking-widest"
+                        >
+                          Đã mở khóa ✨
+                        </motion.span>
+                      ) : (
+                        <motion.span
+                          key="badge-locked"
+                          exit={{ opacity: 0, y: -8 }}
+                          className="inline-block px-4 py-1.5 rounded-full bg-surface-accent/20 border border-surface-accent/30 text-surface-accent text-label-md font-label-md uppercase tracking-widest"
+                        >
+                          Đang khóa
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
                   </div>
                 </div>
 
@@ -148,20 +213,33 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
                   </p>
 
                   {/* Countdown */}
-                  <div className="grid grid-cols-3 gap-4 mb-10 max-w-md">
+                  <div className="flex items-center gap-2 sm:gap-3 mb-10 flex-wrap-none">
                     {[
                       { label: "Ngày", value: pad(countdown.days) },
                       { label: "Giờ", value: pad(countdown.hours) },
                       { label: "Phút", value: pad(countdown.minutes) },
-                    ].map(({ label, value }) => (
-                      <div
-                        key={label}
-                        className="bg-white/10 rounded-2xl p-4 text-center border border-white/5"
-                      >
-                        <span className="block text-headline-md font-headline-md text-white tabular-nums">
-                          {value}
-                        </span>
-                        <span className="text-label-sm font-label-sm text-white">{label}</span>
+                      { label: "Giây", value: pad(countdown.seconds) },
+                    ].map(({ label, value }, idx) => (
+                      <div key={label} className="flex items-center gap-2 sm:gap-3 shrink-0">
+                        <div
+                          className={`rounded-xl sm:rounded-2xl px-3 py-2 sm:px-5 sm:py-3 text-center border transition-colors duration-300 min-w-[52px] sm:min-w-[72px] ${isCountdownDone
+                              ? "bg-emerald-500/15 border-emerald-400/20"
+                              : "bg-white/10 border-white/5"
+                            }`}
+                        >
+                          <span className={`block text-lg sm:text-headline-md font-headline-md tabular-nums leading-tight transition-colors duration-300 ${isCountdownDone ? "text-emerald-300" : "text-white"
+                            }`}>
+                            {value}
+                          </span>
+                          <span className={`text-[10px] sm:text-label-sm font-label-sm transition-colors duration-300 ${isCountdownDone ? "text-emerald-300/70" : "text-white"
+                            }`}>
+                            {label}
+                          </span>
+                        </div>
+                        {idx < 3 && (
+                          <span className={`text-lg sm:text-xl font-bold transition-colors duration-300 ${isCountdownDone ? "text-emerald-400/50" : "text-white/30"
+                            }`}>:</span>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -191,7 +269,7 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
                   {lockedNotes.map((note) => (
                     <div
                       key={note.id}
-                      onClick={() => setSelectedNote(note)}
+                      onClick={() => setEditingLockedNote(note)}
                       className="min-w-[280px] bg-white/40 backdrop-blur-sm p-5 rounded-2xl border border-white/20 flex flex-col gap-3 cursor-pointer hover:-translate-y-1 transition-transform duration-300"
                       style={{ boxShadow: "0 4px 15px rgba(37,53,88,0.08)" }}
                     >
@@ -381,16 +459,18 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
           onClose={() => setIsCreatePopupOpen(false)}
           onSuccess={(data) => {
             setIsCreatePopupOpen(false);
+            const parts = data.unlockDate ? data.unlockDate.split("-") : [];
+            const formattedDate = parts.length === 3 ? `${parts[2]}.${parts[1]}.${parts[0]}` : "Hôm nay";
             const newNote = {
               id: `sn-new-${Date.now()}`,
               title: data.title,
               previewText: data.content,
-              unlockDate: data.unlockDate || "Hôm nay",
-              isLocked: false,
-              icon: "sentiment_very_satisfied" as const,
-              tags: ["Mới", "Kỷ niệm"],
-              progressPercent: 100,
-              category: "Personal" as const,
+              unlockDate: formattedDate,
+              isLocked: true,
+              icon: "lock_clock",
+              tags: ["Mới", "Đang khóa"],
+              progressPercent: 20,
+              category: "Tình cảm",
             };
             setLocalNotes([newNote, ...localNotes]);
           }}
@@ -425,6 +505,23 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
         <SecretBoxDetailModal
           note={selectedNote}
           onClose={() => setSelectedNote(null)}
+        />
+      )}
+
+      {editingLockedNote && (
+        <LockedNoteEditPopup
+          note={editingLockedNote}
+          onClose={() => setEditingLockedNote(null)}
+          onSend={(updatedData) => {
+            setLocalNotes((prev) =>
+              prev.map((n) =>
+                n.id === editingLockedNote.id
+                  ? { ...n, title: updatedData.title, previewText: updatedData.content, category: updatedData.category }
+                  : n
+              )
+            );
+            setEditingLockedNote(null);
+          }}
         />
       )}
     </div>
