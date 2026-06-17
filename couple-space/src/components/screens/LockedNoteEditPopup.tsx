@@ -54,7 +54,7 @@ export const LockedNoteEditPopup: React.FC<Readonly<LockedNoteEditPopupProps>> =
   return (
     <AnimatePresence>
       <Portal>
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[200] flex items-end md:items-center justify-center p-0 md:p-4">
           {/* Backdrop */}
           <motion.div
             className="absolute inset-0 bg-ink-primary/60 backdrop-blur-md"
@@ -70,7 +70,7 @@ export const LockedNoteEditPopup: React.FC<Readonly<LockedNoteEditPopupProps>> =
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.92, y: 24 }}
             transition={{ type: "spring", damping: 28, stiffness: 320 }}
-            className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-[2.5rem] bg-surface-text-container"
+            className="relative w-full max-w-2xl max-h-[90vh] md:max-h-[85vh] overflow-y-auto rounded-t-[2.5rem] md:rounded-[2.5rem] bg-surface-text-container mt-auto md:mt-0"
             style={{ boxShadow: "0 25px 60px -12px rgba(37, 53, 88, 0.35)" }}
           >
             {/* Ambient decorations */}

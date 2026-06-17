@@ -34,13 +34,13 @@ export const SecretBoxPasswordPopup: React.FC<SecretBoxPasswordPopupProps> = ({
   return (
     <AnimatePresence>
       <Portal>
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-ink-primary/40 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[200] flex items-end md:items-center justify-center p-0 md:p-4 bg-ink-primary/40 backdrop-blur-sm">
         <motion.div
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="bg-white/90 rounded-[2rem] w-full max-w-md overflow-hidden shadow-2xl border border-white/40 backdrop-blur-md"
+          className="bg-white/90 rounded-t-[2rem] md:rounded-[2rem] w-full max-w-md overflow-hidden shadow-2xl border border-white/40 backdrop-blur-md mt-auto md:mt-0"
         >
           <div className="p-8 flex flex-col gap-6">
             <div className="text-center space-y-2">
@@ -64,7 +64,7 @@ export const SecretBoxPasswordPopup: React.FC<SecretBoxPasswordPopupProps> = ({
                 />
               </div>
 
-              {error && (
+               {error && (
                 <motion.p
                   initial={{ opacity: 0, y: -4 }}
                   animate={{ opacity: 1, y: 0 }}

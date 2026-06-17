@@ -1,196 +1,295 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { memories } from "@/data/mockData";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
+import { memories as defaultMemories } from "@/data/mockData";
 import NavBar from "@/components/ui/NavBar";
+import { CreateMemoryModal } from "./CreateMemoryModal";
 
-interface MemoryJourneyOverviewProps {}
+export const MemoryJourneyOverview: React.FC = () => {
+  const [localMemories, setLocalMemories] = useState(defaultMemories);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-type FilterTag = "Tất cả" | "Du lịch" | "Hằng ngày" | "Lãng mạn";
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-export const MemoryJourneyOverview: React.FC<MemoryJourneyOverviewProps> = () => {
-  const [activeFilter, setActiveFilter] = useState<FilterTag>("Tất cả");
-  const filters: FilterTag[] = ["Tất cả", "Du lịch", "Hằng ngày", "Lãng mạn"];
+  // Sort memories by date descending
+  const sortedMemories = [...localMemories].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
 
-  const filtered = activeFilter === "Tất cả"
-    ? memories
-    : memories.filter((m) => m.tags.includes(activeFilter));
+  // Take top 2 for featured
+  const featuredMemories = sortedMemories.slice(0, 2);
+  // Rest for all albums
+  const allMemories = sortedMemories; // In the design "Tất cả Album" shows all
+
+  const totalPhotos = localMemories.reduce((sum, m) => sum + m.photos.length, 0);
 
   return (
-    <div className="min-h-screen bg-background-main selection:bg-surface-accent/30 font-body-md text-on-background">
-      {/* Side Navigation Bar (Desktop) */}
-      <nav className="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 bg-background-main border-r border-on-primary-fixed/10 p-stack-md space-y-stack-md z-50">
-        <div className="mb-stack-lg px-2 pt-4">
-          <h1 className="font-headline-md text-headline-md text-on-primary-fixed">Duyên</h1>
-          <p className="font-label-sm text-label-sm text-on-primary-fixed opacity-70">Digital Sanctuary</p>
-        </div>
-        <div className="flex flex-col space-y-2">
-          <a className="flex items-center gap-3 px-4 py-3 text-on-primary-fixed/80 hover:bg-surface-accent/50 rounded-xl transition-all duration-200" href="/emotions">
-            <span className="material-symbols-outlined">favorite</span>
-            <span className="font-label-md text-label-md">Emotions</span>
-          </a>
-          <a className="flex items-center gap-3 px-4 py-3 bg-surface-accent text-on-primary-fixed rounded-xl font-bold shadow-sm translate-x-1 duration-200" href="/memories">
-            <span className="material-symbols-outlined">timeline</span>
-            <span className="font-label-md text-label-md">Hành trình</span>
-          </a>
-          <a className="flex items-center gap-3 px-4 py-3 text-on-primary-fixed/80 hover:bg-surface-accent/50 rounded-xl transition-all duration-200" href="/plans">
-            <span className="material-symbols-outlined">auto_awesome</span>
-            <span className="font-label-md text-label-md">Future</span>
-          </a>
-          <a className="flex items-center gap-3 px-4 py-3 text-on-primary-fixed/80 hover:bg-surface-accent/50 rounded-xl transition-all duration-200" href="/dates">
-            <span className="material-symbols-outlined">calendar_month</span>
-            <span className="font-label-md text-label-md">Dates</span>
-          </a>
-          <a className="flex items-center gap-3 px-4 py-3 text-on-primary-fixed/80 hover:bg-surface-accent/50 rounded-xl transition-all duration-200" href="/secrets">
-            <span className="material-symbols-outlined">lock</span>
-            <span className="font-label-md text-label-md">Secrets</span>
-          </a>
-        </div>
-        <div className="mt-auto flex items-center gap-3 p-2 bg-surface-container-low rounded-xl">
-          <div className="w-10 h-10 rounded-full bg-surface-accent flex items-center justify-center">
-            <span className="material-symbols-outlined text-primary">diversity_1</span>
-          </div>
-          <div className="overflow-hidden">
-            <p className="font-label-md text-label-md truncate">Chúng mình</p>
-            <p className="text-[10px] opacity-60">Couple Avatar</p>
-          </div>
-        </div>
-      </nav>
-
-      {/* Top AppBar (Mobile) */}
-      <header className="md:hidden flex justify-between items-center w-full px-margin-mobile py-4 bg-background-main sticky top-0 z-50">
-        <h1 className="font-headline-lg-mobile text-headline-lg-mobile text-on-primary-fixed italic">Duyên</h1>
-        <div className="flex gap-4">
-          <span className="material-symbols-outlined text-on-primary-fixed">notifications</span>
-          <span className="material-symbols-outlined text-on-primary-fixed">account_circle</span>
-        </div>
-      </header>
-
-      {/* Main Content Canvas */}
-      <main className="md:ml-64 min-h-screen px-margin-mobile md:px-margin-desktop py-stack-lg pb-24 md:pb-8">
+    <div className="min-h-screen bg-background-main font-body-md text-ink-primary overflow-x-hidden selection:bg-surface-accent/30">
+      {/* Main Content */}
+      <main className="lg:ml-64 min-h-screen px-margin-mobile md:px-margin-desktop py-stack-lg pb-32">
         {/* Header Section */}
         <header className="mb-stack-lg">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
-              <h2 className="font-headline-lg text-headline-lg md:text-headline-lg text-ink-primary">Hành trình tình yêu</h2>
-              <p className="font-body-md text-body-md text-primary opacity-80 mt-1">Ghi dấu những bước chân ta cùng đi qua.</p>
+              <h2 className="font-headline-lg text-headline-lg md:text-4xl text-ink-primary tracking-tight">
+                Hành trình Kỷ niệm
+              </h2>
+              <p className="font-body-md text-body-md text-ink-primary opacity-70 mt-1">
+                Nơi lưu giữ những khoảnh khắc đẹp nhất của đôi mình.
+              </p>
             </div>
-            <div className="inline-flex items-center gap-2 bg-surface-accent px-4 py-2 rounded-full soft-shadow">
-              <span className="material-symbols-outlined text-ink-primary" style={{ fontVariationSettings: "'FILL' 1" }}>explore</span>
-              <span className="font-label-md text-label-md text-ink-primary">{memories.length} Chuyến đi</span>
+            <div className="inline-flex items-center gap-2 bg-surface-accent/40 backdrop-blur-sm border border-surface-accent px-4 py-2 rounded-full shadow-soft">
+              <span
+                className="material-symbols-outlined text-ink-primary"
+                style={{ fontVariationSettings: "'FILL' 1" }}
+              >
+                explore
+              </span>
+              <span className="font-label-md text-label-md text-ink-primary">
+                {localMemories.length} Chuyến đi
+              </span>
             </div>
           </div>
         </header>
 
-        {/* Filters */}
-        <div className="flex gap-2 mb-stack-md overflow-x-auto pb-2" style={{ scrollbarWidth: "none" }}>
-          {filters.map((f) => (
-            <button
-              key={f}
-              onClick={() => setActiveFilter(f)}
-              className={`px-4 py-2 rounded-full text-label-md whitespace-nowrap transition-all ${
-                activeFilter === f
-                  ? "bg-ink-primary text-on-primary"
-                  : "bg-surface-text-container text-ink-primary hover:bg-surface-container-high"
-              }`}
+        {/* Featured Memories Section */}
+        <section className="mb-12">
+          <h3 className="font-headline-sm text-headline-sm text-ink-primary mb-6 flex items-center gap-2">
+            <span
+              className="material-symbols-outlined text-surface-accent"
+              style={{ fontVariationSettings: "'FILL' 1" }}
             >
-              {f}
-            </button>
-          ))}
-        </div>
-
-        {/* Bento Grid / Cards */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-gutter">
-          {filtered.map((memory, i) => (
-            <motion.article
-              key={memory.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1, duration: 0.5 }}
-              className="group bg-surface rounded-xl overflow-hidden soft-shadow transition-transform duration-300 hover:-translate-y-1 cursor-pointer"
-            >
-              <div className="relative h-56 overflow-hidden">
-                <img
-                  src={memory.coverImage}
-                  alt={memory.coverImageAlt}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src =
-                      "https://via.placeholder.com/400x300/b2ccec/253558?text=K%E1%BB%B7+ni%E1%BB%87m";
-                  }}
-                />
-                <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full">
-                  <span className="font-label-sm text-label-sm text-primary">
-                    {new Date(memory.date).toLocaleDateString("vi-VN", { month: "2-digit", year: "numeric" })}
-                  </span>
-                </div>
-              </div>
-              <div className="p-5 border-b border-outline-variant/10">
-                <h3 className="font-headline-sm text-headline-sm text-ink-primary mb-2">{memory.title}</h3>
-                <p className="font-body-sm text-body-sm text-on-surface-variant italic line-clamp-2 leading-relaxed">
-                  &quot;{memory.quote}&quot;
-                </p>
-              </div>
-              <div className="p-4 bg-surface-container-low flex justify-between items-center">
-                <div className="flex -space-x-2">
-                  <div className="w-8 h-8 rounded-full border-2 border-surface bg-primary-fixed overflow-hidden">
-                    <span className="material-symbols-outlined text-xs flex items-center justify-center h-full">person</span>
+              stars
+            </span>
+            Kỷ niệm nổi bật
+          </h3>
+          <div
+            className="flex flex-row gap-6 overflow-x-auto pb-4 -mx-margin-mobile px-margin-mobile md:mx-0 md:px-0 snap-x"
+            style={{ scrollbarWidth: "none" }}
+          >
+            {featuredMemories.map((memory, i) => (
+              <Link key={`feat-${memory.id}`} href={`/memories/${memory.id}`} className="block group">
+                <motion.article
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={mounted ? { opacity: 1, y: 0 } : {}}
+                  transition={{ delay: i * 0.1, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                  className="min-w-[65vw] md:min-w-[280px] md:w-[280px] aspect-[4/3] relative rounded-3xl overflow-hidden shadow-soft snap-center"
+                >
+                  <img
+                    alt={memory.coverImageAlt}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    src={memory.coverImage}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src =
+                        "https://via.placeholder.com/800x500/b2ccec/253558?text=Kỷ+niệm";
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-ink-primary/90 via-ink-primary/20 to-transparent"></div>
+                  <div className="absolute bottom-0 left-0 p-6 w-full">
+                    <span className="font-label-sm text-label-sm bg-surface-accent text-ink-primary px-3 py-1 rounded-full mb-3 inline-block">
+                      {new Date(memory.date).toLocaleDateString("vi-VN", {
+                        month: "2-digit",
+                        year: "numeric",
+                      })}
+                    </span>
+                    <h4 className="font-headline-md text-white mb-2">{memory.title}</h4>
+                    <p className="font-body-sm text-white/80 italic line-clamp-1">
+                      &quot;{memory.quote}&quot;
+                    </p>
                   </div>
-                  <div className="w-8 h-8 rounded-full border-2 border-surface bg-secondary-fixed overflow-hidden">
-                    <span className="material-symbols-outlined text-xs flex items-center justify-center h-full">person_4</span>
-                  </div>
-                </div>
-                <span className="material-symbols-outlined text-primary/40 group-hover:text-primary transition-colors">arrow_forward</span>
-              </div>
-            </motion.article>
-          ))}
-
-          {/* Add New Memory Card */}
-          <button className="group relative min-h-[300px] bg-white/20 border-2 border-dashed border-primary/30 rounded-xl flex flex-col items-center justify-center transition-all hover:bg-white/40 hover:border-primary/50 cursor-pointer">
-            <div className="w-16 h-16 rounded-full bg-surface-accent flex items-center justify-center mb-4 transition-transform group-hover:scale-110">
-              <span className="material-symbols-outlined text-ink-primary text-3xl">add</span>
-            </div>
-            <span className="font-headline-sm text-headline-sm text-ink-primary">Thêm kỷ niệm mới</span>
-            <p className="font-body-sm text-body-sm text-primary mt-2 opacity-70">Ghi lại chương tiếp theo của chúng mình</p>
-          </button>
+                </motion.article>
+              </Link>
+            ))}
+          </div>
         </section>
 
-        {/* Progress Section */}
-        <section className="mt-stack-lg bg-surface-text-container/80 backdrop-blur-md rounded-2xl p-6 border border-on-primary-fixed/5">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="p-3 bg-secondary-container rounded-xl">
-              <span className="material-symbols-outlined text-on-secondary-container" style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
+        {/* Artistic Grid Section */}
+        <section>
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="font-headline-sm text-headline-sm text-ink-primary">
+              Tất cả Album
+            </h3>
+            <button className="text-ink-primary/60 hover:text-ink-primary transition-colors flex items-center gap-1 font-label-md">
+              Xem thêm{" "}
+              <span className="material-symbols-outlined text-sm">
+                keyboard_arrow_right
+              </span>
+            </button>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            <AnimatePresence>
+              {allMemories.map((memory, index) => {
+                const isImageHeavy = index % 3 === 2; // Every 3rd item uses the overlay layout
+                return (
+                  <Link key={memory.id} href={`/memories/${memory.id}`} className="block group">
+                    <motion.article
+                      layout
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      transition={{
+                        delay: 0.1 + (index % 6) * 0.05,
+                        duration: 0.6,
+                        ease: [0.22, 1, 0.36, 1],
+                      }}
+                      className="group relative bg-white/40 rounded-2xl overflow-hidden shadow-soft transition-all duration-300 hover:-translate-y-2 aspect-[3/4] md:aspect-square lg:aspect-[4/5]"
+                    >
+                      {isImageHeavy ? (
+                        <div className="h-full relative overflow-hidden">
+                          <img
+                            alt={memory.coverImageAlt}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            src={memory.coverImage}
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src =
+                                "https://via.placeholder.com/400x500/b2ccec/253558?text=Ảnh";
+                            }}
+                          />
+                          <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-ink-primary/80 to-transparent">
+                            <h4 className="font-label-md text-white">{memory.title}</h4>
+                            <p className="text-[10px] text-white/70 mt-0.5">
+                              {new Date(memory.date).toLocaleDateString("vi-VN", {
+                                month: "2-digit",
+                                year: "numeric",
+                              })}{" "}
+                              • {memory.photos.length} ảnh
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="h-full flex flex-col">
+                          <div className="h-[70%] overflow-hidden">
+                            <img
+                              alt={memory.coverImageAlt}
+                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                              src={memory.coverImage}
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src =
+                                  "https://via.placeholder.com/400x350/b2ccec/253558?text=Ảnh";
+                              }}
+                            />
+                          </div>
+                          <div className="flex-1 p-4 bg-white/60 backdrop-blur-sm flex flex-col justify-between">
+                            <div>
+                              <h4 className="font-label-md text-ink-primary">
+                                {memory.title}
+                              </h4>
+                              <p className="text-[10px] text-ink-primary/60 mt-0.5">
+                                {new Date(memory.date).toLocaleDateString("vi-VN", {
+                                  month: "2-digit",
+                                  year: "numeric",
+                                })}{" "}
+                                • {memory.photos.length} ảnh
+                              </p>
+                            </div>
+                            <p className="text-xs italic text-ink-primary/80 line-clamp-1">
+                              &quot;{memory.quote}&quot;
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </motion.article>
+                  </Link>
+                );
+              })}
+            </AnimatePresence>
+          </div>
+        </section>
+
+        {/* Emotional Journey Progress */}
+        <section className="mt-32 mb-12 bg-white/40 backdrop-blur-md rounded-3xl p-8 border border-white/30 shadow-soft relative">
+          {/* Decorative Divider */}
+          <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-24 h-1 bg-surface-accent/50 rounded-full"></div>
+          <div className="flex items-center gap-4 mb-8">
+            <div className="p-4 bg-surface-accent rounded-2xl">
+              <span
+                className="material-symbols-outlined text-ink-primary"
+                style={{ fontVariationSettings: "'FILL' 1" }}
+              >
+                favorite
+              </span>
             </div>
             <div>
-              <h4 className="font-headline-sm text-headline-sm text-ink-primary">Tiến độ Hành trình</h4>
-              <p className="font-label-sm text-label-sm text-on-surface-variant">Thành tựu cặp đôi tháng này</p>
+              <h4 className="font-headline-sm text-headline-sm text-ink-primary">
+                Tiến độ Hành trình
+              </h4>
+              <p className="font-label-sm text-label-sm text-ink-primary/60">
+                Cùng nhau viết tiếp câu chuyện tình yêu
+              </p>
             </div>
           </div>
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <div className="flex justify-between mb-2">
-                <span className="font-label-md text-label-md text-primary">Khám phá 63 tỉnh thành</span>
-                <span className="font-label-md text-label-md text-primary">12/63</span>
+              <div className="flex justify-between mb-3">
+                <span className="font-label-md text-label-md text-ink-primary">
+                  Khám phá 63 tỉnh thành
+                </span>
+                <span className="font-label-md text-label-md text-ink-primary">12/63</span>
               </div>
-              <div className="h-3 bg-surface-container rounded-full overflow-hidden">
-                <div className="h-full bg-surface-accent transition-all duration-1000" style={{ width: "19%" }} />
+              <div className="h-4 bg-ink-primary/10 rounded-full overflow-hidden p-1">
+                <motion.div
+                  className="h-full bg-surface-accent rounded-full"
+                  initial={{ width: 0 }}
+                  animate={mounted ? { width: "19%" } : { width: 0 }}
+                  transition={{ duration: 1.2, ease: "easeOut", delay: 0.3 }}
+                />
               </div>
             </div>
             <div>
-              <div className="flex justify-between mb-2">
-                <span className="font-label-md text-label-md text-primary">Kho ảnh kỷ niệm</span>
-                <span className="font-label-md text-label-md text-primary">840/1000</span>
+              <div className="flex justify-between mb-3">
+                <span className="font-label-md text-label-md text-ink-primary">
+                  Kho ảnh kỷ niệm
+                </span>
+                <span className="font-label-md text-label-md text-ink-primary">
+                  {totalPhotos}/1000
+                </span>
               </div>
-              <div className="h-3 bg-surface-container rounded-full overflow-hidden">
-                <div className="h-full bg-surface-accent transition-all duration-1000" style={{ width: "84%" }} />
+              <div className="h-4 bg-ink-primary/10 rounded-full overflow-hidden p-1">
+                <motion.div
+                  className="h-full bg-surface-accent rounded-full"
+                  initial={{ width: 0 }}
+                  animate={
+                    mounted
+                      ? { width: `${Math.min((totalPhotos / 1000) * 100, 100)}%` }
+                      : { width: 0 }
+                  }
+                  transition={{ duration: 1.2, ease: "easeOut", delay: 0.5 }}
+                />
               </div>
             </div>
           </div>
         </section>
       </main>
 
+      {/* Shared NavBar */}
       <NavBar activeHref="/memories" />
+
+      {/* FAB — Add Memory */}
+      <button
+        onClick={() => setIsCreateModalOpen(true)}
+        className="fixed bottom-20 md:bottom-8 right-6 md:right-8 w-14 h-14 bg-surface-accent text-ink-primary rounded-full shadow-lg shadow-ink-primary/20 flex items-center justify-center transition-transform hover:scale-110 active:scale-95 z-40 border-4 border-background-main"
+        aria-label="Thêm kỷ niệm mới"
+      >
+        <span className="material-symbols-outlined text-3xl">add</span>
+      </button>
+
+      {/* Create Memory Modal */}
+      <AnimatePresence>
+        {isCreateModalOpen && (
+          <CreateMemoryModal
+            onClose={() => setIsCreateModalOpen(false)}
+            onSuccess={(newMemory) => {
+              setLocalMemories((prev) => [newMemory, ...prev]);
+              setIsCreateModalOpen(false);
+            }}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

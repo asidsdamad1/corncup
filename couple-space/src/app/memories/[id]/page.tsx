@@ -1,4 +1,10 @@
 import MemoryDetail from "@/components/screens/MemoryDetail";
-export default function Page({ params }: { params: { id: string } }) {
-  return <MemoryDetail memoryId={params.id} />;
+
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
+
+export default async function Page({ params }: PageProps) {
+  const { id } = await params;
+  return <MemoryDetail memoryId={id} />;
 }

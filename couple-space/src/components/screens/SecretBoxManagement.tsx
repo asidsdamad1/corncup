@@ -145,16 +145,16 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
               style={{ boxShadow: "0 4px 15px rgba(37,53,88,0.08)" }}
             >
               {/* Decorative glow */}
-              <div className="absolute top-0 right-0 w-1/3 h-full bg-surface-accent/10 blur-[100px] pointer-events-none" />
+              <div className="absolute top-0 right-0 w-full h-1/3 md:w-1/3 md:h-full bg-surface-accent/10 blur-[100px] pointer-events-none" />
 
-              <div className="flex lg:flex-row gap-12 items-center relative">
+              <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-center relative">
                 {/* Lock Icon side */}
-                <div className="w-full lg:w-2/5 flex flex-col items-center">
+                <div className="w-full md:w-2/5 flex flex-col items-center">
                   <div
                     onClick={() => setIsPasswordPopupOpen(true)}
                     className="relative group cursor-pointer">
                     <div className={`absolute inset-0 rounded-full blur-2xl group-hover:blur-3xl transition-all duration-700 ${isCountdownDone ? "bg-emerald-400/30" : "bg-surface-accent/20"}`} />
-                    <div className={`w-48 h-48 lg:w-64 lg:h-64 rounded-full flex items-center justify-center backdrop-blur-md border relative transition-all duration-500 hover:scale-105 ${isCountdownDone ? "bg-emerald-500/10 border-emerald-400/30" : "bg-white/5 border-white/10"}`}>
+                    <div className={`w-48 h-48 md:w-64 md:h-64 rounded-full flex items-center justify-center backdrop-blur-md border relative transition-all duration-500 hover:scale-105 ${isCountdownDone ? "bg-emerald-500/10 border-emerald-400/30" : "bg-white/5 border-white/10"}`}>
                       <AnimatePresence mode="wait">
                         {isCountdownDone ? (
                           <motion.span
@@ -164,6 +164,7 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
                             transition={{ type: "spring", damping: 12, stiffness: 200 }}
                             className="material-symbols-outlined text-emerald-400"
                             style={{ fontSize: "100px", fontVariationSettings: "'FILL' 1" }}
+                            suppressHydrationWarning
                           >
                             lock_open
                           </motion.span>
@@ -174,6 +175,7 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
                             transition={{ duration: 0.4 }}
                             className="material-symbols-outlined text-surface-accent"
                             style={{ fontSize: "100px", fontVariationSettings: "'FILL' 1" }}
+                            suppressHydrationWarning
                           >
                             lock
                           </motion.span>
@@ -206,14 +208,14 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
                 </div>
 
                 {/* Info side */}
-                <div className="w-full lg:w-3/5">
+                <div className="w-full md:w-3/5">
                   <h3 className="text-headline-lg font-headline-lg text-white mb-4">{featuredCapsule.title}</h3>
                   <p className="text-body-lg font-body-lg text-white mb-8 max-w-lg">
                     {featuredCapsule.description}
                   </p>
 
                   {/* Countdown */}
-                  <div className="flex items-center gap-2 sm:gap-3 mb-10 flex-wrap-none">
+                  <div className="flex items-center justify-center md:justify-start gap-2 sm:gap-3 mb-10 flex-wrap sm:flex-nowrap">
                     {[
                       { label: "Ngày", value: pad(countdown.days) },
                       { label: "Giờ", value: pad(countdown.hours) },
@@ -223,8 +225,8 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
                       <div key={label} className="flex items-center gap-2 sm:gap-3 shrink-0">
                         <div
                           className={`rounded-xl sm:rounded-2xl px-3 py-2 sm:px-5 sm:py-3 text-center border transition-colors duration-300 min-w-[52px] sm:min-w-[72px] ${isCountdownDone
-                              ? "bg-emerald-500/15 border-emerald-400/20"
-                              : "bg-white/10 border-white/5"
+                            ? "bg-emerald-500/15 border-emerald-400/20"
+                            : "bg-white/10 border-white/5"
                             }`}
                         >
                           <span className={`block text-lg sm:text-headline-md font-headline-md tabular-nums leading-tight transition-colors duration-300 ${isCountdownDone ? "text-emerald-300" : "text-white"
@@ -246,7 +248,7 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
 
                   <button
                     onClick={() => setIsCreatePopupOpen(true)}
-                    className="bg-surface-accent text-on-secondary-container px-8 py-4 rounded-xl font-headline-sm flex items-center gap-3 transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-surface-accent/20"
+                    className="w-full md:w-auto justify-center bg-surface-accent text-on-secondary-container px-8 py-4 rounded-xl font-headline-sm flex items-center gap-3 transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-surface-accent/20"
                   >
                     <span className="material-symbols-outlined">add_circle</span>
                     Gửi thêm bí mật
@@ -263,7 +265,7 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
                   Đang chờ mở khóa
                 </h3>
                 <div
-                  className="flex gap-4 overflow-x-auto pb-4"
+                  className="flex gap-4 overflow-x-auto pb-4 md:grid md:grid-cols-2 lg:grid-cols-3 md:overflow-visible"
                   style={{ scrollbarWidth: "none" }}
                 >
                   {lockedNotes.map((note) => (

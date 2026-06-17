@@ -19,7 +19,7 @@ export const SecretBoxUnlockSuccess: React.FC<SecretBoxUnlockSuccessProps> = ({ 
   }, []);
 
   return (
-    <div className="relative flex h-full w-full flex-col bg-background-main/95 backdrop-blur-md group/design-root overflow-x-hidden overflow-y-auto selection:bg-surface-accent selection:text-ink-primary">
+    <div className="relative flex h-full w-full flex-col bg-background-main/95 backdrop-blur-md group/design-root overflow-x-hidden selection:bg-surface-accent selection:text-ink-primary">
       <div className="layout-container flex h-full grow flex-col">
         <div className="flex flex-1 justify-center py-5 px-4 md:px-20 lg:px-40">
           <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
@@ -29,8 +29,8 @@ export const SecretBoxUnlockSuccess: React.FC<SecretBoxUnlockSuccessProps> = ({ 
               {/* Main Content Area */}
               <main className="flex-1 flex flex-col gap-6">
                 {/* Top App Bar */}
-                <header className="flex items-center justify-between whitespace-nowrap bg-white/80 backdrop-blur-md rounded-xl px-6 py-4 shadow-sm border border-white/20">
-                  <div className="flex items-center gap-4 text-ink-primary">
+                <header className="flex flex-wrap md:flex-nowrap items-center justify-between bg-white/80 backdrop-blur-md rounded-xl px-4 md:px-6 py-4 shadow-sm border border-white/20 gap-4">
+                  <div className="flex items-center gap-2 md:gap-4 text-ink-primary">
                     <button onClick={onBack} className="text-primary hover:bg-surface-accent p-2 rounded-full transition-colors flex items-center justify-center">
                       <span className="material-symbols-outlined">arrow_back</span>
                     </button>

@@ -1,0 +1,373 @@
+<!DOCTYPE html><html class="light" lang="vi"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Duyên - Tổng quan Hành trình</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Fonts: Be Vietnam Pro & Plus Jakarta Sans -->
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&amp;family=Plus+Jakarta+Sans:ital,wght@0,600;0,700;1,700&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "outline-variant": "#c3c6ce",
+                    "tertiary-fixed": "#d9e2ff",
+                    "primary": "#47607c",
+                    "on-surface-variant": "#43474d",
+                    "primary-fixed": "#d0e4ff",
+                    "on-error-container": "#93000a",
+                    "tertiary-container": "#b9c9f4",
+                    "on-secondary": "#ffffff",
+                    "outline": "#73777e",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-variant": "#e2e2e2",
+                    "surface-container-highest": "#e2e2e2",
+                    "tertiary-fixed-dim": "#b6c6f1",
+                    "ink-primary": "#253558",
+                    "error": "#ba1a1a",
+                    "surface-container-high": "#e8e8e8",
+                    "surface": "#f9f9f9",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-fixed-variant": "#5e3e3f",
+                    "on-primary": "#ffffff",
+                    "secondary-fixed": "#ffdad9",
+                    "error-container": "#ffdad6",
+                    "on-secondary-fixed": "#2d1415",
+                    "secondary-fixed-dim": "#e9bcbc",
+                    "tertiary": "#4e5e83",
+                    "on-primary-container": "#3d5772",
+                    "surface-tint": "#47607c",
+                    "background-main": "#b2ccec",
+                    "on-tertiary-container": "#445479",
+                    "on-tertiary-fixed": "#081a3c",
+                    "background": "#f9f9f9",
+                    "primary-fixed-dim": "#afc9e9",
+                    "on-primary-fixed-variant": "#2f4963",
+                    "secondary-container": "#fdcfcf",
+                    "inverse-on-surface": "#f1f1f1",
+                    "surface-container": "#eeeeee",
+                    "on-secondary-container": "#795656",
+                    "on-tertiary-fixed-variant": "#36466a",
+                    "on-background": "#1a1c1c",
+                    "on-error": "#ffffff",
+                    "inverse-surface": "#2f3131",
+                    "secondary": "#785556",
+                    "surface-container-low": "#f3f3f3",
+                    "surface-text-container": "#f2f2f2",
+                    "surface-accent": "#f5c7c7",
+                    "primary-container": "#b2ccec",
+                    "surface-dim": "#dadada",
+                    "surface-bright": "#f9f9f9",
+                    "on-primary-fixed": "#001d35",
+                    "on-surface": "#1a1c1c",
+                    "inverse-primary": "#afc9e9"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "2xl": "1.5rem",
+                    "3xl": "2rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-sm": "0.5rem",
+                    "margin-mobile": "1.25rem",
+                    "margin-desktop": "2.5rem",
+                    "gutter": "1rem",
+                    "stack-lg": "2rem",
+                    "stack-md": "1rem"
+            },
+            "fontFamily": {
+                    "label-md": ["Be Vietnam Pro"],
+                    "label-sm": ["Be Vietnam Pro"],
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "headline-lg-mobile": ["Plus Jakarta Sans"],
+                    "body-sm": ["Be Vietnam Pro"],
+                    "headline-sm": ["Plus Jakarta Sans"],
+                    "body-lg": ["Be Vietnam Pro"],
+                    "body-md": ["Be Vietnam Pro"]
+            },
+            "fontSize": {
+                    "label-md": ["14px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["26px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .soft-shadow {
+            box-shadow: 0 4px 20px -2px rgba(37, 53, 88, 0.1);
+        }
+        .active-dot::after {
+            content: '';
+            display: block;
+            width: 4px;
+            height: 4px;
+            background-color: #f5c7c7;
+            border-radius: 50%;
+            margin: 2px auto 0;
+        }
+        body {
+            background-color: #b2ccec;
+        }
+        .masonry-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-auto-rows: 10px;
+            gap: 1.5rem;
+        }
+        .masonry-item-sm { grid-row-end: span 28; }
+        .masonry-item-md { grid-row-end: span 36; }
+        .masonry-item-lg { grid-row-end: span 44; }
+        
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="font-body-md text-ink-primary selection:bg-surface-accent/30">
+<!-- Top AppBar (Mobile) -->
+<header class="md:hidden flex justify-between items-center w-full px-margin-mobile py-4 bg-background-main sticky top-0 z-50">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-ink-primary italic">Duyên</h1>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-ink-primary">notifications</span>
+<span class="material-symbols-outlined text-ink-primary">account_circle</span>
+</div>
+</header>
+<!-- Side Navigation Bar (Desktop) -->
+<nav class="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 bg-background-main border-r border-ink-primary/10 p-stack-md space-y-stack-md z-50">
+<div class="mb-stack-lg px-2 pt-4">
+<h1 class="font-headline-md text-headline-md text-ink-primary">Duyên</h1>
+<p class="font-label-sm text-label-sm text-ink-primary opacity-70">Digital Sanctuary</p>
+</div>
+<div class="flex flex-col space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 text-ink-primary/80 hover:bg-surface-accent/50 rounded-xl transition-all duration-200" href="#">
+<span class="material-symbols-outlined">favorite</span>
+<span class="font-label-md text-label-md">Emotions</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-surface-accent text-ink-primary rounded-xl font-bold shadow-sm translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">timeline</span>
+<span class="font-label-md text-label-md">Hành trình</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-ink-primary/80 hover:bg-surface-accent/50 rounded-xl transition-all duration-200" href="#">
+<span class="material-symbols-outlined">auto_awesome</span>
+<span class="font-label-md text-label-md">Future</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-ink-primary/80 hover:bg-surface-accent/50 rounded-xl transition-all duration-200" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-label-md text-label-md">Dates</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-ink-primary/80 hover:bg-surface-accent/50 rounded-xl transition-all duration-200" href="#">
+<span class="material-symbols-outlined">lock</span>
+<span class="font-label-md text-label-md">Secrets</span>
+</a>
+</div>
+<div class="mt-auto flex items-center gap-3 p-3 bg-surface-container-low/50 rounded-2xl border border-white/20">
+<div class="w-10 h-10 rounded-full bg-surface-accent flex items-center justify-center">
+<span class="material-symbols-outlined text-ink-primary">diversity_1</span>
+</div>
+<div class="overflow-hidden">
+<p class="font-label-md text-label-md text-ink-primary truncate">Chúng mình</p>
+<p class="text-[10px] text-ink-primary/60">Couple Avatar</p>
+</div>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="md:ml-64 min-h-screen px-margin-mobile md:px-margin-desktop py-stack-lg">
+<!-- Header Section -->
+<header class="mb-stack-lg">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h2 class="font-headline-lg text-headline-lg md:text-4xl text-ink-primary tracking-tight">Hành trình Kỷ niệm</h2>
+<p class="font-body-md text-body-md text-ink-primary opacity-70 mt-1">Nơi lưu giữ những khoảnh khắc đẹp nhất của đôi mình.</p>
+</div>
+<div class="inline-flex items-center gap-2 bg-surface-accent/40 backdrop-blur-sm border border-surface-accent px-4 py-2 rounded-full">
+<span class="material-symbols-outlined text-ink-primary" style="font-variation-settings: 'FILL' 1;">explore</span>
+<span class="font-label-md text-label-md text-ink-primary">12 Chuyến đi</span>
+</div>
+</div>
+</header>
+<!-- Featured Memories Section -->
+<section class="mb-12">
+<h3 class="font-headline-sm text-headline-sm text-ink-primary mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-surface-accent" style="font-variation-settings: 'FILL' 1;">stars</span>
+            Kỷ niệm nổi bật
+        </h3>
+<div class="flex flex-row gap-6 overflow-x-auto pb-4 hide-scrollbar -mx-margin-mobile px-margin-mobile md:mx-0 md:px-0 snap-x">
+<!-- Featured Card 1 -->
+<article class="min-w-[85vw] md:min-w-[450px] aspect-[16/10] relative rounded-3xl overflow-hidden soft-shadow group snap-center cursor-pointer" style="opacity: 1; transform: translateY(0px); transition: 0.6s cubic-bezier(0.22, 1, 0.36, 1);">
+<img alt="Hà Giang" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAB28tTLNTsC-54Q88lQ1-p3iUTQS_px3WaE8veFLiJT_Fc6jKe8wyQInuujnYyi0LRdGL0HAQmQWaoLK2bzWUCLb99aFvrGppCY-WYT3MvemtXd5-Qa4w1MaHlZthvvOOSiqqToY3NZrWOOWrn2Y9PtQaIoKj-61uGeqQvFsYYMNK-ppvp6rCH2iRphBJn9cQ9MkLaSfs38lz1gziBg6MFm5a32Z9d8Ct-9uI14ZeBz3pqfLzn78VSa1Dx89MC3oDM7qLMj0N7V-w">
+<div class="absolute inset-0 bg-gradient-to-t from-ink-primary/90 via-ink-primary/20 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-6 w-full">
+<span class="font-label-sm text-label-sm bg-surface-accent text-ink-primary px-3 py-1 rounded-full mb-3 inline-block">04/2026</span>
+<h4 class="font-headline-md text-white mb-2">Hà Giang: Nơi đá nở hoa</h4>
+<p class="font-body-sm text-white/80 italic line-clamp-1">"Giữa mây trời Đông Bắc, mình tựa vai nhau ngắm những nương ngô xanh ngắt."</p>
+</div>
+</article>
+<!-- Featured Card 2 -->
+<article class="min-w-[85vw] md:min-w-[450px] aspect-[16/10] relative rounded-3xl overflow-hidden soft-shadow group snap-center cursor-pointer" style="opacity: 1; transform: translateY(0px); transition: 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.05s;">
+<img alt="Phú Quốc" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGiGYaKsl1yWkl9NBh7-pGCoY8XnXgqXuLN6C9-RhXMdnN_ZVoqOM-vuy0r-9Y3TvcFKFDxDDWdgo1pQNKcpRJVZdWrySHAfUL5E5itvMioyWbUJdYei7D1cfW4l22VznPgShGWhosi4w2Wda6VVwSEQkVuPPy7cR1o2RhriQSxogaZ6xONzRwRpDjg34F38AUY5WINaT3AtOo50RIwYsfxaAk7iQkdR9p3Jye6QWJqWHSEZ0rcnh2AoIA4l7NPxcs9pDINaFDDpI">
+<div class="absolute inset-0 bg-gradient-to-t from-ink-primary/90 via-ink-primary/20 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-6 w-full">
+<span class="font-label-sm text-label-sm bg-surface-accent text-ink-primary px-3 py-1 rounded-full mb-3 inline-block">12/2025</span>
+<h4 class="font-headline-md text-white mb-2">Phú Quốc: Sắc tím hoàng hôn</h4>
+<p class="font-body-sm text-white/80 italic line-clamp-1">"Hoàng hôn nhuộm tím biển khơi, và đôi mắt em là cả một bầu trời."</p>
+</div>
+</article>
+</div>
+</section>
+<!-- Artistic Grid Section -->
+<section>
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-headline-sm text-headline-sm text-ink-primary">Tất cả Album</h3>
+<button class="text-ink-primary/60 hover:text-ink-primary transition-colors flex items-center gap-1 font-label-md">
+                Xem thêm <span class="material-symbols-outlined text-sm">keyboard_arrow_right</span>
+</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Grid Item 1 (Medium) -->
+<article class="group relative bg-white/40 rounded-2xl overflow-hidden soft-shadow transition-all duration-300 hover:-translate-y-2 cursor-pointer aspect-[4/5]" style="opacity: 1; transform: translateY(0px); transition: 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s;">
+<img alt="Đà Lạt" class="w-full h-[70%] object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBo1xa7EHgqwvYw5z03ddfiqBKSIthtnBZ2qzjbkEGQR_m3lFnnLeNibohRVFp04n_E5c-W8rQLLrGZrfc3phKNiO549iKrXCXFCTfeG-w3Z2bD1Hh7PpUX8oJLOJ2x6UPMKyVzcdYPg8UzHf0GGgYbQJP0rcU30ZCZDcz04LAuF09MjQhY-Ozqniz-hVgYFwLwn3x84LhoVWHiUO5QtmnGgB6IhD3DjLm8Psau_lS9GWj8WHisyETKdgquHKSGccCarSgvws4yrQc">
+<div class="p-4 bg-white/60 backdrop-blur-sm h-[30%] flex flex-col justify-between">
+<div>
+<h4 class="font-label-md text-ink-primary">Đà Lạt</h4>
+<p class="text-[10px] text-ink-primary/60">08/2024 • 120 ảnh</p>
+</div>
+<p class="text-xs italic text-ink-primary/80 line-clamp-1">"Những buổi sáng lạnh tê tái..."</p>
+</div>
+</article>
+<!-- Add New Memory Item -->
+
+<!-- Grid Item 2 (Large) -->
+<article class="group relative bg-white/40 rounded-2xl overflow-hidden soft-shadow transition-all duration-300 hover:-translate-y-2 cursor-pointer aspect-[4/5]" style="opacity: 1; transition: 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.2s;">
+<img alt="Mộc Châu" class="w-full h-[75%] object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAB28tTLNTsC-54Q88lQ1-p3iUTQS_px3WaE8veFLiJT_Fc6jKe8wyQInuujnYyi0LRdGL0HAQmQWaoLK2bzWUCLb99aFvrGppCY-WYT3MvemtXd5-Qa4w1MaHlZthvvOOSiqqToY3NZrWOOWrn2Y9PtQaIoKj-61uGeqQvFsYYMNK-ppvp6rCH2iRphBJn9cQ9MkLaSfs38lz1gziBg6MFm5a32Z9d8Ct-9uI14ZeBz3pqfLzn78VSa1Dx89MC3oDM7qLMj0N7V-w">
+<div class="p-4 bg-white/60 backdrop-blur-sm h-[25%] flex flex-col justify-between">
+<div>
+<h4 class="font-label-md text-ink-primary">Mộc Châu</h4>
+<p class="text-[10px] text-ink-primary/60">01/2024 • 85 ảnh</p>
+</div>
+<p class="text-xs italic text-ink-primary/80 line-clamp-1">"Đồng cải trắng và trái tim mình..."</p>
+</div>
+</article>
+<!-- Grid Item 3 (Small) -->
+<article class="group relative bg-white/40 rounded-2xl overflow-hidden soft-shadow transition-all duration-300 hover:-translate-y-2 cursor-pointer aspect-[4/5]" style="opacity: 1; transition: 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.25s;">
+<div class="h-full relative overflow-hidden">
+<img alt="Coffee date" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBo1xa7EHgqwvYw5z03ddfiqBKSIthtnBZ2qzjbkEGQR_m3lFnnLeNibohRVFp04n_E5c-W8rQLLrGZrfc3phKNiO549iKrXCXFCTfeG-w3Z2bD1Hh7PpUX8oJLOJ2x6UPMKyVzcdYPg8UzHf0GGgYbQJP0rcU30ZCZDcz04LAuF09MjQhY-Ozqniz-hVgYFwLwn3x84LhoVWHiUO5QtmnGgB6IhD3DjLm8Psau_lS9GWj8WHisyETKdgquHKSGccCarSgvws4yrQc">
+<div class="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-ink-primary/80 to-transparent">
+<h4 class="font-label-md text-white">Chuyện Phố</h4>
+<p class="text-[10px] text-white/70">Mọi lúc • 42 ảnh</p>
+</div>
+</div>
+</article>
+</div>
+</section>
+<!-- Emotional Journey Progress -->
+<section class="mt-16 bg-white/40 backdrop-blur-md rounded-3xl p-8 border border-white/30 soft-shadow">
+<div class="flex items-center gap-4 mb-8">
+<div class="p-4 bg-surface-accent rounded-2xl">
+<span class="material-symbols-outlined text-ink-primary" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+<div>
+<h4 class="font-headline-sm text-ink-primary">Tiến độ Hành trình</h4>
+<p class="font-label-sm text-ink-primary/60">Cùng nhau viết tiếp câu chuyện tình yêu</p>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div>
+<div class="flex justify-between mb-3">
+<span class="font-label-md text-ink-primary">Khám phá 63 tỉnh thành</span>
+<span class="font-label-md text-ink-primary">12/63</span>
+</div>
+<div class="h-4 bg-ink-primary/10 rounded-full overflow-hidden p-1">
+<div class="h-full bg-surface-accent rounded-full transition-all duration-1000" style="width: 19%;"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between mb-3">
+<span class="font-label-md text-ink-primary">Kho ảnh kỷ niệm</span>
+<span class="font-label-md text-ink-primary">840/1000</span>
+</div>
+<div class="h-4 bg-ink-primary/10 rounded-full overflow-hidden p-1">
+<div class="h-full bg-surface-accent rounded-full transition-all duration-1000" style="width: 84%;"></div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- FAB for Mobile -->
+<button class="md:hidden fixed bottom-24 right-6 w-14 h-14 bg-surface-accent text-ink-primary rounded-full shadow-lg flex items-center justify-center active:scale-90 transition-transform z-40 border-4 border-background-main">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+<!-- Bottom Navigation Bar (Mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-background-main/90 backdrop-blur-lg border-t border-ink-primary/5 flex justify-around items-center py-3 px-4 z-50">
+<a class="flex flex-col items-center gap-1 text-ink-primary opacity-50" href="#">
+<span class="material-symbols-outlined">favorite</span>
+<span class="font-label-sm text-[10px]">Emotions</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-ink-primary font-bold active-dot" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">timeline</span>
+<span class="font-label-sm text-[10px]">Hành trình</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-ink-primary opacity-50" href="#">
+<span class="material-symbols-outlined">auto_awesome</span>
+<span class="font-label-sm text-[10px]">Future</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-ink-primary opacity-50" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-label-sm text-[10px]">Dates</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-ink-primary opacity-50" href="#">
+<span class="material-symbols-outlined">lock</span>
+<span class="font-label-sm text-[10px]">Secrets</span>
+</a>
+</nav>
+<script>
+    // Micro-interactions for cards
+    document.querySelectorAll('article').forEach(card => {
+        card.addEventListener('mousedown', () => {
+            card.style.transform = 'scale(0.98)';
+        });
+        card.addEventListener('mouseup', () => {
+            card.style.transform = '';
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = '';
+        });
+    });
+
+    // Simple Fade-in for cards on load
+    window.addEventListener('DOMContentLoaded', () => {
+        const items = document.querySelectorAll('article, button.group');
+        items.forEach((item, index) => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateY(20px)';
+            item.style.transition = `all 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${index * 0.05}s`;
+            
+            setTimeout(() => {
+                item.style.opacity = '1';
+                item.style.transform = 'translateY(0)';
+            }, 100);
+        });
+    });
+</script>
+
+
+<button class="fixed bottom-8 right-8 w-14 h-14 bg-surface-accent text-white rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-110 active:scale-95 z-50">
+  <span class="material-symbols-outlined text-3xl">add</span>
+</button></body></html>
