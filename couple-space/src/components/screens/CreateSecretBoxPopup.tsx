@@ -1,165 +1,276 @@
-import React, { useState } from "react";
+"use client";
+
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Portal } from "@/components/ui/Portal";
+import { useModalKeys } from "@/lib/useModalKeys";
+import {
+  PASSCODE_LENGTH,
+  fromDateInput,
+  isValidPasscode,
+  todayInput,
+} from "@/lib/secretBox";
+import type { SecretNote } from "@/data/mockData";
 
 interface CreateSecretBoxPopupProps {
-    readonly onClose: () => void;
-    readonly onSuccess: (data: { title: string; content: string; unlockDate: string; passcode: string }) => void;
+  readonly onClose: () => void;
+  readonly onSuccess: (note: SecretNote) => void;
 }
 
-export const CreateSecretBoxPopup: React.FC<Readonly<CreateSecretBoxPopupProps>> = ({ onClose, onSuccess }) => {
-    const [title, setTitle] = useState("");
-    const [content, setContent] = useState("");
-    const [passcode, setPasscode] = useState("");
-    const [unlockDate, setUnlockDate] = useState("");
-    const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+/** Offered categories. "Đã mở" is not among them — that is a state, not a kind. */
+const CATEGORIES = ["Tình cảm", "Du lịch", "Tương lai", "Kỷ niệm", "Lời hứa"] as const;
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!title || !content || !passcode || !unlockDate) {
-            alert("Vui lòng điền đầy đủ thông tin.");
-            return;
-        }
-        // Show success modal first, then trigger onSuccess
-        setIsSuccessModalOpen(true);
-    };
+export function CreateSecretBoxPopup({ onClose, onSuccess }: CreateSecretBoxPopupProps) {
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [preview, setPreview] = useState("");
+  const [passcode, setPasscode] = useState("");
+  const [unlockDate, setUnlockDate] = useState("");
+  const [category, setCategory] = useState<string>(CATEGORIES[0]);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { dialogRef, onKeyDown } = useModalKeys(onClose);
 
-    const handleFinish = () => {
-        setIsSuccessModalOpen(false);
-        onSuccess({ title, content, unlockDate, passcode });
-    };
+  const [today] = useState(() => todayInput(Date.now()));
 
-    return (
-        <Portal>
-            <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-ink-primary/60 backdrop-blur-md">
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                    transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                    className="w-full max-w-2xl bg-surface-text-container rounded-[2rem] p-8 md:p-12 relative overflow-hidden"
-                    style={{ boxShadow: "0 15px 30px -10px rgba(37, 53, 88, 0.2)" }}
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    /* Each rule says which field is wrong. The old check was one blanket
+       "điền đầy đủ thông tin", which passed a 1-digit passcode under a label
+       that promised four, and accepted an unlock date in the past. */
+    if (!title.trim()) return setError("Hãy đặt một tiêu đề cho hộp.");
+    if (!content.trim()) return setError("Hộp chưa có lời nhắn nào bên trong.");
+    if (!isValidPasscode(passcode)) return setError(`Mật mã phải đúng ${PASSCODE_LENGTH} chữ số.`);
+    if (!unlockDate) return setError("Hãy chọn ngày mở khóa.");
+    if (unlockDate < today) return setError("Ngày mở khóa phải từ hôm nay trở đi.");
+    setError(null);
+    setIsSuccessModalOpen(true);
+  };
+
+  const handleFinish = () => {
+    setIsSuccessModalOpen(false);
+    onSuccess({
+      id: `sn-new-${Date.now()}`,
+      title: title.trim(),
+      preview: preview.trim() || "Một điều thầm kín đang chờ ngày mở.",
+      content: content.trim(),
+      unlockAt: fromDateInput(unlockDate),
+      createdAt: new Date().toISOString(),
+      passcode,
+      category,
+      icon: "lock_clock",
+    });
+  };
+
+  return (
+    <Portal>
+      <div
+        className="overlay z-[200] items-end justify-center md:items-center md:p-4"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="create-secret-title"
+      >
+        <motion.button
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="absolute inset-0 cursor-default"
+          onClick={onClose}
+          aria-label="Đóng"
+          tabIndex={-1}
+        />
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.97, y: 24 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.97, y: 24 }}
+          transition={{ type: "spring", damping: 25, stiffness: 300 }}
+          className="modal custom-scrollbar max-w-2xl"
+          ref={dialogRef}
+          onKeyDown={onKeyDown}
+        >
+          <div className="modal-head md:px-8">
+            <div className="flex min-w-0 items-center gap-3">
+              <span className="flex h-12 w-12 flex-none -rotate-3 items-center justify-center rounded-[var(--radius-wobble-sm)] border-[2.2px] border-ink-primary bg-surface-accent">
+                <span className="material-symbols-outlined text-ink-primary">lock_open</span>
+              </span>
+              <div className="min-w-0">
+                <h3
+                  id="create-secret-title"
+                  className="font-headline-sm text-headline-sm text-ink-primary"
                 >
-                    {/* Atmospheric background element */}
-                    <div className="absolute -top-12 -right-12 w-48 h-48 bg-surface-accent/20 rounded-full blur-3xl"></div>
-                    <div className="relative z-10">
-                        <div className="flex items-center gap-4 mb-10">
-                            <div className="w-12 h-12 rounded-2xl bg-surface-accent flex items-center justify-center shadow-sm">
-                                <span className="material-symbols-outlined text-ink-primary">lock_open</span>
-                            </div>
-                            <div>
-                                <h3 className="font-headline-sm text-headline-sm text-ink-primary">Gửi gắm điều thầm kín</h3>
-                                <p className="font-body-sm text-on-surface-variant">Hộp bí mật sẽ chỉ mở ra vào khoảnh khắc bạn chọn.</p>
-                            </div>
-                        </div>
-                        <form className="space-y-8" onSubmit={handleSubmit}>
-                            {/* Title Field */}
-                            <div className="space-y-2">
-                                <label className="font-label-md text-on-surface-variant ml-1" htmlFor="title">Tiêu đề cảm xúc</label>
-                                <input
-                                    className="w-full bg-surface-container-lowest border border-ink-primary/10 rounded-2xl px-6 py-4 font-body-md transition-all focus:outline-none focus:border-surface-accent focus:ring-2 focus:ring-surface-accent/40"
-                                    id="title"
-                                    value={title}
-                                    onChange={(e) => setTitle(e.target.value)}
-                                    placeholder="Nhập tiêu đề (ví dụ: Lần đầu tiên ta gặp nhau)"
-                                    type="text"
-                                />
-                            </div>
-                            {/* Content Field */}
-                            <div className="space-y-2">
-                                <label className="font-label-md text-on-surface-variant ml-1" htmlFor="message">Lời nhắn bí mật</label>
-                                <textarea
-                                    className="w-full bg-surface-container-lowest border border-ink-primary/10 rounded-2xl px-6 py-4 font-body-md transition-all resize-none focus:outline-none focus:border-surface-accent focus:ring-2 focus:ring-surface-accent/40"
-                                    id="message"
-                                    value={content}
-                                    onChange={(e) => setContent(e.target.value)}
-                                    placeholder="Viết những lời bạn muốn nhắn gửi..."
-                                    rows={5}
-                                ></textarea>
-                            </div>
-                            {/* Security & Unlock Grid */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {/* Passcode Setup */}
-                                <div className="space-y-2">
-                                    <label className="font-label-md text-on-surface-variant ml-1" htmlFor="passcode">Thiết lập mật mã (4 số)</label>
-                                    <div className="relative">
-                                        <input
-                                            className="w-full bg-surface-container-lowest border border-ink-primary/10 rounded-2xl px-6 py-4 font-body-md transition-all tracking-[1em] text-center focus:outline-none focus:border-surface-accent focus:ring-2 focus:ring-surface-accent/40"
-                                            id="passcode"
-                                            maxLength={4}
-                                            value={passcode}
-                                            onChange={(e) => setPasscode(e.target.value.replace(/\D/g, ""))}
-                                            placeholder="••••"
-                                            type="password"
-                                        />
-                                        <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant/40">key</span>
-                                    </div>
-                                </div>
-                                {/* Unlock Condition */}
-                                <div className="space-y-2">
-                                    <label className="font-label-md text-on-surface-variant ml-1" htmlFor="unlock-date">Thời gian mở khóa</label>
-                                    <div className="relative">
-                                        <input
-                                            className="w-full bg-surface-container-lowest border border-ink-primary/10 rounded-2xl px-6 py-4 pr-12 font-body-md transition-all focus:outline-none focus:border-surface-accent focus:ring-2 focus:ring-surface-accent/40 appearance-none"
-                                            id="unlock-date"
-                                            value={unlockDate}
-                                            onChange={(e) => setUnlockDate(e.target.value)}
-                                            type="date"
-                                        />
-                                        <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant/40 pointer-events-none">event</span>
-                                    </div>
-                                </div>
-                            </div>
-                            {/* Action Buttons */}
-                            <div className="flex flex-col md:flex-row gap-4 pt-6">
-                                <button
-                                    className="flex-1 px-8 py-4 rounded-2xl font-label-md text-ink-primary border border-ink-primary/10 hover:bg-surface-container-high transition-colors text-center"
-                                    type="button"
-                                    onClick={onClose}
-                                >
-                                    Hủy bỏ
-                                </button>
-                                <button
-                                    className="flex-1 px-8 py-4 rounded-2xl font-label-md text-ink-primary bg-surface-accent hover:opacity-90 active:scale-95 transition-all shadow-md shadow-surface-accent/20 text-center"
-                                    type="submit"
-                                >
-                                    Tạo hộp bí mật
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </motion.div>
-
-                {/* Success Modal Overlay */}
-                <AnimatePresence>
-                    {isSuccessModalOpen && (
-                        <Portal>
-                            <div className="fixed inset-0 z-[210] flex items-center justify-center px-4 bg-ink-primary/40 backdrop-blur-sm">
-                                <motion.div
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    exit={{ opacity: 0, scale: 0.9 }}
-                                    className="bg-surface-text-container p-8 rounded-[2.5rem] max-w-sm w-full text-center"
-                                >
-                                    <div className="w-20 h-20 bg-surface-accent rounded-full flex items-center justify-center mx-auto mb-6">
-                                        <span className="material-symbols-outlined text-4xl">lock_clock</span>
-                                    </div>
-                                    <h4 className="text-headline-sm font-headline-sm mb-2 text-ink-primary">
-                                        &ldquo;{title}&rdquo; đã được khóa!
-                                    </h4>
-                                    <p className="font-body-md text-on-surface-variant mb-8">Điều thầm kín của bạn đã được lưu giữ an toàn cho đến ngày hẹn.</p>
-                                    <button
-                                        className="w-full py-4 bg-ink-primary text-white rounded-2xl font-label-md hover:opacity-90 transition-opacity"
-                                        onClick={handleFinish}
-                                    >
-                                        Tuyệt vời
-                                    </button>
-                                </motion.div>
-                            </div>
-                        </Portal>
-                    )}
-                </AnimatePresence>
+                  Gửi gắm điều thầm kín
+                </h3>
+                <p className="font-body-sm text-body-sm text-primary">
+                  Hộp bí mật sẽ chỉ mở ra vào khoảnh khắc bạn chọn.
+                </p>
+              </div>
             </div>
-        </Portal>
-    );
-};
+            <button onClick={onClose} className="btn btn-icon btn-sm" aria-label="Đóng">
+              <span className="material-symbols-outlined">close</span>
+            </button>
+          </div>
+
+          <form className="modal-body space-y-6 md:px-8" onSubmit={handleSubmit}>
+            <div>
+              <label className="field-label" htmlFor="title">
+                Tiêu đề cảm xúc
+              </label>
+              <input
+                className="field"
+                id="title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Nhập tiêu đề (ví dụ: Lần đầu tiên ta gặp nhau)"
+                type="text"
+              />
+            </div>
+
+            <div>
+              <label className="field-label" htmlFor="message">
+                Lời nhắn bí mật
+              </label>
+              <textarea
+                className="field resize-none"
+                id="message"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder="Viết những lời bạn muốn nhắn gửi..."
+                rows={5}
+              />
+            </div>
+
+            {/* The teaser exists so the waiting-list card has something to show.
+                Without it the card would have to print the secret, which is
+                exactly what the old screen did. */}
+            <div>
+              <label className="field-label" htmlFor="preview">
+                Lời gợi ý <span className="text-primary">(hiện ra khi hộp còn khóa)</span>
+              </label>
+              <input
+                className="field"
+                id="preview"
+                value={preview}
+                onChange={(e) => setPreview(e.target.value)}
+                placeholder="Một câu bâng quơ, đủ để tò mò mà chưa lộ gì"
+                type="text"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <label className="field-label" htmlFor="passcode">
+                  Thiết lập mật mã ({PASSCODE_LENGTH} số)
+                </label>
+                <div className="relative">
+                  <input
+                    className="field font-headline text-center tracking-[0.6em]"
+                    id="passcode"
+                    maxLength={PASSCODE_LENGTH}
+                    value={passcode}
+                    onChange={(e) => setPasscode(e.target.value.replace(/\D/g, ""))}
+                    placeholder="••••"
+                    type="password"
+                    inputMode="numeric"
+                  />
+                  <span className="material-symbols-outlined pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-primary/50">
+                    key
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <label className="field-label" htmlFor="unlock-date">
+                  Thời gian mở khóa
+                </label>
+                <input
+                  className="field appearance-none"
+                  id="unlock-date"
+                  value={unlockDate}
+                  onChange={(e) => setUnlockDate(e.target.value)}
+                  type="date"
+                  min={today}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="field-label" htmlFor="create-category">
+                Danh mục
+              </label>
+              <select
+                id="create-category"
+                className="field cursor-pointer"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              >
+                {CATEGORIES.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {error && (
+              <div className="toast toast-error" role="alert">
+                <span className="material-symbols-outlined text-[18px]">error</span>
+                <p className="font-label-sm text-label-sm text-ink-primary">{error}</p>
+              </div>
+            )}
+
+            <div className="flex flex-col gap-4 pt-2 md:flex-row">
+              <button className="btn flex-1 py-4" type="button" onClick={onClose}>
+                Hủy bỏ
+              </button>
+              <button className="btn btn-accent flex-1 py-4" type="submit">
+                <span className="material-symbols-outlined">lock</span>
+                Tạo hộp bí mật
+              </button>
+            </div>
+          </form>
+        </motion.div>
+
+        {/* ---------- Success notification ---------- */}
+        <AnimatePresence>
+          {isSuccessModalOpen && (
+            <div
+              className="overlay z-[210] items-center justify-center px-4"
+              role="alertdialog"
+              aria-modal="true"
+              aria-labelledby="locked-title"
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.94, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.94 }}
+                transition={{ type: "spring", damping: 24, stiffness: 300 }}
+                className="card card-flat w-full max-w-sm p-8 text-center"
+              >
+                <span className="mx-auto mb-6 flex h-20 w-20 -rotate-3 items-center justify-center rounded-[var(--radius-wobble-sm)] border-[2.4px] border-ink-primary bg-surface-accent">
+                  <span className="material-symbols-outlined text-4xl text-ink-primary">
+                    lock_clock
+                  </span>
+                </span>
+                <h4
+                  id="locked-title"
+                  className="font-headline-sm text-headline-sm mb-2 text-ink-primary"
+                >
+                  &ldquo;{title}&rdquo; đã được khóa!
+                </h4>
+                <p className="font-body-md text-body-md mb-8 text-primary">
+                  Điều thầm kín của bạn đã được lưu giữ cho đến ngày hẹn.
+                </p>
+                <button className="btn btn-ink w-full py-4" onClick={handleFinish} autoFocus>
+                  Tuyệt vời
+                </button>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+      </div>
+    </Portal>
+  );
+}
+
+export default CreateSecretBoxPopup;

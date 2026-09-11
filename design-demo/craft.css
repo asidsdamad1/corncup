@@ -1,0 +1,554 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Be+Vietnam+Pro:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap");
+
+/* =============================================================
+   Duyên — "Refined Craft" reference stylesheet
+   The runnable half of DESIGN.MD. Every token here mirrors
+   couple-space/tailwind.config.ts; nothing is invented.
+
+   Typefaces are corncup's own: Plus Jakarta Sans (display/label)
+   + Be Vietnam Pro (body). NO script/handwriting face — the
+   handmade feel comes from geometry and texture instead.
+   ============================================================= */
+
+:root {
+  color-scheme: light;
+
+  /* --- brand tokens (identical to tailwind.config.ts) --- */
+  --bg-main: #b2ccec;      /* background-main       */
+  --accent: #f5c7c7;       /* surface-accent        */
+  --container: #f2f2f2;    /* surface-text-container*/
+  --ink: #253558;          /* ink-primary           */
+  --primary: #47607c;      /* primary               */
+  --mint: #00d294;         /* completion signal only*/
+  --error: #ba1a1a;
+
+  /* --- derived --- */
+  --paper: #fcfbf8;
+  --paper-2: #f4f7fc;
+  --ink-20: #25355833;
+  --ink-08: #25355814;
+  --ink-05: #2535580d;
+
+  --shadow-soft: 0 15px 30px -10px #25355814;
+  --shadow-lift: 0 24px 44px -18px #2535582e;
+
+  /* The signature move: an asymmetric radius that reads as a
+     hand-drawn ballpoint outline rather than a UI rectangle. */
+  --wobble: 255px 16px 226px 18px / 18px 224px 16px 252px;
+  --wobble-sm: 130px 8px 116px 10px / 10px 114px 9px 128px;
+
+  --rule: 30px;            /* ruled-paper line height */
+  --stroke: 2.2px;         /* the one ink stroke width */
+
+  /* spacing tokens from tailwind.config.ts */
+  --stack-lg: 2rem;
+  --stack-md: 1rem;
+  --stack-sm: 0.5rem;
+  --gutter: 1rem;
+}
+
+* { box-sizing: border-box; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  padding: 0 18px 124px;
+  color: var(--ink);
+  font-family: "Be Vietnam Pro", "Segoe UI", system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+
+  /* Paper ground: colour washes + a dot grid so the page reads
+     as a sheet of graph paper, not a flat viewport. */
+  background-color: var(--paper-2);
+  background-image:
+    radial-gradient(640px 400px at 92% 2%, #f5c7c74d, transparent 66%),
+    radial-gradient(700px 420px at 4% 34%, #b2ccec66, transparent 68%),
+    radial-gradient(620px 400px at 96% 76%, #b2ccec4d, transparent 66%),
+    radial-gradient(var(--ink-08) 1px, transparent 1.4px),
+    linear-gradient(172deg, #ffffff 0%, var(--paper-2) 46%, #edf2fa 100%);
+  background-size: auto, auto, auto, 17px 17px, auto;
+  background-attachment: fixed;
+}
+
+.page { max-width: 940px; margin: 0 auto; position: relative; }
+
+/* ---------- typography ---------- */
+
+.display,
+h1.display {
+  margin: 0;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.75rem, 6vw, 2rem);
+  line-height: 1.24;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  transform: rotate(-0.6deg);   /* stands in for a handwritten heading */
+}
+
+h2.headline, .headline {
+  margin: 0;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 600;
+  font-size: 1.5rem;
+  line-height: 1.34;
+}
+
+h3.headline-sm, .headline-sm {
+  margin: 0;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 600;
+  font-size: 1.25rem;
+  line-height: 1.4;
+}
+
+.label {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 600;
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.meta { color: var(--primary); font-size: 0.875rem; line-height: 1.45; }
+.body-lg { font-size: 1.125rem; line-height: 1.6; }
+
+/* Ruled paper. This — not a script font — is what makes a block
+   read as something written by hand in a notebook. */
+.ruled {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 calc(var(--rule) - 1px),
+    var(--ink-08) calc(var(--rule) - 1px) var(--rule)
+  );
+  border-left: 2px solid #f5c7c7cc;
+  padding: 6px 0 2px 16px;
+}
+.ruled p {
+  margin: 0;
+  font-size: 1rem;
+  line-height: var(--rule);
+}
+.ruled p + p { margin-top: var(--rule); }
+
+/* ---------- surfaces ---------- */
+
+.sheet {
+  position: relative;
+  background: var(--paper);
+  border-radius: 28px;
+  box-shadow: var(--shadow-lift);
+  padding: 22px 22px 20px;
+}
+
+/* The wobble card: ink outline + asymmetric radius + a half-degree
+   of rotation. Rotation is what sells "placed by hand". */
+.card {
+  position: relative;
+  background: var(--paper);
+  border: var(--stroke) solid var(--ink);
+  border-radius: var(--wobble);
+  box-shadow: var(--shadow-soft);
+  padding: 18px 20px 16px;
+  transform: rotate(-0.4deg);
+}
+.card.tilt-r { transform: rotate(0.5deg); }
+.card.flat { transform: none; }
+.card.accent { background: var(--accent); }
+.card.wash { background: var(--container); }
+
+/* Dashed variant for secondary / not-yet-filled content. */
+.card.dashed {
+  border-style: dashed;
+  border-color: var(--ink-20);
+  background: var(--paper-2);
+}
+
+.rule {
+  height: 1px;
+  border: 0;
+  margin: 14px 0;
+  background: repeating-linear-gradient(90deg, var(--ink-20) 0 6px, transparent 6px 12px);
+}
+
+/* Photo mat — a graph-paper border so images look mounted. */
+.mat {
+  padding: 10px;
+  background: var(--paper-2);
+  background-image:
+    linear-gradient(#25355812 1px, transparent 1px),
+    linear-gradient(90deg, #25355812 1px, transparent 1px);
+  background-size: 15px 15px;
+  box-shadow: var(--shadow-soft);
+}
+.mat img,
+.mat .ph {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  background: linear-gradient(160deg, #eef4fc, #f5c7c74d);
+  box-shadow: 0 3px 10px #2535581f;
+}
+/* placeholder stand-in where a real photo would go */
+.mat .ph { display: grid; place-items: center; color: var(--primary); }
+.mat .ph .material-symbols-outlined { font-size: 34px; opacity: 0.5; }
+
+/* ---------- section header ---------- */
+
+.sec-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 42px 0 18px;
+  padding-left: 2px;
+}
+.sec-head .no {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 700;
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--accent);
+  -webkit-text-stroke: 1.3px var(--ink);
+  transform: rotate(-6deg);
+}
+.sec-head .tx { min-width: 0; }
+.sec-head h2 {
+  margin: 0;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.3rem, 4.6vw, 1.6rem);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  transform: rotate(-0.5deg);
+}
+.sec-head p { margin: 2px 0 0; color: var(--primary); font-size: 0.875rem; }
+
+/* ---------- chips / stamps ---------- */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 13px 6px;
+  border: var(--stroke) solid var(--ink);
+  border-radius: var(--wobble-sm);
+  background: var(--paper);
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 600;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+  line-height: 1.3;
+}
+.chip.accent { background: var(--accent); }
+.chip.blue { background: var(--bg-main); }
+.chip.soft { border-style: dashed; border-color: var(--ink-20); color: var(--primary); }
+.chip .material-symbols-outlined { font-size: 15px; }
+
+/* A stamp is a chip that has been pressed onto the page at an angle. */
+.stamp {
+  display: inline-block;
+  padding: 5px 14px 7px;
+  border: 2.4px solid var(--ink);
+  border-radius: var(--wobble-sm);
+  background: #fcfbf8cc;
+  text-align: center;
+  transform: rotate(7deg);
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.15;
+}
+.stamp small {
+  display: block;
+  font-weight: 600;
+  font-size: 0.54rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+/* ---------- buttons ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 22px 11px;
+  border: var(--stroke) solid var(--ink);
+  border-radius: var(--wobble-sm);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: background 0.18s ease, transform 0.14s ease;
+}
+.btn:hover { background: var(--accent); }
+.btn:active { transform: translateY(2px); }
+.btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+.btn.accent { background: var(--accent); }
+.btn.accent:hover { background: #fff; }
+.btn.sm { padding: 6px 15px 8px; font-size: 0.8rem; }
+.btn.icon { padding: 0; width: 44px; height: 44px; border-radius: 50%; }
+.btn.icon .material-symbols-outlined { font-size: 20px; }
+
+/* One focus ring for the whole system: a dashed ink outline that
+   matches the pen-drawn language instead of a browser glow. */
+.btn:focus-visible,
+.field:focus-visible,
+.tab:focus-visible,
+.node-btn:focus-visible,
+.dock a:focus-visible,
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+  outline: 3px dashed var(--ink);
+  outline-offset: 3px;
+}
+
+/* ---------- form fields ---------- */
+
+.field {
+  width: 100%;
+  padding: 11px 15px 12px;
+  border: var(--stroke) solid var(--ink);
+  border-radius: var(--wobble-sm);
+  background: var(--container);
+  color: var(--ink);
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+.field::placeholder { color: var(--primary); opacity: 0.75; }
+.field:focus { background: #fff; outline-offset: 3px; }
+
+.field-label {
+  display: block;
+  margin-bottom: 6px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 600;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+/* ---------- tabs ---------- */
+
+.tabs {
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  border: var(--stroke) solid var(--ink);
+  border-radius: var(--wobble-sm);
+  background: var(--paper-2);
+}
+.tab {
+  flex: 1;
+  padding: 9px 8px 10px;
+  border: 0;
+  border-radius: 14px;
+  background: none;
+  color: var(--primary);
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 600;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+.tab:hover { background: #f5c7c74d; color: var(--ink); }
+.tab[aria-selected="true"] {
+  background: var(--accent);
+  color: var(--ink);
+  box-shadow: 0 2px 0 var(--ink);
+}
+
+/* ---------- meter (hand-ruled progress) ---------- */
+
+.meter { display: flex; align-items: center; gap: 12px; }
+.meter svg { flex: 1; height: 16px; overflow: visible; min-width: 90px; }
+.meter .tr {
+  fill: none;
+  stroke: var(--ink-20);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.meter .fl {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 5.4;
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  transition: stroke-dashoffset 0.9s cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+.meter .pct {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  min-width: 4ch;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.meter.done .fl { stroke: var(--mint); }
+.meter.done .pct { color: var(--mint); }
+
+/* ---------- timeline ---------- */
+
+.timeline { position: relative; padding-left: 30px; }
+/* dashed spine, drawn as a background so it sits behind the nodes */
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: 6px;
+  bottom: 6px;
+  width: 2px;
+  background: repeating-linear-gradient(to bottom, var(--ink-20) 0 7px, transparent 7px 14px);
+}
+.tl-item { position: relative; margin-bottom: 22px; }
+.tl-item::after {
+  content: "";
+  position: absolute;
+  left: -29px;
+  top: 20px;
+  width: 15px;
+  height: 15px;
+  border: var(--stroke) solid var(--ink);
+  border-radius: 50%;
+  background: var(--paper);
+  box-shadow: 0 0 0 4px var(--paper-2);
+}
+.tl-item.done::after { background: var(--accent); }
+.tl-item.here::after { background: var(--mint); }
+
+/* Node toggle. Kept as a small inline control rather than wrapping the
+   whole card, because a <button> may not contain headings or divs. */
+.node-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: none;
+  padding: 3px 9px 4px;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  font: inherit;
+  color: var(--primary);
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+.node-btn:hover { background: #f5c7c74d; color: var(--ink); }
+.node-btn .material-symbols-outlined { font-size: 20px; }
+
+/* ---------- bottom dock ---------- */
+
+.dock {
+  position: fixed;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  z-index: 30;
+  display: flex;
+  gap: 2px;
+  padding: 7px 9px;
+  background: #fcfbf8f2;
+  border: 2.4px solid var(--ink);
+  border-radius: var(--wobble-sm);
+  box-shadow: 0 14px 28px -12px #2535583d;
+  backdrop-filter: blur(6px);
+  max-width: calc(100vw - 24px);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.dock::-webkit-scrollbar { display: none; }
+.dock a {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 5px 10px 3px;
+  border-radius: 14px;
+  text-decoration: none;
+  color: var(--primary);
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 600;
+  font-size: 0.6rem;
+  letter-spacing: 0.04em;
+  line-height: 1.3;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+.dock a .material-symbols-outlined { font-size: 21px; }
+.dock a:hover { color: var(--ink); background: #f5c7c74d; }
+.dock a.on { color: var(--ink); background: var(--accent); }
+
+/* ---------- page furniture ---------- */
+
+header.hero { padding: 40px 0 4px; }
+header.hero .display { margin-top: 6px; }
+header.hero .sub { margin: 12px 0 0; max-width: 46ch; color: var(--primary); }
+
+footer.foot {
+  padding: 44px 0 10px;
+  text-align: center;
+  color: var(--primary);
+  font-size: 0.85rem;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+  vertical-align: middle;
+}
+.material-symbols-outlined.fill { font-variation-settings: "FILL" 1; }
+
+.sr {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Reveal transition used by the locked note and expanding nodes. */
+.reveal {
+  opacity: 0;
+  translate: 0 24px;
+  scale: 0.97;
+  transform-origin: 50% 0;
+  transition:
+    opacity 0.5s ease,
+    translate 0.55s cubic-bezier(0.2, 0.9, 0.25, 1),
+    scale 0.55s ease;
+}
+.reveal.in { opacity: 1; translate: 0 0; scale: 1; }
+
+@media (max-width: 620px) {
+  .sec-head { margin-top: 34px; }
+  .sheet { padding: 18px 16px 16px; border-radius: 24px; }
+  .card { padding: 16px 16px 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001s !important;
+  }
+  html { scroll-behavior: auto; }
+}
+
+html { scroll-behavior: smooth; }

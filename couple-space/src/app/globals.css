@@ -2,14 +2,30 @@
 @import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap");
 @import "tailwindcss";
 
-/* Fonts */
+/* =============================================================
+   Duyên — "Refined Craft"
+   See ../../../DESIGN.MD for the reasoning behind every token.
+
+   NOTE: this project is Tailwind v4 and does NOT use `@config`,
+   so tailwind.config.ts is never loaded. Everything the app can
+   actually use must live in the @theme block below. The text
+   scale and shadows were previously only in tailwind.config.ts,
+   which is why ~284 `text-headline-*` / `text-label-*` classes
+   silently produced no font-size at all. They are restored here.
+   ============================================================= */
 
 @theme {
-  /* Brand Colors */
+  /* ---------- brand ---------- */
   --color-background-main: #b2ccec;
   --color-surface-accent: #f5c7c7;
   --color-surface-text-container: #f2f2f2;
   --color-ink-primary: #253558;
+
+  /* derived paper surfaces — the craft palette */
+  --color-paper: #fcfbf8;
+  --color-paper-2: #f4f7fc;
+  --color-mint: #00d294;
+
   --color-primary: #47607c;
   --color-primary-container: #b2ccec;
   --color-primary-fixed: #d0e4ff;
@@ -19,6 +35,7 @@
   --color-on-primary-container: #3d5772;
   --color-secondary: #785556;
   --color-secondary-container: #fdcfcf;
+  --color-on-secondary-container: #795656;
   --color-tertiary: #4e5e83;
   --color-tertiary-container: #b9c9f4;
   --color-tertiary-fixed: #d9e2ff;
@@ -29,27 +46,208 @@
   --color-surface-container: #eeeeee;
   --color-surface-container-low: #f3f3f3;
   --color-surface-container-high: #e8e8e8;
+  --color-surface-container-lowest: #ffffff;
   --color-surface-variant: #e2e2e2;
   --color-on-surface: #1a1c1c;
   --color-on-surface-variant: #43474d;
+  --color-on-background: #1a1c1c;
   --color-outline: #73777e;
   --color-outline-variant: #c3c6ce;
   --color-error: #ba1a1a;
 
-  /* Spacing tokens */
+  /* ---------- spacing ---------- */
   --spacing-stack-lg: 2rem;
   --spacing-stack-md: 1rem;
   --spacing-gutter: 1rem;
   --spacing-stack-sm: 0.5rem;
   --spacing-margin-mobile: 1.25rem;
   --spacing-margin-desktop: 2.5rem;
+
+  /* ---------- type scale (restored — see note above) ---------- */
+  --text-label-sm: 12px;
+  --text-label-sm--line-height: 14px;
+  --text-label-sm--letter-spacing: 0.02em;
+  --text-label-sm--font-weight: 500;
+
+  --text-body-sm: 14px;
+  --text-body-sm--line-height: 20px;
+  --text-body-sm--font-weight: 400;
+
+  --text-label-md: 14px;
+  --text-label-md--line-height: 16px;
+  --text-label-md--letter-spacing: 0.05em;
+  --text-label-md--font-weight: 600;
+
+  --text-body-md: 16px;
+  --text-body-md--line-height: 24px;
+  --text-body-md--font-weight: 400;
+
+  --text-body-lg: 18px;
+  --text-body-lg--line-height: 28px;
+  --text-body-lg--font-weight: 400;
+
+  --text-headline-sm: 20px;
+  --text-headline-sm--line-height: 28px;
+  --text-headline-sm--font-weight: 600;
+
+  --text-headline-md: 24px;
+  --text-headline-md--line-height: 32px;
+  --text-headline-md--font-weight: 600;
+
+  --text-headline-lg-mobile: 26px;
+  --text-headline-lg-mobile--line-height: 32px;
+  --text-headline-lg-mobile--letter-spacing: -0.02em;
+  --text-headline-lg-mobile--font-weight: 700;
+
+  --text-headline-lg: 32px;
+  --text-headline-lg--line-height: 40px;
+  --text-headline-lg--letter-spacing: -0.02em;
+  --text-headline-lg--font-weight: 700;
+
+  /* ---------- shadows (restored) ---------- */
+  --shadow-soft: 0 15px 30px -10px #25355814;
+  --shadow-card: 0 2px 12px #25355810;
+  --shadow-lift: 0 24px 44px -18px #2535582e;
+
+  /* ---------- the signature radii ---------- */
+  --radius-wobble: 255px 16px 226px 18px / 18px 224px 16px 252px;
+  --radius-wobble-sm: 130px 8px 116px 10px / 10px 114px 9px 128px;
 }
+
+/* Tokens that are not Tailwind namespaces, kept as plain custom
+   properties so the primitives below can reference them. */
+:root {
+  --ink-20: #25355833;
+  --ink-08: #25355814;
+  --ink-05: #2535580d;
+  --stroke: 2.2px;
+  --rule: 30px;
+}
+
+/* =============================================================
+   Base
+   ============================================================= */
+
+/* =============================================================
+   The ground
+
+   The colour is unchanged: Soft Cornflower (#b2ccec) is still the
+   base, and it is the only thing painted on `body` itself. Every
+   effect below sits in two fixed, non-interactive pseudo-element
+   layers behind the content, so the blue still reads as the app's
+   colour — it just stops being a flat fill.
+
+     body::after   drifting light washes   (z-index -2, animated)
+     body::before  desk texture            (z-index -1, static)
+
+   Both are `position: fixed`, so they behave like the desk the app
+   sits on: content scrolls, the desk does not.
+   ============================================================= */
 
 body {
   background-color: var(--color-background-main);
   color: var(--color-ink-primary);
   font-family: "Be Vietnam Pro", sans-serif;
   overflow-x: hidden;
+}
+
+/* --- Layer 1: light washes, drifting very slowly ---
+   Oversized and moved with `transform` (not background-position) so
+   the browser can composite it on the GPU instead of repainting. */
+body::after {
+  content: "";
+  position: fixed;
+  top: -25%;
+  left: -25%;
+  width: 150%;
+  height: 150%;
+  z-index: -2;
+  pointer-events: none;
+  background-image:
+    radial-gradient(38% 34% at 84% 12%, #f5c7c759, transparent 70%),
+    radial-gradient(42% 38% at 8% 34%, #ffffff4d, transparent 72%),
+    radial-gradient(40% 36% at 96% 82%, #f5c7c74d, transparent 68%),
+    radial-gradient(46% 40% at 26% 96%, #d0e4ff66, transparent 70%);
+  animation: ground-drift 54s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes ground-drift {
+  from {
+    transform: translate3d(-1.6%, -1.2%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(1.6%, 1.4%, 0) scale(1.04);
+  }
+}
+
+/* --- Layer 2: the desk itself ---
+   Graph-paper rules, ink dots at the crossings, three ballpoint
+   doodles pinned to the corners, paper grain, and a soft vignette.
+   Static: texture that moved would read as noise, not as paper. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    /* pen doodles */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 104 58'%3E%3Cpath d='M5 40c9-22 21 14 31-4s21 16 31-3 21 10 31-6' fill='none' stroke='%23253558' stroke-width='2.6' stroke-linecap='round' opacity='.22'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 72 72'%3E%3Cpath d='M36 62C14 45 6 34 10 23c4-11 20-10 26 2 6-12 22-13 26-2 4 11-4 22-26 39z' fill='none' stroke='%23253558' stroke-width='2.6' stroke-linejoin='round' opacity='.2'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 58 58'%3E%3Cpath d='M29 4c2 14 11 23 25 25-14 2-23 11-25 25-2-14-11-23-25-25 14-2 23-11 25-25z' fill='none' stroke='%23253558' stroke-width='2.4' stroke-linejoin='round' opacity='.2'/%3E%3C/svg%3E"),
+    /* ink dot at every crossing */
+    radial-gradient(var(--ink-08) 1.1px, transparent 1.6px),
+    /* graph-paper rules */
+    linear-gradient(var(--ink-05) 1px, transparent 1px),
+    linear-gradient(90deg, var(--ink-05) 1px, transparent 1px),
+    /* paper grain */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23g)' opacity='.28'/%3E%3C/svg%3E"),
+    /* vignette so the edges feel like the far side of a desk */
+    radial-gradient(120% 90% at 50% 45%, transparent 58%, #25355814 100%);
+  background-position:
+    left 7% top 15%,
+    right 9% top 40%,
+    left 13% bottom 17%,
+    0 0,
+    0 0,
+    0 0,
+    0 0,
+    0 0;
+  background-size:
+    104px 58px,
+    72px 72px,
+    58px 58px,
+    22px 22px,
+    88px 88px,
+    88px 88px,
+    200px 200px,
+    100% 100%;
+  background-repeat:
+    no-repeat,
+    no-repeat,
+    no-repeat,
+    repeat,
+    repeat,
+    repeat,
+    repeat,
+    no-repeat;
+}
+
+/* On small screens the doodles crowd the content — keep the paper,
+   drop the marks. */
+@media (max-width: 640px) {
+  body::before {
+    background-image:
+      radial-gradient(var(--ink-08) 1.1px, transparent 1.6px),
+      linear-gradient(var(--ink-05) 1px, transparent 1px),
+      linear-gradient(90deg, var(--ink-05) 1px, transparent 1px),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23g)' opacity='.28'/%3E%3C/svg%3E"),
+      radial-gradient(120% 90% at 50% 45%, transparent 58%, #25355814 100%);
+    background-position: 0 0, 0 0, 0 0, 0 0, 0 0;
+    background-size: 22px 22px, 88px 88px, 88px 88px, 200px 200px, 100% 100%;
+    background-repeat: repeat, repeat, repeat, repeat, no-repeat;
+  }
 }
 
 .font-headline,
@@ -68,18 +266,624 @@ body {
   font-family: "Be Vietnam Pro", sans-serif;
 }
 
+/* Labels, buttons and numerals are display type, not body type. */
+.font-label-md,
+.font-label-sm {
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+
 .material-symbols-outlined {
   font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
   vertical-align: middle;
 }
 
-.custom-scrollbar::-webkit-scrollbar {
-  width: 4px;
+/* One focus ring for the whole app: a dashed ink outline that
+   matches the dashed rules and empty states.
+
+   :where() keeps specificity at 0, but that is NOT enough for a
+   component to override this rule: these declarations are unlayered,
+   and unlayered CSS outranks every @layer regardless of specificity.
+   So an opt-out has to be written into the selector itself, as with
+   .map-pin below — a map pin is a tabindex element that supplies its
+   own focus indicator (it scales and thickens), and a 3px dashed
+   rectangle around its bounding box swamped a pin drawn at r=5.5. */
+:where(a, button, input, textarea, select, summary, [tabindex]:not(.map-pin)):focus-visible {
+  outline: 3px dashed var(--color-ink-primary);
+  outline-offset: 3px;
+  border-radius: 2px;
 }
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
+
+/* Belt to that braces, and deliberately unlayered too. A pin draws its own
+   focus state (see .map-pin .pin-art); this guarantees no rectangle can come
+   back around one - not from a future rule inside @layer, which unlayered CSS
+   outranks anyway, and not from anyone who edits the selector above and
+   forgets the :not(). :focus is covered as well as :focus-visible, so a mouse
+   click cannot paint one either. */
+.map-pin:focus,
+.map-pin:focus-visible {
+  outline: none;
 }
+
+.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: var(--color-outline-variant);
   border-radius: 999px;
 }
+
+/* =============================================================
+   Craft primitives
+   These mirror design-demo/craft.css one-for-one, so DESIGN.MD's
+   recipes and the running app cannot drift apart.
+   ============================================================= */
+
+@layer components {
+
+  /* ---------- surfaces ---------- */
+
+  /* The page's own paper: no border, no rotation. Use for the
+     main container of a section. */
+  .sheet {
+    position: relative;
+    background: var(--color-paper);
+    border-radius: 28px;
+    box-shadow: var(--shadow-lift);
+  }
+
+  /* Something *placed on* the paper: ink outline, asymmetric
+     radius, half a degree of rotation. Use for discrete items. */
+  .card {
+    position: relative;
+    background: var(--color-paper);
+    border: var(--stroke) solid var(--color-ink-primary);
+    border-radius: var(--radius-wobble);
+    box-shadow: var(--shadow-soft);
+    transform: rotate(-0.4deg);
+  }
+  /* Alternate down a list so a column never looks mechanical. */
+  .card-tilt-r { transform: rotate(0.5deg); }
+  .card-flat { transform: none; }
+
+  .card-accent { background: var(--color-surface-accent); }
+  .card-wash { background: var(--color-surface-text-container); }
+  .card-ink {
+    background: var(--color-ink-primary);
+    border-color: var(--color-ink-primary);
+    color: var(--color-paper);
+  }
+
+  /* Every empty state uses this: a space waiting to be filled in,
+     not a broken card. */
+  .card-dashed {
+    position: relative;
+    background: var(--color-paper-2);
+    border: var(--stroke) dashed var(--ink-20);
+    border-radius: var(--radius-wobble);
+    transform: rotate(-0.4deg);
+  }
+
+  /* Quiet inner container for text-heavy blocks. */
+  .panel {
+    background: var(--color-surface-text-container);
+    border: 1.6px solid var(--ink-08);
+    border-radius: 18px;
+  }
+
+  /* ---------- rules & ruled paper ---------- */
+
+  .rule {
+    height: 1px;
+    border: 0;
+    background: repeating-linear-gradient(90deg, var(--ink-20) 0 6px, transparent 6px 12px);
+  }
+
+  .rule-v {
+    width: 1px;
+    border: 0;
+    background: repeating-linear-gradient(to bottom, var(--ink-20) 0 6px, transparent 6px 12px);
+  }
+
+  /* What makes text read as hand-written without a script font. */
+  .ruled {
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0 calc(var(--rule) - 1px),
+      var(--ink-08) calc(var(--rule) - 1px) var(--rule)
+    );
+    border-left: 2px solid #f5c7c7cc;
+    padding: 6px 0 2px 16px;
+  }
+  .ruled p {
+    margin: 0;
+    font-size: 16px;
+    line-height: var(--rule);
+  }
+  .ruled p + p { margin-top: var(--rule); }
+
+  /* ---------- chips & stamps ---------- */
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 13px 6px;
+    border: var(--stroke) solid var(--color-ink-primary);
+    border-radius: var(--radius-wobble-sm);
+    background: var(--color-paper);
+    color: var(--color-ink-primary);
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 600;
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    line-height: 1.3;
+    white-space: nowrap;
+  }
+  .chip-accent { background: var(--color-surface-accent); }
+  .chip-blue { background: var(--color-background-main); }
+  .chip-soft {
+    border-style: dashed;
+    border-color: var(--ink-20);
+    color: var(--color-primary);
+  }
+  .chip .material-symbols-outlined { font-size: 15px; }
+
+  /* A chip pressed onto the page at an angle. Dates, countdowns,
+     counts. At most one or two per screen. */
+  .stamp {
+    display: inline-block;
+    padding: 5px 14px 7px;
+    border: 2.4px solid var(--color-ink-primary);
+    border-radius: var(--radius-wobble-sm);
+    background: #fcfbf8cc;
+    text-align: center;
+    transform: rotate(7deg);
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    line-height: 1.15;
+  }
+  .stamp small {
+    display: block;
+    font-weight: 600;
+    font-size: 0.54rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+
+  /* ---------- buttons ---------- */
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 9px 22px 11px;
+    border: var(--stroke) solid var(--color-ink-primary);
+    border-radius: var(--radius-wobble-sm);
+    background: var(--color-paper);
+    color: var(--color-ink-primary);
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.18s ease, transform 0.14s ease;
+  }
+  .btn:hover { background: var(--color-surface-accent); }
+  .btn:active { transform: translateY(2px); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn:disabled:hover { background: var(--color-paper); }
+
+  /* Primary lightens to white on hover — inverted from the usual
+     darken, which keeps the surface feeling like paper. */
+  .btn-accent { background: var(--color-surface-accent); }
+  .btn-accent:hover { background: #ffffff; }
+  .btn-accent:disabled:hover { background: var(--color-surface-accent); }
+
+  .btn-ink {
+    background: var(--color-ink-primary);
+    color: var(--color-paper);
+  }
+  .btn-ink:hover { background: #2f4363; }
+
+  .btn-sm { padding: 6px 15px 8px; font-size: 0.8rem; }
+  .btn-icon {
+    padding: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    flex: none;
+  }
+
+  /* ---------- fields ---------- */
+
+  .field {
+    width: 100%;
+    padding: 11px 15px 12px;
+    border: var(--stroke) solid var(--color-ink-primary);
+    border-radius: var(--radius-wobble-sm);
+    background: var(--color-surface-text-container);
+    color: var(--color-ink-primary);
+    font-family: "Be Vietnam Pro", sans-serif;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  .field::placeholder { color: var(--color-primary); opacity: 0.75; }
+  /* Fill brightens on focus; the ink border never changes colour. */
+  .field:focus { background: #ffffff; }
+  .field-error { border-color: var(--color-error); background: #ffdad6; }
+
+  .field-label {
+    display: block;
+    margin-bottom: 6px;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 600;
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+
+  /* ---------- tabs ---------- */
+
+  .tabs {
+    display: flex;
+    gap: 6px;
+    padding: 6px;
+    border: var(--stroke) solid var(--color-ink-primary);
+    border-radius: var(--radius-wobble-sm);
+    background: var(--color-paper-2);
+  }
+  .tab {
+    flex: 1;
+    padding: 9px 8px 10px;
+    border: 0;
+    border-radius: 14px;
+    background: none;
+    color: var(--color-primary);
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 600;
+    font-size: 0.82rem;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: background 0.18s ease, color 0.18s ease;
+    white-space: nowrap;
+  }
+  .tab:hover { background: #f5c7c74d; color: var(--color-ink-primary); }
+  .tab-on {
+    background: var(--color-surface-accent);
+    color: var(--color-ink-primary);
+    box-shadow: 0 2px 0 var(--color-ink-primary);
+  }
+
+  /* ---------- photo mount ---------- */
+
+  .mat {
+    padding: 10px;
+    background: var(--color-paper-2);
+    background-image:
+      linear-gradient(#25355812 1px, transparent 1px),
+      linear-gradient(90deg, #25355812 1px, transparent 1px);
+    background-size: 15px 15px;
+    box-shadow: var(--shadow-soft);
+  }
+  .mat > img,
+  .mat > .mat-inner {
+    display: block;
+    width: 100%;
+    box-shadow: 0 3px 10px #2535581f;
+    background: linear-gradient(160deg, #eef4fc, #f5c7c74d);
+  }
+
+  /* ---------- timeline ---------- */
+
+  .timeline { position: relative; }
+  .timeline::before {
+    content: "";
+    position: absolute;
+    left: 7px;
+    top: 6px;
+    bottom: 6px;
+    width: 2px;
+    background: repeating-linear-gradient(to bottom, var(--ink-20) 0 7px, transparent 7px 14px);
+  }
+  .node-dot {
+    position: absolute;
+    left: 0;
+    width: 16px;
+    height: 16px;
+    border: var(--stroke) solid var(--color-ink-primary);
+    border-radius: 50%;
+    background: var(--color-paper);
+    /* halo matches the page ground so the dot punches through the spine */
+    box-shadow: 0 0 0 4px var(--color-background-main);
+  }
+  .node-dot-done { background: var(--color-surface-accent); }
+  .node-dot-here { background: var(--color-mint); }
+
+  /* ---------- floating dock (mobile nav) ---------- */
+
+  .dock {
+    background: #fcfbf8f2;
+    border: 2.4px solid var(--color-ink-primary);
+    border-radius: var(--radius-wobble-sm);
+    box-shadow: 0 14px 28px -12px #2535583d;
+    backdrop-filter: blur(6px);
+  }
+
+  /* ---------- modals, popups, notifications ---------- */
+
+  /* One backdrop for every overlay in the app: deep ink, so the
+     paper surface on top reads as a sheet held up to the light. */
+  .overlay {
+     position: fixed;
+     inset: 0;
+     display: flex;
+     background: #253558e6;
+     backdrop-filter: blur(3px);
+   }
+
+  /* The modal surface. Ink outline + lifted shadow, and on mobile it
+     rises from the bottom edge, so only the top corners round off. */
+  .modal {
+    position: relative;
+    width: 100%;
+    background: var(--color-paper);
+    border: var(--stroke) solid var(--color-ink-primary);
+    border-bottom: 0;
+    border-radius: 28px 28px 0 0;
+    box-shadow: var(--shadow-lift);
+    max-height: 92vh;
+    overflow-y: auto;
+  }
+  @media (min-width: 768px) {
+    .modal {
+      border-bottom: var(--stroke) solid var(--color-ink-primary);
+      border-radius: var(--radius-wobble);
+      max-height: 88vh;
+    }
+  }
+
+  /* Sticky modal header, so long forms keep their title and close
+     button reachable. Dashed underline keeps the pen language. */
+  .modal-head {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 20px 14px;
+    background: var(--color-paper);
+    border-bottom: 1.6px dashed var(--ink-20);
+  }
+
+  .modal-body { padding: 20px; }
+
+  .modal-foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 0 20px 20px;
+  }
+
+  /* Toast / inline notification. */
+  .toast {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 16px 13px;
+    border: var(--stroke) solid var(--color-ink-primary);
+    border-radius: var(--radius-wobble-sm);
+    background: var(--color-paper);
+    box-shadow: var(--shadow-lift);
+    transform: rotate(-0.5deg);
+  }
+  .toast-ok { background: #eafff8; }
+  .toast-warn { background: var(--color-surface-accent); }
+  .toast-error { background: #ffdad6; }
+
+  /* ---------- masonry (unlocked memories) ---------- */
+
+  .masonry-grid {
+    column-count: 1;
+    column-gap: 1.5rem;
+  }
+  @media (min-width: 768px) {
+    .masonry-grid { column-count: 2; }
+  }
+  @media (min-width: 1024px) {
+    .masonry-grid { column-count: 3; }
+  }
+  .masonry-item {
+    break-inside: avoid;
+    margin-bottom: 1.5rem;
+  }
+
+  /* ---------- reveal ---------- */
+
+  .reveal {
+    opacity: 0;
+    translate: 0 24px;
+    scale: 0.97;
+    transform-origin: 50% 0;
+    transition:
+      opacity 0.5s ease,
+      translate 0.55s cubic-bezier(0.2, 0.9, 0.25, 1),
+      scale 0.55s ease;
+  }
+  .reveal-in { opacity: 1; translate: 0 0; scale: 1; }
+
+  /* ---------- justified photo rows ---------- */
+
+  /* Flickr/Google-Photos layout with no JavaScript and no measuring.
+     Each item gets flex-basis = ar x H and flex-grow = ar. Flex hands
+     out the leftover space in proportion to grow, so an item ends up
+     at width = ar x (H + leftover / sum-of-ar). Divide by ar and every
+     item in the row lands on the SAME height — a flush row, and since
+     the frame carries that same ratio, nothing is ever cropped.
+     --ar is set per item from the photo's stored width/height. */
+  .jr {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: var(--jr-gap, 0.75rem);
+  }
+  .jr > * {
+    flex-grow: var(--ar);
+    flex-basis: calc(var(--ar) * var(--jr-h, 200px));
+    min-width: 0;
+  }
+  /* Without this the final row stretches to fill the width and its
+     photos tower over the rest. A zero-width item with an enormous
+     grow factor soaks up the slack instead; the negative margin
+     cancels the flex gap it would otherwise introduce. */
+  .jr::after {
+    content: "";
+    flex-grow: 999;
+    flex-basis: 0;
+    height: 0;
+    margin-left: calc(-1 * var(--jr-gap, 0.75rem));
+  }
+  .jr-frame {
+    position: relative;
+    aspect-ratio: var(--ar);
+    overflow: hidden;
+    background: linear-gradient(160deg, #eef4fc, #f5c7c74d);
+  }
+  .jr-frame img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ---------- map ---------- */
+
+  .map-sheet {
+    position: relative;
+    overflow: hidden;
+    background: var(--color-paper);
+    border: 2.2px solid var(--color-ink-primary);
+    border-radius: var(--radius-wobble);
+    box-shadow: var(--shadow-card);
+  }
+  .map-sheet::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(var(--ink-05) 1px, transparent 1px),
+      linear-gradient(90deg, var(--ink-05) 1px, transparent 1px);
+    background-size: 26px 26px;
+  }
+  .map-coast {
+    fill: #e8f0fa;
+    stroke: var(--color-ink-primary);
+    stroke-width: 2.4;
+    stroke-linejoin: round;
+  }
+  .map-thread {
+    fill: none;
+    stroke: var(--color-ink-primary);
+    stroke-width: 1.8;
+    stroke-dasharray: 6 6;
+    stroke-linecap: round;
+    opacity: 0.42;
+  }
+  .map-pin { cursor: pointer; }
+  /* Hit area only — never painted, always clickable. */
+  .map-pin .pin-hit { fill: transparent; }
+  .map-pin .pin-body {
+    fill: var(--color-surface-accent);
+    stroke: var(--color-ink-primary);
+    stroke-width: 1.8;
+  }
+  .map-pin .pin-tail { fill: var(--color-ink-primary); }
+
+  /* Focus and selection are shown ON the pin, never as a ring around it —
+     any ring wide enough to read dwarfed a pin drawn at r=5.5. The art
+     grows from its own tip, so the pin lifts off the map rather than
+     sliding off the place it marks.
+     Size and stroke weight carry the state; colour deliberately does not.
+     A pin's fill says what kind of place it is — blush for visited, paper
+     for an idea — and recolouring on select would overwrite that. */
+  .map-pin .pin-art {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    transition:
+      transform 0.18s cubic-bezier(0.2, 0.9, 0.25, 1),
+      stroke-width 0.18s ease;
+  }
+  .map-pin:focus-visible .pin-art,
+  .map-pin[aria-pressed="true"] .pin-art {
+    transform: scale(1.25);
+  }
+  .map-pin:focus-visible .pin-body,
+  .map-pin[aria-pressed="true"] .pin-body {
+    stroke-width: 2.8;
+  }
+  .map-pin:focus-visible .pin-tag,
+  .map-pin[aria-pressed="true"] .pin-tag {
+    font-weight: 700;
+  }
+
+  .map-pin .pin-tag {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 7.5px;
+    font-weight: 600;
+    fill: var(--color-ink-primary);
+    paint-order: stroke;
+    stroke: var(--color-paper);
+    stroke-width: 2.6px;
+    stroke-linejoin: round;
+  }
+  /* No outline and no ring: the scale + heavier stroke above IS the focus
+     indicator. Weaker than an outline, so it is made deliberately large
+     (1.25x, stroke 1.8 -> 2.8, label to 700) to stay clearly visible.
+     The rule that suppresses the outline lives unlayered, further up. */
+  .map-pin-idea .pin-body {
+    fill: var(--color-paper);
+    /* dashes scaled with the smaller pin, or they read as a solid ring */
+    stroke-dasharray: 3.2 2.5;
+  }
+  .map-pin-idea .pin-tail { fill: var(--ink-20); }
+  .map-pin-idea .pin-tag { fill: var(--color-primary); font-weight: 500; }
+
+  /* Saved to the wishlist: still hollow-dashed (not visited yet), but
+     tinted and inked so the intention is visible on the map itself. */
+  .map-pin-saved .pin-body { fill: var(--color-surface-accent); }
+  .map-pin-saved .pin-tail { fill: var(--color-ink-primary); }
+  .map-pin-saved .pin-tag { fill: var(--color-ink-primary); font-weight: 600; }
+}
+
+/* Wrong-passcode / invalid-input shake. */
+@keyframes craft-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-7px); }
+  75% { transform: translateX(7px); }
+}
+.shake { animation: craft-shake 0.4s cubic-bezier(0.3, 1.2, 0.4, 1); }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001s !important;
+  }
+  html { scroll-behavior: auto; }
+
+  /* Park the ground drift at its resting position rather than letting
+     the blanket rule snap it to the end keyframe. */
+  body::after {
+    animation: none !important;
+    transform: none;
+  }
+}
+
+html { scroll-behavior: smooth; }

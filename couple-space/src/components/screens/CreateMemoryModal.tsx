@@ -1,13 +1,20 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Portal } from "@/components/ui/Portal";
+import { readImageSize, PHOTO_FALLBACK } from "@/lib/image";
 import { memoryCategoryLabels, type Memory, type MemoryCategory } from "@/data/mockData";
 
 interface CreateMemoryModalProps {
   readonly onClose: () => void;
   readonly onSuccess: (memory: Memory) => void;
+}
+
+interface LocalPhoto {
+  readonly url: string;
+  readonly width: number;
+  readonly height: number;
 }
 
 export const CreateMemoryModal: React.FC<Readonly<CreateMemoryModalProps>> = ({
@@ -21,56 +28,135 @@ export const CreateMemoryModal: React.FC<Readonly<CreateMemoryModalProps>> = ({
   const [location, setLocation] = useState("");
   const [quote, setQuote] = useState("");
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
-  const [photosPreviews, setPhotosPreviews] = useState<string[]>([]);
+  const [photosPreviews, setPhotosPreviews] = useState<LocalPhoto[]>([]);
   const coverInputRef = useRef<HTMLInputElement>(null);
   const photosInputRef = useRef<HTMLInputElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const submittedRef = useRef(false);
 
-  const handleCoverUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  /* Object URLs rather than FileReader data URLs: they are created
+     synchronously (so selection order is preserved), and they do not
+     balloon a 3 MB photo into 4 MB of base64 held in React state. */
+  const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => setCoverPreview(reader.result as string);
-    reader.readAsDataURL(file);
-  };
-
-  const handlePhotosUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-    Array.from(files).forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = () =>
-        setPhotosPreviews((prev) => [...prev, reader.result as string]);
-      reader.readAsDataURL(file);
+    setCoverPreview((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return URL.createObjectURL(file);
     });
   };
+
+  const handlePhotosUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    /* Read every size first, then append in one go. Appending from inside
+       each callback would order the photos by whichever decoded first —
+       i.e. smallest file wins — not by the order they were picked. */
+    const picked = await Promise.all(
+      Array.from(files).map(async (file) => {
+        const url = URL.createObjectURL(file);
+        const { width, height } = await readImageSize(url);
+        return { url, width, height };
+      })
+    );
+    setPhotosPreviews((prev) => [...prev, ...picked]);
+    // Let the same file be picked again after it has been removed.
+    if (photosInputRef.current) photosInputRef.current.value = "";
+  };
+
+  const removePhoto = (i: number) => {
+    setPhotosPreviews((prev) => {
+      URL.revokeObjectURL(prev[i].url);
+      return prev.filter((_, idx) => idx !== i);
+    });
+  };
+
+  /* Esc closes, and Tab is kept inside the dialog — without this the
+     keyboard walks out of the modal and into the page behind it. */
+  const onKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.stopPropagation();
+        onClose();
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const root = dialogRef.current;
+      if (!root) return;
+      const focusable = root.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    },
+    [onClose]
+  );
+
+  useEffect(() => {
+    dialogRef.current?.querySelector<HTMLElement>("input, textarea, button")?.focus();
+  }, []);
+
+  /* Release anything the user picked but never saved. The live values are
+     read through a ref so this effect can depend on nothing and therefore
+     run only on unmount — depending on the state itself would revoke the
+     previous URLs every time a photo is added, blanking the previews. */
+  const liveRef = useRef({ cover: coverPreview, photos: photosPreviews });
+  useEffect(() => {
+    liveRef.current = { cover: coverPreview, photos: photosPreviews };
+  }, [coverPreview, photosPreviews]);
+
+  useEffect(() => {
+    return () => {
+      if (submittedRef.current) return;
+      const { cover, photos } = liveRef.current;
+      if (cover) URL.revokeObjectURL(cover);
+      photos.forEach((p) => URL.revokeObjectURL(p.url));
+    };
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
 
     const dateStr = `${year}-${month.padStart(2, "0")}-15`;
+    const stamp = Date.now();
     const newMemory: Memory = {
-      id: `mem-${Date.now()}`,
+      id: `mem-${stamp}`,
       title: title.trim(),
       date: dateStr,
-      location: location.trim() || "Việt Nam",
+      /* Empty rather than "Việt Nam": that default matched no province, so
+         every memory saved without a location landed in the unresolved
+         list. An empty location is honestly blank instead of falsely set. */
+      location: location.trim(),
       category,
-      coverImage:
-        coverPreview ||
-        "https://via.placeholder.com/400x300/b2ccec/253558?text=Kỷ+niệm",
+      coverImage: coverPreview || PHOTO_FALLBACK,
       coverImageAlt: title.trim(),
       quote: quote.trim() || "Một kỷ niệm đẹp của chúng mình.",
       tags: [memoryCategoryLabels[category]],
       rating: 5,
       participants: ["Anh", "Em"],
-      photos: photosPreviews.map((url, i) => ({
-        id: `photo-new-${i}`,
-        url,
+      photos: photosPreviews.map((p, i) => ({
+        // The timestamp keeps ids unique across several memories added in
+        // one session — plain `photo-new-0` would collide.
+        id: `photo-${stamp}-${i}`,
+        url: p.url,
         alt: `Ảnh ${i + 1}`,
+        width: p.width,
+        height: p.height,
       })),
       moments: [],
     };
 
+    // Stops the unmount cleanup from revoking URLs the new memory now owns.
+    submittedRef.current = true;
     onSuccess(newMemory);
   };
 
@@ -82,249 +168,268 @@ export const CreateMemoryModal: React.FC<Readonly<CreateMemoryModalProps>> = ({
 
   return (
     <Portal>
-      <div className="fixed inset-0 z-[200] flex items-end md:items-center justify-center">
-        {/* Backdrop */}
-        <motion.div
+      <div
+        className="overlay z-[200] items-end justify-center md:items-center md:p-4"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="create-mem-title"
+      >
+        <motion.button
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="absolute inset-0 bg-ink-primary/40 backdrop-blur-sm"
+          className="absolute inset-0 cursor-default"
           onClick={onClose}
+          aria-label="Đóng"
+          tabIndex={-1}
         />
 
-        {/* Modal */}
         <motion.div
           initial={{ y: "100%", opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: "100%", opacity: 0 }}
           transition={{ type: "spring", damping: 28, stiffness: 350 }}
-          className="relative w-full md:max-w-xl bg-surface-text-container rounded-t-[2.5rem] md:rounded-[2.5rem] max-h-[90vh] overflow-y-auto custom-scrollbar"
+          className="modal custom-scrollbar md:max-w-xl"
+          ref={dialogRef}
+          onKeyDown={onKeyDown}
         >
-          {/* Handle bar (mobile) */}
-          <div className="md:hidden flex justify-center pt-3 pb-1">
-            <div className="w-10 h-1 bg-outline-variant rounded-full" />
+          {/* grab handle (mobile) */}
+          <div className="flex justify-center pb-1 pt-3 md:hidden">
+            <span className="h-1 w-10 rounded-full bg-[var(--ink-20)]" />
           </div>
 
-          <div className="p-6 md:p-8">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-surface-accent flex items-center justify-center">
-                  <span className="material-symbols-outlined text-ink-primary">add_a_photo</span>
-                </div>
-                <h3 className="font-headline-sm text-headline-sm text-ink-primary">
-                  Thêm kỷ niệm mới
-                </h3>
-              </div>
-              <button
-                onClick={onClose}
-                className="w-9 h-9 rounded-full bg-surface-container-high flex items-center justify-center hover:bg-surface-container transition-colors"
+          <div className="modal-head md:px-8">
+            <div className="flex min-w-0 items-center gap-3">
+              <span className="flex h-10 w-10 flex-none items-center justify-center rounded-[var(--radius-wobble-sm)] border-[2.2px] border-ink-primary bg-surface-accent -rotate-3">
+                <span className="material-symbols-outlined text-ink-primary">add_a_photo</span>
+              </span>
+              <h3
+                id="create-mem-title"
+                className="font-headline-sm text-headline-sm text-ink-primary"
               >
-                <span className="material-symbols-outlined text-on-surface-variant text-xl">close</span>
-              </button>
+                Thêm kỷ niệm mới
+              </h3>
+            </div>
+            <button onClick={onClose} className="btn btn-icon btn-sm" aria-label="Đóng">
+              <span className="material-symbols-outlined">close</span>
+            </button>
+          </div>
+
+          <form onSubmit={handleSubmit} className="modal-body space-y-5 md:px-8">
+            {/* Title */}
+            <div>
+              <label className="field-label" htmlFor="mem-title">
+                Tên kỷ niệm
+              </label>
+              <input
+                id="mem-title"
+                className="field"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="VD: Hà Giang 04/2026"
+                required
+              />
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Title */}
-              <div className="space-y-1.5">
-                <label className="font-label-md text-label-md text-on-surface-variant" htmlFor="mem-title">
-                  Tên kỷ niệm
+            {/* Date */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="field-label" htmlFor="mem-month">
+                  Tháng
+                </label>
+                <select
+                  id="mem-month"
+                  className="field appearance-none"
+                  value={month}
+                  onChange={(e) => setMonth(e.target.value)}
+                  required
+                >
+                  <option value="">Chọn</option>
+                  {Array.from({ length: 12 }, (_, i) => (
+                    <option key={i + 1} value={String(i + 1)}>
+                      Tháng {i + 1}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="field-label" htmlFor="mem-year">
+                  Năm
                 </label>
                 <input
-                  id="mem-title"
-                  className="w-full bg-surface-container-lowest border border-ink-primary/10 rounded-2xl px-5 py-3.5 font-body-md transition-all focus:outline-none focus:border-surface-accent focus:ring-2 focus:ring-surface-accent/40"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="VD: Hà Giang 04/2026"
+                  id="mem-year"
+                  type="number"
+                  className="field"
+                  value={year}
+                  onChange={(e) => setYear(e.target.value)}
+                  min="2020"
+                  max="2030"
                   required
                 />
               </div>
+            </div>
 
-              {/* Date (Month + Year) */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="font-label-md text-label-md text-on-surface-variant" htmlFor="mem-month">
-                    Tháng
-                  </label>
-                  <select
-                    id="mem-month"
-                    className="w-full bg-surface-container-lowest border border-ink-primary/10 rounded-2xl px-5 py-3.5 font-body-md focus:outline-none focus:border-surface-accent focus:ring-2 focus:ring-surface-accent/40 appearance-none"
-                    value={month}
-                    onChange={(e) => setMonth(e.target.value)}
-                    required
+            {/* Category */}
+            <div>
+              <span className="field-label">Danh mục</span>
+              <div className="flex flex-wrap gap-3">
+                {categories.map((cat) => (
+                  <button
+                    key={cat.key}
+                    type="button"
+                    onClick={() => setCategory(cat.key)}
+                    aria-pressed={category === cat.key}
+                    className={`chip cursor-pointer px-4 py-2.5 transition-all ${
+                      category === cat.key
+                        ? "-rotate-2 bg-surface-accent shadow-[0_3px_0_var(--color-ink-primary)]"
+                        : ""
+                    }`}
                   >
-                    <option value="">Chọn</option>
-                    {Array.from({ length: 12 }, (_, i) => (
-                      <option key={i + 1} value={String(i + 1)}>
-                        Tháng {i + 1}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="space-y-1.5">
-                  <label className="font-label-md text-label-md text-on-surface-variant" htmlFor="mem-year">
-                    Năm
-                  </label>
-                  <input
-                    id="mem-year"
-                    type="number"
-                    className="w-full bg-surface-container-lowest border border-ink-primary/10 rounded-2xl px-5 py-3.5 font-body-md focus:outline-none focus:border-surface-accent focus:ring-2 focus:ring-surface-accent/40"
-                    value={year}
-                    onChange={(e) => setYear(e.target.value)}
-                    min="2020"
-                    max="2030"
-                    required
-                  />
-                </div>
+                    <span className="material-symbols-outlined">{cat.icon}</span>
+                    {cat.label}
+                  </button>
+                ))}
               </div>
+            </div>
 
-              {/* Category */}
-              <div className="space-y-1.5">
-                <label className="font-label-md text-label-md text-on-surface-variant">
-                  Danh mục
-                </label>
-                <div className="flex gap-3">
-                  {categories.map((cat) => (
-                    <button
-                      key={cat.key}
-                      type="button"
-                      onClick={() => setCategory(cat.key)}
-                      className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-label-md font-label-md transition-all ${
-                        category === cat.key
-                          ? "bg-ink-primary text-on-primary shadow-soft"
-                          : "bg-surface-container-lowest border border-ink-primary/10 text-ink-primary hover:bg-surface-container-high"
-                      }`}
-                    >
-                      <span className="material-symbols-outlined text-[18px]">{cat.icon}</span>
-                      {cat.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Location */}
-              <div className="space-y-1.5">
-                <label className="font-label-md text-label-md text-on-surface-variant" htmlFor="mem-location">
-                  Địa điểm <span className="opacity-50">(tuỳ chọn)</span>
-                </label>
-                <div className="relative">
-                  <input
-                    id="mem-location"
-                    className="w-full bg-surface-container-lowest border border-ink-primary/10 rounded-2xl px-5 py-3.5 font-body-md focus:outline-none focus:border-surface-accent focus:ring-2 focus:ring-surface-accent/40"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    placeholder="VD: Hà Giang, Việt Nam"
-                  />
-                  <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant/40">
-                    location_on
-                  </span>
-                </div>
-              </div>
-
-              {/* Quote */}
-              <div className="space-y-1.5">
-                <label className="font-label-md text-label-md text-on-surface-variant" htmlFor="mem-quote">
-                  Câu quote
-                </label>
-                <textarea
-                  id="mem-quote"
-                  className="w-full bg-surface-container-lowest border border-ink-primary/10 rounded-2xl px-5 py-3.5 font-body-md focus:outline-none focus:border-surface-accent focus:ring-2 focus:ring-surface-accent/40 resize-none"
-                  rows={3}
-                  value={quote}
-                  onChange={(e) => setQuote(e.target.value)}
-                  placeholder="Viết một câu đáng nhớ cho chuyến đi này..."
-                />
-              </div>
-
-              {/* Cover Image Upload */}
-              <div className="space-y-1.5">
-                <label className="font-label-md text-label-md text-on-surface-variant">
-                  Ảnh bìa
-                </label>
+            {/* Location */}
+            <div>
+              <label className="field-label" htmlFor="mem-location">
+                Địa điểm <span className="opacity-60">(để trống nếu chưa rõ)</span>
+              </label>
+              <div className="relative">
                 <input
-                  ref={coverInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleCoverUpload}
-                  className="hidden"
+                  id="mem-location"
+                  className="field pr-12"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  placeholder="VD: Hà Giang, Việt Nam"
                 />
-                {coverPreview ? (
-                  <div className="relative rounded-2xl overflow-hidden h-40">
-                    <img src={coverPreview} alt="Cover preview" className="w-full h-full object-cover" />
-                    <button
-                      type="button"
-                      onClick={() => { setCoverPreview(null); if (coverInputRef.current) coverInputRef.current.value = ""; }}
-                      className="absolute top-2 right-2 w-8 h-8 rounded-full bg-ink-primary/60 text-white flex items-center justify-center"
-                    >
-                      <span className="material-symbols-outlined text-sm">close</span>
-                    </button>
+                <span className="material-symbols-outlined pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-primary/50">
+                  location_on
+                </span>
+              </div>
+            </div>
+
+            {/* Quote */}
+            <div>
+              <label className="field-label" htmlFor="mem-quote">
+                Câu quote
+              </label>
+              <textarea
+                id="mem-quote"
+                className="field resize-none"
+                rows={3}
+                value={quote}
+                onChange={(e) => setQuote(e.target.value)}
+                placeholder="Viết một câu đáng nhớ cho chuyến đi này..."
+              />
+            </div>
+
+            {/* Cover */}
+            <div>
+              <span className="field-label">Ảnh bìa</span>
+              <input
+                ref={coverInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleCoverUpload}
+                className="hidden"
+              />
+              {coverPreview ? (
+                <div className="mat relative -rotate-[0.8deg]">
+                  <div className="mat-inner h-40 overflow-hidden">
+                    <img
+                      src={coverPreview}
+                      alt="Xem trước ảnh bìa"
+                      className="h-full w-full object-cover"
+                    />
                   </div>
-                ) : (
                   <button
                     type="button"
-                    onClick={() => coverInputRef.current?.click()}
-                    className="w-full h-32 border-2 border-dashed border-primary/30 rounded-2xl flex flex-col items-center justify-center gap-2 hover:bg-surface-container-low transition-colors"
+                    onClick={() => {
+                      URL.revokeObjectURL(coverPreview);
+                      setCoverPreview(null);
+                      if (coverInputRef.current) coverInputRef.current.value = "";
+                    }}
+                    className="btn btn-icon absolute -right-3 -top-3 h-9 w-9"
+                    aria-label="Bỏ ảnh bìa"
                   >
-                    <span className="material-symbols-outlined text-3xl text-primary/40">add_photo_alternate</span>
-                    <span className="font-label-sm text-label-sm text-primary/60">Chọn ảnh bìa</span>
-                  </button>
-                )}
-              </div>
-
-              {/* Photos Upload */}
-              <div className="space-y-1.5">
-                <label className="font-label-md text-label-md text-on-surface-variant">
-                  Kho ảnh
-                </label>
-                <input
-                  ref={photosInputRef}
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handlePhotosUpload}
-                  className="hidden"
-                />
-                <div className="grid grid-cols-4 gap-2">
-                  {photosPreviews.map((url, i) => (
-                    <div key={i} className="relative aspect-square rounded-xl overflow-hidden">
-                      <img src={url} alt={`Photo ${i + 1}`} className="w-full h-full object-cover" />
-                      <button
-                        type="button"
-                        onClick={() => setPhotosPreviews((prev) => prev.filter((_, idx) => idx !== i))}
-                        className="absolute top-1 right-1 w-6 h-6 rounded-full bg-ink-primary/60 text-white flex items-center justify-center"
-                      >
-                        <span className="material-symbols-outlined text-[12px]">close</span>
-                      </button>
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => photosInputRef.current?.click()}
-                    className="aspect-square border-2 border-dashed border-primary/20 rounded-xl flex items-center justify-center hover:bg-surface-container-low transition-colors"
-                  >
-                    <span className="material-symbols-outlined text-xl text-primary/40">add</span>
+                    <span className="material-symbols-outlined text-base">close</span>
                   </button>
                 </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex flex-col md:flex-row gap-3 pt-4">
+              ) : (
                 <button
                   type="button"
-                  onClick={onClose}
-                  className="flex-1 px-6 py-3.5 rounded-2xl font-label-md text-ink-primary border border-ink-primary/10 hover:bg-surface-container-high transition-colors text-center"
+                  onClick={() => coverInputRef.current?.click()}
+                  className="card-dashed flex h-32 w-full flex-col items-center justify-center gap-2 transition-colors hover:border-ink-primary"
                 >
-                  Hủy bỏ
+                  <span className="material-symbols-outlined text-3xl text-primary">
+                    add_photo_alternate
+                  </span>
+                  <span className="font-label-sm text-label-sm text-primary">Chọn ảnh bìa</span>
                 </button>
+              )}
+            </div>
+
+            {/* Photos */}
+            <div>
+              <span className="field-label">Kho ảnh</span>
+              <input
+                ref={photosInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handlePhotosUpload}
+                className="hidden"
+              />
+              <div className="grid grid-cols-4 gap-3">
+                {photosPreviews.map((photo, i) => (
+                  <div
+                    key={photo.url}
+                    className={`mat relative ${i % 2 ? "rotate-[0.9deg]" : "-rotate-[1deg]"}`}
+                  >
+                    <div className="mat-inner aspect-square overflow-hidden">
+                      <img
+                        src={photo.url}
+                        alt={`Ảnh ${i + 1}`}
+                        width={photo.width}
+                        height={photo.height}
+                        decoding="async"
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removePhoto(i)}
+                      className="btn btn-icon absolute -right-2 -top-2 h-7 w-7"
+                      aria-label={`Bỏ ảnh ${i + 1}`}
+                    >
+                      <span className="material-symbols-outlined text-[13px]">close</span>
+                    </button>
+                  </div>
+                ))}
                 <button
-                  type="submit"
-                  className="flex-1 px-6 py-3.5 rounded-2xl font-label-md text-ink-primary bg-surface-accent hover:opacity-90 active:scale-95 transition-all shadow-md shadow-surface-accent/20 text-center"
+                  type="button"
+                  onClick={() => photosInputRef.current?.click()}
+                  className="card-dashed flex aspect-square items-center justify-center transition-colors hover:border-ink-primary"
+                  aria-label="Thêm ảnh"
                 >
-                  Lưu kỷ niệm
+                  <span className="material-symbols-outlined text-xl text-primary">add</span>
                 </button>
               </div>
-            </form>
-          </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-col gap-3 pt-2 md:flex-row">
+              <button type="button" onClick={onClose} className="btn flex-1 py-3.5">
+                Hủy bỏ
+              </button>
+              <button type="submit" className="btn btn-accent flex-1 py-3.5">
+                Lưu kỷ niệm
+              </button>
+            </div>
+          </form>
         </motion.div>
       </div>
     </Portal>

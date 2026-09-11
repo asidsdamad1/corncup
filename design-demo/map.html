@@ -1,0 +1,733 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bản đồ Duyên</title>
+<link rel="stylesheet" href="craft.css">
+<style>
+  /* ===========================================================
+     Chỉ những gì riêng cho màn bản đồ. Mọi thứ khác lấy từ
+     craft.css để không trôi khỏi hệ thống thiết kế.
+     =========================================================== */
+
+  .hero-stat {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 6px 18px;
+  }
+  .hero-stat .big {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 700;
+    font-size: clamp(3rem, 14vw, 4.4rem);
+    line-height: 0.92;
+    letter-spacing: -0.03em;
+    transform: rotate(-1deg);
+  }
+  .hero-stat .of {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 600;
+    font-size: 1.05rem;
+    color: var(--primary);
+    padding-bottom: 9px;
+  }
+
+  /* --- khung bản đồ --- */
+  .map-wrap {
+    position: relative;
+    background: var(--paper);
+    border: var(--stroke) solid var(--ink);
+    border-radius: var(--wobble);
+    box-shadow: var(--shadow-lift);
+    padding: 14px 10px 10px;
+    overflow: hidden;
+  }
+  /* giấy kẻ ô mờ phía sau, như bản đồ vẽ trong sổ tay */
+  .map-wrap::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--ink-05) 1px, transparent 1px),
+      linear-gradient(90deg, var(--ink-05) 1px, transparent 1px);
+    background-size: 26px 26px;
+    pointer-events: none;
+  }
+  .map-svg {
+    display: block;
+    width: 100%;
+    max-width: 420px;
+    height: auto;
+    max-height: 74vh;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .coast {
+    fill: #e8f0fa;
+    stroke: var(--ink);
+    stroke-width: 2.4;
+    stroke-linejoin: round;
+  }
+  .isle { fill: #e8f0fa; stroke: var(--ink); stroke-width: 2; }
+
+  /* hộp phụ cho hai quần đảo — theo đúng quy ước bản đồ Việt Nam */
+  .inset-box {
+    fill: none;
+    stroke: var(--ink-20);
+    stroke-width: 1.6;
+    stroke-dasharray: 5 4;
+  }
+  .inset-label {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    fill: var(--primary);
+  }
+
+  /* --- ghim --- */
+  .pin { cursor: pointer; }
+  .pin .body { fill: var(--accent); stroke: var(--ink); stroke-width: 2.2; }
+  .pin .tail { fill: var(--ink); }
+  .pin .halo { fill: #f5c7c700; transition: fill 0.18s ease; }
+  .pin:hover .halo,
+  .pin[aria-pressed="true"] .halo { fill: #f5c7c766; }
+  .pin .tag {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    fill: var(--ink);
+    paint-order: stroke;
+    stroke: var(--paper);
+    stroke-width: 4px;
+    stroke-linejoin: round;
+  }
+  .pin[aria-pressed="true"] .body { fill: #fff; }
+  .pin:focus-visible { outline: none; }
+  .pin:focus-visible .halo { fill: #f5c7c766; stroke: var(--ink); stroke-width: 2; stroke-dasharray: 4 3; }
+
+  /* gợi ý: ghim rỗng, nét đứt */
+  .pin.idea .body { fill: var(--paper); stroke-dasharray: 4.5 3.5; }
+  .pin.idea .tail { fill: var(--ink-20); }
+  .pin.idea .tag { fill: var(--primary); font-weight: 500; }
+
+  /* nét nối các chuyến theo thứ tự thời gian */
+  .thread {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 1.8;
+    stroke-dasharray: 6 6;
+    opacity: 0.42;
+    stroke-linecap: round;
+  }
+
+  /* --- bảng vùng miền --- */
+  .region-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px 14px;
+    align-items: center;
+    padding: 11px 0;
+  }
+  .region-row + .region-row { border-top: 1px dashed var(--ink-20); }
+  .region-row .nm { font-weight: 500; }
+  .region-row .ct {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 700;
+    font-size: 1.15rem;
+  }
+  .region-row .pv {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  /* --- bảng phân giải location --- */
+  .resolve {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.87rem;
+  }
+  .resolve th {
+    text-align: left;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--primary);
+    padding: 0 10px 9px 0;
+    border-bottom: var(--stroke) solid var(--ink);
+  }
+  .resolve td {
+    padding: 10px 10px 10px 0;
+    border-bottom: 1px dashed var(--ink-20);
+    vertical-align: top;
+  }
+  .resolve tr:last-child td { border-bottom: 0; }
+  .resolve code {
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    font-size: 0.82em;
+    background: var(--paper-2);
+    padding: 2px 6px;
+    border-radius: 5px;
+  }
+  .resolve .miss { color: var(--error); font-weight: 600; }
+  .scroll-x { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  /* --- thẻ chi tiết khi bấm ghim --- */
+  #detail { min-height: 118px; }
+  #detail .empty {
+    display: grid;
+    place-items: center;
+    min-height: 118px;
+    text-align: center;
+    color: var(--primary);
+    font-size: 0.9rem;
+  }
+
+  .two-col { display: grid; gap: 22px; }
+  @media (min-width: 900px) {
+    .two-col { grid-template-columns: 1.05fr 0.95fr; align-items: start; }
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--ink-20);
+    font-size: 0.82rem;
+    color: var(--primary);
+    position: relative;
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 7px; }
+  .legend i {
+    width: 13px; height: 13px; border-radius: 50%;
+    border: 2.2px solid var(--ink); background: var(--accent);
+  }
+  .legend i.idea { background: var(--paper); border-style: dashed; }
+
+  .seg {
+    display: inline-flex;
+    border: var(--stroke) solid var(--ink);
+    border-radius: var(--wobble-sm);
+    overflow: hidden;
+    background: var(--paper);
+  }
+  .seg button {
+    font: 600 0.78rem/1 "Plus Jakarta Sans", sans-serif;
+    letter-spacing: 0.04em;
+    padding: 9px 15px;
+    border: 0;
+    background: transparent;
+    color: var(--primary);
+    cursor: pointer;
+  }
+  .seg button[aria-pressed="true"] { background: var(--accent); color: var(--ink); }
+  .seg button + button { border-left: var(--stroke) solid var(--ink); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <header style="padding:34px 0 26px">
+    <p class="label" style="transform:rotate(-2deg);color:var(--primary)">Duyên · Bản đồ hành trình</p>
+    <h1 class="display" style="transform:rotate(-0.6deg);margin:2px 0 0">Mình đã đi tới đâu rồi?</h1>
+    <p class="meta" style="max-width:56ch;margin-top:10px">
+      Mỗi kỷ niệm đều có sẵn một địa điểm. Trang này không nhập thêm gì cả — nó chỉ
+      <strong>đọc trường <code>location</code></strong> của 6 kỷ niệm đang có, suy ra tỉnh thành,
+      rồi vẽ lại thành bản đồ.
+    </p>
+  </header>
+
+  <!-- ============ 1. Con số, tính từ dữ liệu ============ -->
+  <section class="sheet" style="padding:26px 24px;margin-bottom:26px">
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:18px;align-items:flex-start">
+      <div>
+        <p class="label" style="color:var(--primary);margin:0 0 6px">Đã đặt chân tới</p>
+        <div class="hero-stat">
+          <span class="big" id="stat-visited">0</span>
+          <span class="of">/ <b id="stat-target">34</b> tỉnh thành</span>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <p class="label" style="color:var(--primary);margin:0 0 8px">Mốc so sánh</p>
+        <div class="seg" role="group" aria-label="Chọn mốc tỉnh thành">
+          <button type="button" data-target="34" aria-pressed="true">34 (từ 7/2025)</button>
+          <button type="button" data-target="63" aria-pressed="false">63 (cũ)</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="meter" id="main-meter" data-pct="0" style="margin-top:20px">
+      <svg viewBox="0 0 300 16" preserveAspectRatio="none" aria-hidden="true">
+        <path class="tr" pathLength="100" d="M2 11 C 60 3, 120 15, 178 6 S 260 10, 298 5"></path>
+        <path class="fl" pathLength="100" d="M2 11 C 60 3, 120 15, 178 6 S 260 10, 298 5"></path>
+      </svg>
+      <span class="pct" id="main-pct">0%</span>
+    </div>
+
+    <hr class="rule" style="margin:20px 0 16px">
+    <p class="meta" style="margin:0">
+      Thanh tiến độ trong app hiện ghi cứng <code>12/63</code>. Tính thật từ dữ liệu thì ra
+      <b id="inline-visited">6</b> — chênh gấp đôi. Con số ghi cứng sẽ sai vĩnh viễn vì
+      nó không đổi khi thêm kỷ niệm.
+    </p>
+  </section>
+
+  <div class="two-col">
+
+    <!-- ============ 2. Bản đồ ============ -->
+    <section>
+      <div class="sec-head">
+        <span class="no">01</span>
+        <div class="tx">
+          <h2>Bản đồ</h2>
+          <p>Bấm vào ghim để mở kỷ niệm</p>
+        </div>
+      </div>
+
+      <div class="map-wrap">
+        <svg class="map-svg" viewBox="0 0 400 940" role="img"
+             aria-label="Bản đồ Việt Nam với các tỉnh thành đã đến">
+          <defs>
+            <!-- rung nhẹ để đường bờ trông như nét bút, không phải nét máy -->
+            <filter id="ink-wobble" x="-4%" y="-4%" width="108%" height="108%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.021" numOctaves="2" seed="7" result="n"/>
+              <feDisplacementMap in="SourceGraphic" in2="n" scale="3.4"
+                                 xChannelSelector="R" yChannelSelector="G"/>
+            </filter>
+          </defs>
+
+          <g filter="url(#ink-wobble)">
+            <path class="coast" id="coast"></path>
+            <!-- Phú Quốc -->
+            <ellipse class="isle" cx="98" cy="786" rx="13" ry="19" transform="rotate(-18 98 786)"/>
+          </g>
+
+          <!-- hộp phụ: Hoàng Sa & Trường Sa -->
+          <g>
+            <rect class="inset-box" x="306" y="756" width="90" height="140" rx="8"/>
+            <circle cx="347" cy="782" r="3" fill="var(--ink)"/>
+            <circle cx="356" cy="791" r="2.2" fill="var(--ink)"/>
+            <text class="inset-label" x="351" y="808" text-anchor="middle">Hoàng Sa</text>
+            <circle cx="347" cy="846" r="3" fill="var(--ink)"/>
+            <circle cx="356" cy="855" r="2.2" fill="var(--ink)"/>
+            <text class="inset-label" x="351" y="872" text-anchor="middle">Trường Sa</text>
+          </g>
+
+          <path class="thread" id="thread"></path>
+          <g id="pins"></g>
+        </svg>
+
+        <div class="legend">
+          <span><i></i> Đã đến (<b id="leg-visited">6</b>)</span>
+          <span><i class="idea"></i> Gợi ý đi tiếp</span>
+          <span style="gap:9px"><svg width="22" height="6" aria-hidden="true"><line x1="1" y1="3" x2="21" y2="3" stroke="#253558" stroke-width="1.8" stroke-dasharray="6 6" opacity=".42"/></svg> Nối theo thời gian</span>
+        </div>
+      </div>
+
+      <p class="meta" style="margin-top:12px;font-size:0.8rem">
+        Đường bờ được vẽ tay theo toạ độ thật (kinh độ 102–110°Đ, vĩ độ 8,3–23,5°B) nên
+        vị trí ghim là đúng tương đối, nhưng <b>không phải bản đồ đo đạc</b> — đúng tinh thần
+        bản đồ phác trong sổ tay.
+      </p>
+    </section>
+
+    <!-- ============ 3. Chi tiết + vùng miền ============ -->
+    <section>
+      <div class="sec-head">
+        <span class="no">02</span>
+        <div class="tx">
+          <h2>Nơi đã qua</h2>
+          <p id="detail-sub">Chọn một ghim trên bản đồ</p>
+        </div>
+      </div>
+
+      <div class="card flat" id="detail" style="padding:20px;margin-bottom:24px">
+        <div class="empty">
+          <div>
+            <span class="material-symbols-outlined" style="font-size:32px;opacity:.4">touch_app</span>
+            <p style="margin:4px 0 0">Bấm một ghim để xem kỷ niệm ở đó.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="sheet" style="padding:20px 22px">
+        <p class="label" style="color:var(--primary);margin:0 0 4px">Theo vùng</p>
+        <div id="regions"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============ 4. Phần lõi: suy ra tỉnh từ location ============ -->
+  <section style="margin-top:34px">
+    <div class="sec-head">
+      <span class="no">03</span>
+      <div class="tx">
+        <h2>Chuỗi <code>location</code> được hiểu thế nào</h2>
+        <p>Đây mới là phần khó, không phải cái bản đồ</p>
+      </div>
+    </div>
+
+    <div class="sheet" style="padding:22px 24px">
+      <div class="scroll-x">
+        <table class="resolve">
+          <thead>
+            <tr>
+              <th>Chuỗi gốc trong dữ liệu</th>
+              <th>Ra tỉnh thành</th>
+              <th>Nhờ luật nào</th>
+            </tr>
+          </thead>
+          <tbody id="resolve-body"></tbody>
+        </table>
+      </div>
+
+      <hr class="rule" style="margin:20px 0 14px">
+      <p class="meta" style="margin:0">
+        Hàng cuối là ví dụ <b>cố tình cho hỏng</b>: <code>"Vincom Đồng Khởi"</code> là một địa
+        điểm hẹn hò có thật trong <code>mockData.ts</code>. Không luật nào khớp được, nên nó
+        phải hiện ra để người dùng tự chọn tỉnh — <b>chứ không được im lặng bỏ qua</b>.
+        Đếm sai một tỉnh còn tệ hơn là hỏi.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 5. Cảnh báo về mốc 63 ============ -->
+  <section style="margin-top:30px">
+    <div class="card dashed" style="padding:20px 22px;background:var(--paper-2)">
+      <span class="chip soft" style="margin-bottom:10px">Cần kiểm chứng trước khi chốt</span>
+      <p style="margin:0 0 8px"><b>Mốc "63 tỉnh thành" có thể đã lỗi thời.</b></p>
+      <p class="meta" style="margin:0">
+        Theo tôi được biết, Việt Nam đã sắp xếp lại đơn vị hành chính cấp tỉnh từ khoảng
+        tháng 7/2025, còn <b>34</b> tỉnh/thành thay vì 63. Nếu đúng thì câu chữ "Khám phá 63
+        tỉnh thành" trong app cần đổi, và bảng tra tỉnh phải dùng danh sách mới — vài cái tên
+        trong dữ liệu hiện tại có thể đã được gộp. <b>Tôi không chắc chi tiết từng tỉnh gộp
+        vào đâu, bạn nên tra lại văn bản chính thức</b> trước khi cố định danh sách. Nút gạt
+        ở trên để bạn thấy con số nhảy thế nào giữa hai mốc.
+      </p>
+    </div>
+  </section>
+
+</div>
+
+<nav class="dock" aria-label="Điều hướng chính">
+  <a href="home.html"><span class="material-symbols-outlined">home</span>Trang chủ</a>
+  <a href="emotions-savings.html"><span class="material-symbols-outlined">favorite</span>Cảm xúc</a>
+  <a href="memories.html" class="on"><span class="material-symbols-outlined">photo_album</span>Kỷ niệm</a>
+  <a href="secrets.html"><span class="material-symbols-outlined">lock</span>Bí mật</a>
+  <a href="#" aria-disabled="true"><span class="material-symbols-outlined">calendar_month</span>Hẹn hò</a>
+  <a href="emotions-savings.html#tiet-kiem"><span class="material-symbols-outlined">savings</span>Tiết kiệm</a>
+</nav>
+
+<script>
+/* =================================================================
+   Dữ liệu lấy nguyên văn từ couple-space/src/data/mockData.ts.
+   Không sửa, không thêm toạ độ vào từng kỷ niệm — toàn bộ vị trí
+   đều suy ra từ chuỗi `location`, đúng như app sẽ phải làm.
+   ================================================================= */
+const MEMORIES = [
+  { id: "1", title: "Hà Giang 04/2026",                 date: "2026-04-12", location: "Hà Giang, Việt Nam", photos: 5, quote: "Đi để thấy mình nhỏ bé giữa trời đất, và thấy nhau lớn hơn." },
+  { id: "2", title: "Hội An lúc hoàng hôn",             date: "2025-12-20", location: "Hội An, Quảng Nam",  photos: 3, quote: "Phố cổ lên đèn, và em cười." },
+  { id: "3", title: "Cà phê thứ Bảy",                   date: "2025-09-06", location: "Sài Gòn",            photos: 2, quote: "Không cần đi đâu xa, chỉ cần có nhau." },
+  { id: "4", title: "Đà Lạt: Những buổi sáng lạnh tê tái", date: "2025-02-14", location: "Đà Lạt, Lâm Đồng", photos: 2, quote: "Sáng nào cũng lạnh, nhưng tay em thì ấm." },
+  { id: "5", title: "Mộc Châu",                         date: "2024-03-09", location: "Mộc Châu, Sơn La",   photos: 1, quote: "Đồi chè xanh ngắt, hai đứa đi lạc cả buổi chiều." },
+  { id: "6", title: "Chuyện Phố",                       date: "2023-11-05", location: "Hà Nội",             photos: 0, quote: "Những ngày lang thang quanh Hồ Tây." },
+  /* Hàng dưới KHÔNG phải kỷ niệm — là location của một DatePlan.
+     Để đây để chứng minh bộ phân giải biết kêu khi không hiểu. */
+  { id: "x", title: "(ví dụ không nhận diện được)",      date: "2026-01-01", location: "Vincom Đồng Khởi",   photos: 0, quote: "", demo: true }
+];
+
+/* --- Bảng tra. Đây chính là dữ liệu tham chiếu app sẽ cần nuôi. --- */
+const PROVINCES = new Set([
+  "Hà Giang", "Quảng Nam", "TP. Hồ Chí Minh", "Lâm Đồng", "Sơn La", "Hà Nội",
+  "Lào Cai", "Ninh Bình", "Quảng Bình", "Thừa Thiên Huế", "Kiên Giang", "Khánh Hoà",
+  "Hải Phòng", "Đà Nẵng"
+]);
+
+/* Tên dân gian / tên huyện-thị → tỉnh. Thiếu bảng này là đếm sai ngay. */
+const ALIAS = {
+  "sài gòn": "TP. Hồ Chí Minh",
+  "tp.hcm": "TP. Hồ Chí Minh",
+  "tphcm": "TP. Hồ Chí Minh",
+  "hội an": "Quảng Nam",
+  "đà lạt": "Lâm Đồng",
+  "mộc châu": "Sơn La",
+  "cát bà": "Hải Phòng",
+  "sa pa": "Lào Cai",
+  "sapa": "Lào Cai",
+  "phong nha": "Quảng Bình",
+  "phú quốc": "Kiên Giang",
+  "nha trang": "Khánh Hoà",
+  "huế": "Thừa Thiên Huế",
+  "tràng an": "Ninh Bình"
+};
+
+/* Toạ độ của CHỖ THỰC SỰ ĐẾN, không phải tâm tỉnh — Mộc Châu cách
+   thành phố Sơn La cả trăm cây số, ghim vào tâm tỉnh sẽ sai chỗ. */
+const COORD = {
+  "Hà Giang":        [22.82, 104.98],
+  "Quảng Nam":       [15.88, 108.33],
+  "TP. Hồ Chí Minh": [10.78, 106.70],
+  "Lâm Đồng":        [11.94, 108.44],
+  "Sơn La":          [20.84, 104.63],
+  "Hà Nội":          [21.03, 105.85],
+  "Lào Cai":         [22.34, 103.84],
+  "Ninh Bình":       [20.25, 105.97],
+  "Quảng Bình":      [17.59, 106.28],
+  "Thừa Thiên Huế":  [16.46, 107.58],
+  "Kiên Giang":      [10.22, 103.96],
+  "Khánh Hoà":       [12.24, 109.05]
+};
+
+const REGION = {
+  "Hà Giang": "Bắc", "Sơn La": "Bắc", "Hà Nội": "Bắc", "Lào Cai": "Bắc",
+  "Ninh Bình": "Bắc", "Hải Phòng": "Bắc",
+  "Quảng Nam": "Trung", "Lâm Đồng": "Trung", "Quảng Bình": "Trung",
+  "Thừa Thiên Huế": "Trung", "Khánh Hoà": "Trung", "Đà Nẵng": "Trung",
+  "TP. Hồ Chí Minh": "Nam", "Kiên Giang": "Nam"
+};
+const REGION_LABEL = {
+  "Bắc": "Miền Bắc",
+  "Trung": "Miền Trung & Tây Nguyên",
+  "Nam": "Miền Nam"
+};
+
+/* Gợi ý đi tiếp — ghim rỗng, nét đứt. */
+const IDEAS = [
+  { province: "Lào Cai",        place: "Sa Pa" },
+  { province: "Ninh Bình",      place: "Tràng An" },
+  { province: "Quảng Bình",     place: "Phong Nha" },
+  { province: "Thừa Thiên Huế", place: "Huế" },
+  { province: "Khánh Hoà",      place: "Nha Trang" },
+  { province: "Kiên Giang",     place: "Phú Quốc" }
+];
+
+/* ---------------- Bộ phân giải ----------------
+   Thứ tự luật có chủ ý: mảnh cuối cùng thường là tỉnh
+   ("Hội An, Quảng Nam"), nên xét từ phải sang trái. */
+function resolveProvince(raw) {
+  const parts = raw.split(",")
+    .map(s => s.trim())
+    .filter(s => s && !/^(việt nam|vietnam|vn)$/i.test(s));
+
+  for (let i = parts.length - 1; i >= 0; i--) {
+    const p = parts[i];
+    if (PROVINCES.has(p)) return { province: p, rule: "khớp thẳng tên tỉnh" };
+    const a = ALIAS[p.toLowerCase()];
+    if (a) return { province: a, rule: 'bảng tên gọi khác → "' + a + '"' };
+  }
+  return { province: null, rule: "không luật nào khớp" };
+}
+
+/* ---------------- Phép chiếu ----------------
+   Tuyến tính, khớp với đường bờ vẽ tay bên dưới. */
+const LNG0 = 102.0, LNG_SCALE = 50;
+const LAT0 = 23.5,  LAT_SCALE = 59.2;
+const project = ([lat, lng]) => [
+  (lng - LNG0) * LNG_SCALE,
+  (LAT0 - lat) * LAT_SCALE
+];
+
+/* ---------------- Đường bờ ----------------
+   Điểm neo đặt theo toạ độ thật của các mốc quen thuộc rồi chiếu
+   bằng đúng công thức trên, nên ghim không bao giờ rơi xuống biển. */
+const COAST = [
+  [25,65],[90,58],[140,25],[178,52],[212,47],[250,78],[298,117],
+  [270,148],[257,163],[225,190],[200,219],[195,284],[208,320],
+  [230,357],[280,417],[310,441],[320,455],[345,510],[361,576],
+  [359,666],[340,706],[305,744],[254,778],[215,800],[185,845],
+  [145,882],[132,840],[154,799],[124,777],[160,752],[205,722],
+  [245,686],[275,669],[275,527],[265,479],[260,432],[230,403],
+  [195,355],[160,302],[115,243],[130,196],[95,154],[45,118]
+];
+
+/* Catmull-Rom → Bézier: biến chuỗi điểm gãy thành đường cong mềm. */
+function smooth(pts, closed) {
+  const p = closed
+    ? [pts[pts.length - 1], ...pts, pts[0], pts[1]]
+    : [pts[0], ...pts, pts[pts.length - 1]];
+  let d = "M " + pts[0][0] + " " + pts[0][1];
+  for (let i = 1; i < p.length - 2; i++) {
+    const [x0, y0] = p[i - 1], [x1, y1] = p[i], [x2, y2] = p[i + 1], [x3, y3] = p[i + 2];
+    const c1x = x1 + (x2 - x0) / 6, c1y = y1 + (y2 - y0) / 6;
+    const c2x = x2 - (x3 - x1) / 6, c2y = y2 - (y3 - y1) / 6;
+    d += " C " + c1x.toFixed(1) + " " + c1y.toFixed(1) + ", "
+              + c2x.toFixed(1) + " " + c2y.toFixed(1) + ", "
+              + x2.toFixed(1) + " " + y2.toFixed(1);
+  }
+  return d + (closed ? " Z" : "");
+}
+
+/* ================= Dựng trang ================= */
+const SVG_NS = "http://www.w3.org/2000/svg";
+const fmtDate = iso => new Date(iso)
+  .toLocaleDateString("vi-VN", { month: "long", year: "numeric" });
+
+document.getElementById("coast").setAttribute("d", smooth(COAST, true));
+
+/* --- phân giải toàn bộ --- */
+const resolved = MEMORIES.map(m => ({ ...m, ...resolveProvince(m.location) }));
+const real = resolved.filter(m => !m.demo);
+const visitedProvinces = [...new Set(real.map(m => m.province).filter(Boolean))];
+
+/* --- bảng phân giải --- */
+document.getElementById("resolve-body").innerHTML = resolved.map(m => {
+  const okCell = m.province
+    ? "<b>" + m.province + "</b>"
+    : '<span class="miss">chưa rõ — hỏi người dùng</span>';
+  return "<tr><td><code>" + m.location + "</code></td><td>" + okCell
+       + '</td><td class="meta" style="font-size:.84rem">' + m.rule + "</td></tr>";
+}).join("");
+
+/* --- ghim --- */
+const pinsG = document.getElementById("pins");
+
+function makePin(province, place, label, isIdea, onPick) {
+  const c = COORD[province];
+  if (!c) return null;
+  const [x, y] = project(c);
+
+  const g = document.createElementNS(SVG_NS, "g");
+  g.setAttribute("class", "pin" + (isIdea ? " idea" : ""));
+  g.setAttribute("transform", "translate(" + x.toFixed(1) + "," + y.toFixed(1) + ")");
+  g.setAttribute("tabindex", "0");
+  g.setAttribute("role", "button");
+  g.setAttribute("aria-pressed", "false");
+  g.setAttribute("aria-label", label);
+
+  // vùng bấm rộng hơn phần vẽ — ngón tay không cần chính xác
+  g.innerHTML =
+    '<circle class="halo" cx="0" cy="-20" r="21"></circle>' +
+    '<path class="tail" d="M -6.5 -14 L 0 1.5 L 6.5 -14 Z"></path>' +
+    '<circle class="body" cx="0" cy="-21" r="10.5"></circle>' +
+    '<text class="tag" x="0" y="-38" text-anchor="middle">' + place + "</text>";
+
+  const fire = () => onPick(g);
+  g.addEventListener("click", fire);
+  g.addEventListener("keydown", e => {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fire(); }
+  });
+  pinsG.appendChild(g);
+  return g;
+}
+
+const detailEl = document.getElementById("detail");
+const detailSub = document.getElementById("detail-sub");
+
+function clearPressed() {
+  pinsG.querySelectorAll(".pin").forEach(p => p.setAttribute("aria-pressed", "false"));
+}
+
+function showMemory(m, g) {
+  clearPressed();
+  g.setAttribute("aria-pressed", "true");
+  detailSub.textContent = m.province;
+  detailEl.innerHTML =
+    '<span class="chip accent" style="margin-bottom:10px">' + fmtDate(m.date) + "</span>" +
+    '<h3 style="font-family:\'Plus Jakarta Sans\',sans-serif;font-weight:600;font-size:1.3rem;margin:0 0 4px">'
+      + m.title + "</h3>" +
+    '<p class="label" style="color:var(--primary);margin:0 0 12px">' + m.location
+      + " · " + m.photos + " ảnh</p>" +
+    '<div class="ruled"><p style="font-style:italic">“' + m.quote + "”</p></div>" +
+    '<div style="margin-top:14px"><a class="btn sm" href="memories.html">Mở album'
+      + '<span class="material-symbols-outlined">arrow_forward</span></a></div>';
+}
+
+function showIdea(idea, g) {
+  clearPressed();
+  g.setAttribute("aria-pressed", "true");
+  detailSub.textContent = idea.province;
+  detailEl.innerHTML =
+    '<span class="chip soft" style="margin-bottom:10px">Chưa đến bao giờ</span>' +
+    '<h3 style="font-family:\'Plus Jakarta Sans\',sans-serif;font-weight:600;font-size:1.3rem;margin:0 0 4px">'
+      + idea.place + "</h3>" +
+    '<p class="label" style="color:var(--primary);margin:0 0 12px">' + idea.province + "</p>" +
+    '<p class="meta" style="margin:0">Thêm nơi này vào danh sách muốn đi, rồi khi đã đi thì '
+      + "nó tự chuyển thành ghim đặc.</p>" +
+    '<div style="margin-top:14px"><button class="btn sm accent" type="button">'
+      + '<span class="material-symbols-outlined">add</span>Thêm vào danh sách</button></div>';
+}
+
+// ghim gợi ý vẽ trước, để ghim thật luôn nằm đè lên trên
+IDEAS.forEach(idea => {
+  makePin(idea.province, idea.place, "Gợi ý: " + idea.place + ", " + idea.province,
+          true, g => showIdea(idea, g));
+});
+
+// mỗi tỉnh một ghim; nếu một tỉnh có nhiều kỷ niệm thì lấy cái mới nhất
+const byProvince = new Map();
+real.filter(m => m.province).forEach(m => {
+  const cur = byProvince.get(m.province);
+  if (!cur || new Date(m.date) > new Date(cur.date)) byProvince.set(m.province, m);
+});
+byProvince.forEach((m, province) => {
+  const place = m.location.split(",")[0].trim();
+  makePin(province, place, m.title + " — " + province, false, g => showMemory(m, g));
+});
+
+/* --- nét nối theo thứ tự thời gian --- */
+const threadPts = [...byProvince.values()]
+  .sort((a, b) => new Date(a.date) - new Date(b.date))
+  .map(m => project(COORD[m.province]))
+  .map(([x, y]) => [x, y - 21]);      // nối vào đầu ghim, không phải mũi nhọn
+document.getElementById("thread").setAttribute("d", smooth(threadPts, false));
+
+/* --- vùng miền --- */
+const buckets = { "Bắc": [], "Trung": [], "Nam": [] };
+visitedProvinces.forEach(p => {
+  const r = REGION[p];
+  if (r) buckets[r].push(p);
+});
+document.getElementById("regions").innerHTML = Object.keys(buckets).map(k => {
+  const list = buckets[k];
+  return '<div class="region-row">'
+    + '<span class="nm">' + REGION_LABEL[k] + "</span>"
+    + '<span class="ct">' + list.length + "</span>"
+    + '<span class="pv">'
+    + (list.length
+        ? list.map(p => '<span class="chip blue">' + p + "</span>").join("")
+        : '<span class="meta" style="font-size:.84rem">chưa có kỷ niệm nào</span>')
+    + "</span></div>";
+}).join("");
+
+/* --- con số + thanh tiến độ, đổi theo mốc 34/63 --- */
+let target = 34;
+function paintStat() {
+  const n = visitedProvinces.length;
+  const pct = Math.min((n / target) * 100, 100);
+  document.getElementById("stat-visited").textContent = n;
+  document.getElementById("stat-target").textContent = target;
+  document.getElementById("inline-visited").textContent = n;
+  document.getElementById("leg-visited").textContent = n;
+
+  const meter = document.getElementById("main-meter");
+  meter.querySelector(".fl").style.strokeDashoffset = String(100 - pct);
+  meter.classList.toggle("done", pct >= 95);
+  document.getElementById("main-pct").textContent = Math.round(pct) + "%";
+}
+
+document.querySelectorAll(".seg button").forEach(b => {
+  b.addEventListener("click", () => {
+    document.querySelectorAll(".seg button")
+      .forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    target = Number(b.dataset.target);
+    paintStat();
+  });
+});
+
+requestAnimationFrame(paintStat);
+</script>
+
+</body>
+</html>

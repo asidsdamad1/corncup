@@ -23,34 +23,34 @@ export const EmotionPulse: React.FC<EmotionPulseProps> = ({ userName = "Duyên" 
   const moods = ["😊", "🥰", "😴", "😌", "🤒"];
 
   return (
-    <div className="min-h-screen bg-background-main font-body-md text-ink-primary overflow-x-hidden">
+    <div className="min-h-screen overflow-x-hidden font-body-md text-ink-primary">
       {/* Top Bar */}
-      <header className="fixed top-0 left-0 lg:left-64 right-0 z-40 bg-transparent flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4">
-        <h1 className="text-headline-lg font-headline-lg text-ink-primary">Duyên</h1>
-        <div className="flex gap-4 items-center">
-          <button className="hover:opacity-80 transition-opacity active:scale-95">
-            <span className="material-symbols-outlined text-ink-primary">lock</span>
+      <header className="fixed left-0 right-0 top-0 z-40 flex w-full items-center justify-between px-margin-mobile py-4 md:px-margin-desktop lg:left-64">
+        <h1 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-ink-primary -rotate-[0.6deg]">
+          {userName}
+        </h1>
+        <div className="flex items-center gap-3">
+          <button className="btn btn-icon" aria-label="Khoá">
+            <span className="material-symbols-outlined">lock</span>
           </button>
-          <button className="hover:opacity-80 relative">
-            <span className="material-symbols-outlined text-ink-primary">notifications</span>
-            <span className="absolute top-0 right-0 w-2 h-2 bg-surface-accent rounded-full border border-background-main" />
+          <button className="btn btn-icon relative" aria-label="Thông báo">
+            <span className="material-symbols-outlined">notifications</span>
+            <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full border border-ink-primary bg-surface-accent" />
           </button>
         </div>
       </header>
 
-      <main className="pt-24 pb-32 md:pb-12 lg:pl-64 min-h-screen">
-        <div className="max-w-4xl mx-auto px-margin-mobile md:px-margin-desktop">
+      <main className="min-h-screen pb-32 pt-24 md:pb-12 lg:pl-64">
+        <div className="mx-auto max-w-4xl px-margin-mobile md:px-margin-desktop">
           {/* Segmented Control */}
-          <div className="relative flex p-1 mb-stack-lg bg-surface-text-container/50 rounded-full border border-ink-primary/10 overflow-hidden">
-            <div
-              className="absolute h-[calc(100%-8px)] top-1 bg-surface-accent rounded-full transition-all duration-300"
-              style={{ width: "33.33%", left: `calc(${activeTab * 33.33}% + 4px)` }}
-            />
+          <div className="tabs mb-stack-lg" role="tablist" aria-label="Lớp riêng tư">
             {["Riêng tôi", "Riêng bạn", "Với đối phương"].map((label, i) => (
               <button
                 key={label}
+                role="tab"
+                aria-selected={activeTab === i}
                 onClick={() => setActiveTab(i as 0 | 1 | 2)}
-                className={`relative z-10 flex-1 py-3 text-label-md font-label-md transition-colors text-center ${activeTab === i ? "text-ink-primary" : "text-ink-primary/60"}`}
+                className={`tab ${activeTab === i ? "tab-on" : ""}`}
               >
                 {label}
               </button>
@@ -58,69 +58,94 @@ export const EmotionPulse: React.FC<EmotionPulseProps> = ({ userName = "Duyên" 
           </div>
 
           <AnimatePresence mode="wait">
-            <motion.div key={activeTab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-stack-lg">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="space-y-stack-lg"
+            >
               {activeTab === 0 && (
                 <div className="space-y-stack-lg">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
+                  <div className="grid grid-cols-1 gap-stack-md md:grid-cols-2">
                     {/* Mood Selector */}
-                    <div className="bg-surface-text-container p-6 rounded-[2rem] shadow-sm flex flex-col gap-4 border border-ink-primary/5">
-                      <h2 className="text-headline-sm font-headline-sm text-ink-primary">Hôm nay thế nào?</h2>
+                    <div className="card flex flex-col gap-4 p-6">
+                      <h2 className="font-headline-sm text-headline-sm text-ink-primary">
+                        Hôm nay thế nào?
+                      </h2>
                       <div className="grid grid-cols-5 gap-2">
                         {moods.map((m, i) => (
                           <button
-                            key={i}
+                            key={m}
                             onClick={() => setSelectedMood(i)}
-                            className={`w-full aspect-square rounded-2xl flex items-center justify-center text-2xl hover:bg-surface-accent transition-colors ${selectedMood === i ? "bg-surface-accent shadow-sm ring-2 ring-ink-primary/5" : "bg-background-main/30"}`}
+                            aria-pressed={selectedMood === i}
+                            className={`flex aspect-square w-full items-center justify-center rounded-[var(--radius-wobble-sm)] border-[2.2px] text-2xl transition-all ${
+                              selectedMood === i
+                                ? "-rotate-2 border-ink-primary bg-surface-accent shadow-[0_3px_0_var(--color-ink-primary)]"
+                                : "border-[var(--ink-20)] bg-paper hover:border-ink-primary hover:bg-surface-accent/30"
+                            }`}
                           >
                             {m}
                           </button>
                         ))}
                       </div>
                     </div>
+
                     {/* Private Note */}
-                    <div className="bg-surface-accent/60 p-6 rounded-[2rem] shadow-sm flex flex-col gap-3 border border-ink-primary/5 backdrop-blur-sm">
-                      <div className="flex items-center gap-2 text-ink-primary/70">
+                    <div className="card card-tilt-r card-accent flex flex-col gap-3 p-6">
+                      <div className="flex items-center gap-2 text-ink-primary">
                         <span className="material-symbols-outlined text-[18px]">lock</span>
-                        <span className="text-label-sm font-label-sm">Ghi chú riêng tư</span>
+                        <span className="font-label-sm text-label-sm">Ghi chú riêng tư</span>
                       </div>
                       <textarea
                         value={privateNote}
                         onChange={(e) => setPrivateNote(e.target.value)}
-                        className="w-full flex-grow bg-transparent border-none focus:ring-0 text-body-md font-body-md text-ink-primary placeholder:text-ink-primary/40 resize-none min-h-[100px]"
+                        className="ruled min-h-[100px] flex-grow resize-none border-l-2 border-ink-primary/30 bg-transparent font-body-md text-body-md text-ink-primary placeholder:text-ink-primary/40"
                         placeholder="Điều gì làm bạn suy nghĩ..."
                       />
-                      <button className="self-end px-6 py-2 bg-ink-primary text-white rounded-full text-label-md font-label-md hover:opacity-90 transition-opacity">Lưu tâm sự</button>
+                      <button className="btn btn-ink btn-sm self-end">Lưu tâm sự</button>
                     </div>
                   </div>
+
                   {/* Daily Prompt */}
-                  <div className="bg-surface-text-container p-8 rounded-[2.5rem] border border-ink-primary/5 shadow-sm relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-surface-accent/20 rounded-full -mr-16 -mt-16 blur-3xl" />
-                    <div className="relative z-10 flex flex-col gap-2">
-                      <span className="text-surface-accent text-headline-sm">✨</span>
-                      <h3 className="text-headline-sm font-headline-sm text-ink-primary">Suy ngẫm hôm nay</h3>
-                      <p className="text-body-md font-body-md text-ink-primary/70 italic">&quot;Ba điều bạn cảm thấy biết ơn về đối phương trong ngày hôm nay là gì?&quot;</p>
+                  <div className="sheet p-8">
+                    <span className="chip chip-accent mb-3">✨ Suy ngẫm hôm nay</span>
+                    <div className="ruled mt-3">
+                      <p className="italic text-ink-primary">
+                        &quot;Ba điều bạn cảm thấy biết ơn về đối phương trong ngày hôm nay là
+                        gì?&quot;
+                      </p>
                     </div>
                   </div>
                 </div>
               )}
 
               {activeTab === 1 && (
-                <div className="bg-surface-text-container p-8 rounded-[2.5rem] border border-ink-primary/5 shadow-sm">
-                  <div className="flex flex-col md:flex-row items-center gap-8 mb-8">
-                    <div className="relative">
-                      <div className="w-32 h-32 rounded-full border-4 border-surface-accent bg-surface-container-low flex items-center justify-center">
-                        <span className="material-symbols-outlined text-4xl text-ink-primary/40">person</span>
+                <div className="sheet p-8">
+                  <div className="mb-8 flex flex-col items-center gap-8 md:flex-row">
+                    <div className="relative flex-none">
+                      <div className="flex h-32 w-32 items-center justify-center rounded-full border-[2.6px] border-ink-primary bg-surface-accent">
+                        <span className="material-symbols-outlined text-4xl text-ink-primary">
+                          person
+                        </span>
                       </div>
-                      <span className="absolute bottom-1 right-1 bg-green-500 w-6 h-6 rounded-full border-4 border-surface-text-container" />
+                      <span className="absolute bottom-1 right-1 h-6 w-6 rounded-full border-[2.6px] border-ink-primary bg-mint" />
                     </div>
                     <div className="flex-grow text-center md:text-left">
-                      <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
-                        <h2 className="text-headline-md font-headline-md text-ink-primary">Duy đang cảm thấy</h2>
-                        <span className="text-3xl">✨ Yên bình</span>
+                      <div className="mb-2 flex flex-wrap items-center justify-center gap-2 md:justify-start">
+                        <h2 className="font-headline-md text-headline-md text-ink-primary">
+                          Duy đang cảm thấy
+                        </h2>
+                        <span className="stamp">✨<small>Yên bình</small></span>
                       </div>
-                      <p className="text-body-md font-body-md text-ink-primary/60 mb-6 italic">&quot;Vừa hoàn thành một dự án lớn, cảm thấy thật nhẹ nhõm...&quot;</p>
-                      <button className="px-4 py-2 bg-surface-accent rounded-full text-ink-primary text-label-md font-label-md flex items-center gap-2 hover:scale-105 transition-transform">
-                        <span className="material-symbols-outlined text-[18px]">favorite</span> Gửi yêu thương
+                      <div className="ruled mb-6">
+                        <p className="italic text-ink-primary">
+                          &quot;Vừa hoàn thành một dự án lớn, cảm thấy thật nhẹ nhõm...&quot;
+                        </p>
+                      </div>
+                      <button className="btn btn-accent">
+                        <span className="material-symbols-outlined text-[18px]">favorite</span>
+                        Gửi yêu thương
                       </button>
                     </div>
                   </div>
@@ -128,29 +153,41 @@ export const EmotionPulse: React.FC<EmotionPulseProps> = ({ userName = "Duyên" 
               )}
 
               {activeTab === 2 && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
-                  <div className="bg-ink-primary p-8 rounded-[2.5rem] shadow-xl flex flex-col items-center justify-center text-center relative overflow-hidden group">
-                    <div className="absolute inset-0 bg-gradient-to-br from-surface-accent/20 to-transparent opacity-50" />
-                    <div className="relative z-10">
-                      <span className="text-surface-accent text-label-md font-label-md uppercase tracking-widest mb-4 block">Vibe của chúng mình</span>
-                      <div className="text-8xl font-headline-lg text-white mb-2 group-hover:scale-110 transition-transform duration-500">92</div>
-                      <p className="text-white/80 font-body-sm">Đang ở trạng thái kết nối rất tốt!</p>
+                <div className="grid grid-cols-1 gap-stack-md md:grid-cols-2">
+                  <div className="card card-ink group flex flex-col items-center justify-center p-8 text-center">
+                    <span className="chip chip-accent mb-4">Vibe của chúng mình</span>
+                    <div className="font-headline-lg text-8xl font-bold text-paper transition-transform duration-500 group-hover:scale-105">
+                      92
                     </div>
+                    <p className="font-body-sm text-body-sm mt-2 text-primary-fixed">
+                      Đang ở trạng thái kết nối rất tốt!
+                    </p>
                   </div>
-                  <div className="bg-surface-text-container p-8 rounded-[2.5rem] border border-ink-primary/5 shadow-sm flex flex-col">
-                    <h3 className="text-headline-sm font-headline-sm text-ink-primary mb-4">Mục tiêu chung</h3>
-                    <div className="flex-grow flex flex-col gap-4">
-                      <div className="flex items-start gap-4 bg-background-main/20 p-4 rounded-2xl">
-                        <div className="bg-surface-accent w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0">
-                          <span className="material-symbols-outlined text-ink-primary">restaurant</span>
+
+                  <div className="sheet flex flex-col p-8">
+                    <h3 className="font-headline-sm text-headline-sm mb-4 text-ink-primary">
+                      Mục tiêu chung
+                    </h3>
+                    <div className="flex flex-grow flex-col gap-4">
+                      <div className="panel flex items-start gap-4 p-4">
+                        <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[var(--radius-wobble-sm)] border-[2.2px] border-ink-primary bg-surface-accent">
+                          <span className="material-symbols-outlined text-ink-primary">
+                            restaurant
+                          </span>
+                        </span>
+                        <div className="min-w-0">
+                          <p className="font-label-md text-label-md text-ink-primary">
+                            Nấu ăn cùng nhau
+                          </p>
+                          <p className="font-body-sm text-body-sm text-primary">Hôm nay, 19:00</p>
                         </div>
-                        <div>
-                          <p className="text-label-md font-label-md text-ink-primary">Nấu ăn cùng nhau</p>
-                          <p className="text-body-sm font-body-sm text-ink-primary/60">Hôm nay, 19:00</p>
-                        </div>
-                        <div className="ml-auto">
-                          <span className="material-symbols-outlined text-surface-accent" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                        </div>
+                        <span
+                          className="material-symbols-outlined ml-auto text-mint"
+                          style={{ fontVariationSettings: "'FILL' 1" }}
+                          suppressHydrationWarning
+                        >
+                          check_circle
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -158,26 +195,41 @@ export const EmotionPulse: React.FC<EmotionPulseProps> = ({ userName = "Duyên" 
               )}
 
               {/* Trends Chart */}
-              <div className="bg-surface-text-container/80 backdrop-blur-md p-8 rounded-[2.5rem] border border-ink-primary/5 shadow-sm">
-                <div className="flex justify-between items-center mb-8">
-                  <div>
-                    <h3 className="text-headline-sm font-headline-sm text-ink-primary">Xu hướng cảm xúc</h3>
-                    <p className="text-body-sm font-body-sm text-ink-primary/60">Thống kê 7 ngày qua</p>
+              <div className="sheet p-8">
+                <div className="mb-8 flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <h3 className="font-headline-sm text-headline-sm text-ink-primary">
+                      Xu hướng cảm xúc
+                    </h3>
+                    <p className="font-body-sm text-body-sm text-primary">Thống kê 7 ngày qua</p>
                   </div>
-                  <span className="material-symbols-outlined text-ink-primary/40">more_horiz</span>
+                  <button aria-label="Tuỳ chọn" className="text-primary hover:text-ink-primary">
+                    <span className="material-symbols-outlined">more_horiz</span>
+                  </button>
                 </div>
-                <div className="flex items-end justify-between h-40 gap-2 px-2">
+
+                <div className="flex h-40 items-end justify-between gap-2 px-2">
                   {weekBars.map((bar) => (
-                    <div key={bar.day} className="flex flex-col items-center gap-2 w-full group">
+                    <div key={bar.day} className="group flex w-full flex-col items-center gap-2">
                       <div
-                        className={`w-full bg-surface-accent rounded-t-lg transition-opacity relative ${bar.active ? "opacity-100 shadow-lg" : "opacity-40 group-hover:opacity-100"}`}
+                        className={`relative w-full rounded-t-[10px] border-[2.2px] border-b-0 transition-colors ${
+                          bar.active
+                            ? "border-ink-primary bg-surface-accent"
+                            : "border-[var(--ink-20)] bg-paper group-hover:border-ink-primary group-hover:bg-surface-accent/40"
+                        }`}
                         style={{ height: bar.h }}
                       >
                         {bar.active && (
-                          <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-ink-primary text-white text-[10px] px-2 py-1 rounded">Vui</div>
+                          <span className="chip absolute -top-9 left-1/2 -translate-x-1/2">Vui</span>
                         )}
                       </div>
-                      <span className={`text-label-sm font-label-sm ${bar.active ? "text-ink-primary font-bold" : "text-ink-primary/40"}`}>{bar.day}</span>
+                      <span
+                        className={`font-label-sm text-label-sm ${
+                          bar.active ? "font-bold text-ink-primary" : "text-primary"
+                        }`}
+                      >
+                        {bar.day}
+                      </span>
                     </div>
                   ))}
                 </div>

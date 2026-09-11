@@ -1,533 +1,571 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { secretNotes, featuredCapsule } from "@/data/mockData";
+import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence } from "framer-motion";
 import NavBar from "@/components/ui/NavBar";
 import { Portal } from "@/components/ui/Portal";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { SecretBoxPasswordPopup } from "./SecretBoxPasswordPopup";
 import { SecretBoxUnlockSuccess } from "./SecretBoxUnlockSuccess";
 import { CreateSecretBoxPopup } from "./CreateSecretBoxPopup";
 import { SecretBoxDetailModal } from "./SecretBoxDetailModal";
 import { LockedNoteEditPopup } from "./LockedNoteEditPopup";
+import { onImageError } from "@/lib/image";
+import { formatUnlockDate, statusOf, timeUntil } from "@/lib/secretBox";
+import {
+  addSecretNote,
+  markOpened,
+  removeSecretNote,
+  updateSecretNote,
+  useSecretNotes,
+} from "@/lib/secretStore";
+import type { SecretNote } from "@/data/mockData";
 
-interface SecretBoxManagementProps {
-  readonly onUnlockSuccess?: () => void;
-}
+type SortKey = "newest" | "oldest" | "az";
 
-export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> = ({ onUnlockSuccess }) => {
-  const [mounted, setMounted] = useState(false);
-  const [localNotes, setLocalNotes] = useState(secretNotes);
-  const [search, setSearch] = useState("");
-  const [isPasswordPopupOpen, setIsPasswordPopupOpen] = useState(false);
-  const [isCreatePopupOpen, setIsCreatePopupOpen] = useState(false);
-  const [isUnlockSuccessOpen, setIsUnlockSuccessOpen] = useState(false);
-  const [selectedNote, setSelectedNote] = useState<(typeof localNotes)[0] | null>(null);
-  const [editingLockedNote, setEditingLockedNote] = useState<(typeof localNotes)[0] | null>(null);
-  const [countdown, setCountdown] = useState({
-    days: featuredCapsule.countdownDays,
-    hours: featuredCapsule.countdownHours,
-    minutes: featuredCapsule.countdownMinutes,
-    seconds: 0,
-  });
+const SORTS: ReadonlyArray<{ key: SortKey; label: string }> = [
+  { key: "newest", label: "Mới nhất" },
+  { key: "oldest", label: "Cũ nhất" },
+  { key: "az", label: "A - Z" },
+];
 
-  const isCountdownDone =
-    countdown.days === 0 &&
-    countdown.hours === 0 &&
-    countdown.minutes === 0 &&
-    countdown.seconds === 0;
+const pad = (n: number) => String(n).padStart(2, "0");
 
-  // Live countdown
+export function SecretBoxManagement() {
+  const notes = useSecretNotes();
+
+  /* One clock for the screen. `Date.now()` seeds it so the server renders the
+     same locked/open split the client will; only the seconds can disagree,
+     and those digits say so. The old version seeded three numbers from the
+     data and decremented them, which drifted whenever the tab was backgrounded. */
+  const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
-    setMounted(true);
-    const timer = setInterval(() => {
-      setCountdown((prev) => {
-        let { days, hours, minutes, seconds } = prev;
-        // Stop at zero
-        if (days === 0 && hours === 0 && minutes === 0 && seconds === 0) {
-          return prev;
-        }
-        if (seconds > 0) {
-          seconds--;
-        } else {
-          seconds = 59;
-          if (minutes > 0) {
-            minutes--;
-          } else {
-            minutes = 59;
-            if (hours > 0) {
-              hours--;
-            } else {
-              hours = 23;
-              if (days > 0) days--;
-            }
-          }
-        }
-        return { days, hours, minutes, seconds };
-      });
-    }, 1000);
-    return () => clearInterval(timer);
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
   }, []);
 
-  const lockedNotes = localNotes.filter((n) => n.isLocked);
-  const unlockedNotes = localNotes.filter(
-    (n) => !n.isLocked && n.title.toLowerCase().includes(search.toLowerCase())
-  );
+  const [search, setSearch] = useState("");
+  const [sort, setSort] = useState<SortKey>("newest");
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [unlockTarget, setUnlockTarget] = useState<SecretNote | null>(null);
+  const [justOpenedId, setJustOpenedId] = useState<string | null>(null);
+  const [editing, setEditing] = useState<SecretNote | null>(null);
+  const [reading, setReading] = useState<SecretNote | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<SecretNote | null>(null);
 
-  const hasNotes = localNotes.length > 0;
+  const featured = notes.find((n) => n.featured);
 
-  const handleUnlockSave = () => {
-    setIsUnlockSuccessOpen(false);
-    const newUnlockedNote = {
-      id: `sn-new-${Date.now()}`,
-      title: "Những điều anh chưa nói (Vừa mở)",
-      previewText: "Gửi em, khi em đọc được những dòng này, có lẽ chúng ta đã cùng nhau đi qua thêm một chặng đường dài...",
-      unlockDate: "Hôm nay",
-      isLocked: false,
-      icon: "sentiment_very_satisfied" as const,
-      tags: ["Mới mở khóa", "Kỷ niệm"],
-      progressPercent: 100,
-      category: "Personal" as const,
+  const { waiting, opened, matched } = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    const hit = (n: SecretNote) =>
+      q === "" || n.title.toLowerCase().includes(q) || n.preview.toLowerCase().includes(q);
+
+    const by = (a: SecretNote, b: SecretNote) => {
+      if (sort === "az") return a.title.localeCompare(b.title, "vi");
+      const d = Date.parse(a.unlockAt) - Date.parse(b.unlockAt);
+      return sort === "oldest" ? d : -d;
     };
-    setLocalNotes((prev) => [newUnlockedNote, ...prev]);
-    setSelectedNote(newUnlockedNote);
+
+    /* Search covers both lists. It used to apply only to the opened ones, so
+       typing a word narrowed half the screen and left the other half alone. */
+    const all = notes.filter(hit);
+    return {
+      waiting: all.filter((n) => !n.openedAt && !n.featured).sort(by),
+      opened: all.filter((n) => n.openedAt).sort(by),
+      matched: all.length,
+    };
+  }, [notes, search, sort]);
+
+  const searching = search.trim() !== "";
+  const justOpened = justOpenedId ? notes.find((n) => n.id === justOpenedId) : undefined;
+
+  /**
+   * The passcode is the way in, whatever the box is for. A box past its date
+   * opens and is read; a box still waiting can be edited. Either way the code
+   * is asked for first — the waiting list used to jump straight into the
+   * editor on a single click.
+   */
+  const handleUnlocked = (note: SecretNote) => {
+    setUnlockTarget(null);
+    if (statusOf(note, Date.now()) === "locked") {
+      setEditing(note);
+      return;
+    }
+    markOpened(note.id);
+    setJustOpenedId(note.id);
   };
 
-  if (!mounted) {
-    return (
-      <div className="min-h-screen bg-background-main font-body-md text-ink-primary overflow-x-hidden">
-        <div className="md:ml-64 min-h-screen px-margin-mobile md:px-margin-desktop py-10 pb-24 md:pb-10 flex-1">
-          <header className="flex justify-between items-center mb-stack-lg">
-            <div>
-              <h2 className="text-headline-md font-headline-md text-ink-primary">Secret Capsule Management</h2>
-              <p className="text-body-sm font-body-sm text-primary">Gửi gắm những điều chưa nói cho tương lai của chúng ta.</p>
-            </div>
-          </header>
-        </div>
-      </div>
-    );
-  }
+  const openBox = (note: SecretNote) => {
+    if (note.openedAt) setReading(note);
+    else setUnlockTarget(note);
+  };
 
-  const pad = (n: number) => String(n).padStart(2, "0");
+  const header = (
+    <header className="mb-stack-lg">
+      <p className="font-headline -rotate-2 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-primary">
+        Duyên · Secret Locked Notes
+      </p>
+      <h2 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg -rotate-[0.6deg] text-ink-primary">
+        Hộp bí mật
+      </h2>
+      <p className="font-body-md text-body-md mt-2 max-w-[52ch] text-primary">
+        Gửi gắm những điều chưa nói cho tương lai của chúng ta.
+      </p>
+    </header>
+  );
 
   return (
-    <div className="min-h-screen bg-background-main font-body-md text-ink-primary overflow-x-hidden">
-      {/* Main Content */}
-      <main className="md:ml-64 min-h-screen px-margin-mobile md:px-margin-desktop py-10 pb-24 md:pb-10 flex-1">
+    <div className="min-h-screen overflow-x-hidden font-body-md text-ink-primary">
+      <main className="min-h-screen flex-1 px-margin-mobile py-10 pb-32 md:px-margin-desktop lg:ml-64 lg:pb-10">
+        {header}
 
-        {/* Header Actions */}
-        <header className="flex justify-between items-center mb-stack-lg">
-          <div>
-            <h2 className="text-headline-md font-headline-md text-ink-primary">Secret Capsule Management</h2>
-            <p className="text-body-sm font-body-sm text-primary">Gửi gắm những điều chưa nói cho tương lai của chúng ta.</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <button
-              className="material-symbols-outlined p-2 text-primary hover:bg-white/30 rounded-full transition-colors"
-              aria-label="Thông báo"
-            >
-              notifications
+        {notes.length === 0 ? (
+          <section className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="card-dashed mb-8 flex h-48 w-48 items-center justify-center rounded-full">
+              <span className="material-symbols-outlined text-6xl text-primary/50">
+                auto_stories
+              </span>
+            </div>
+            <h3 className="font-headline-md text-headline-md mb-3 -rotate-[0.5deg] text-ink-primary">
+              Chưa có điều bí mật nào
+            </h3>
+            <p className="font-body-lg text-body-lg mx-auto mb-10 max-w-md text-primary">
+              Hãy bắt đầu viết xuống những tâm tư, lời nhắn nhủ hay những kỷ niệm sắp tới để gửi
+              cho nhau trong tương lai.
+            </p>
+            <button onClick={() => setIsCreateOpen(true)} className="btn btn-accent px-10 py-4">
+              <span className="material-symbols-outlined">add_circle</span>
+              Tạo hộp thư đầu tiên
             </button>
-            <button
-              className="material-symbols-outlined p-2 text-primary hover:bg-white/30 rounded-full transition-colors"
-              aria-label="Yêu thích"
-            >
-              favorite
-            </button>
-          </div>
-        </header>
-
-        {hasNotes ? (
+          </section>
+        ) : (
           <>
-            {/* ── Hero: Featured Locked Capsule ── */}
-            <section
-              className="bg-ink-primary rounded-[2rem] p-8 mb-stack-lg relative overflow-hidden"
-              style={{ boxShadow: "0 4px 15px rgba(37,53,88,0.08)" }}
-            >
-              {/* Decorative glow */}
-              <div className="absolute top-0 right-0 w-full h-1/3 md:w-1/3 md:h-full bg-surface-accent/10 blur-[100px] pointer-events-none" />
+            {featured && <FeaturedBox note={featured} now={now} onOpen={() => openBox(featured)} />}
 
-              <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-center relative">
-                {/* Lock Icon side */}
-                <div className="w-full md:w-2/5 flex flex-col items-center">
-                  <div
-                    onClick={() => setIsPasswordPopupOpen(true)}
-                    className="relative group cursor-pointer">
-                    <div className={`absolute inset-0 rounded-full blur-2xl group-hover:blur-3xl transition-all duration-700 ${isCountdownDone ? "bg-emerald-400/30" : "bg-surface-accent/20"}`} />
-                    <div className={`w-48 h-48 md:w-64 md:h-64 rounded-full flex items-center justify-center backdrop-blur-md border relative transition-all duration-500 hover:scale-105 ${isCountdownDone ? "bg-emerald-500/10 border-emerald-400/30" : "bg-white/5 border-white/10"}`}>
-                      <AnimatePresence mode="wait">
-                        {isCountdownDone ? (
-                          <motion.span
-                            key="unlocked"
-                            initial={{ scale: 0, rotate: -180, opacity: 0 }}
-                            animate={{ scale: 1, rotate: 0, opacity: 1 }}
-                            transition={{ type: "spring", damping: 12, stiffness: 200 }}
-                            className="material-symbols-outlined text-emerald-400"
-                            style={{ fontSize: "100px", fontVariationSettings: "'FILL' 1" }}
-                            suppressHydrationWarning
-                          >
-                            lock_open
-                          </motion.span>
-                        ) : (
-                          <motion.span
-                            key="locked"
-                            exit={{ scale: 0, rotate: 180, opacity: 0 }}
-                            transition={{ duration: 0.4 }}
-                            className="material-symbols-outlined text-surface-accent"
-                            style={{ fontSize: "100px", fontVariationSettings: "'FILL' 1" }}
-                            suppressHydrationWarning
-                          >
-                            lock
-                          </motion.span>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  </div>
-                  <div className="mt-8 text-center">
-                    <AnimatePresence mode="wait">
-                      {isCountdownDone ? (
-                        <motion.span
-                          key="badge-open"
-                          initial={{ opacity: 0, y: 8 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="inline-block px-4 py-1.5 rounded-full bg-emerald-400/20 border border-emerald-400/30 text-emerald-300 text-label-md font-label-md uppercase tracking-widest"
-                        >
-                          Đã mở khóa ✨
-                        </motion.span>
-                      ) : (
-                        <motion.span
-                          key="badge-locked"
-                          exit={{ opacity: 0, y: -8 }}
-                          className="inline-block px-4 py-1.5 rounded-full bg-surface-accent/20 border border-surface-accent/30 text-surface-accent text-label-md font-label-md uppercase tracking-widest"
-                        >
-                          Đang khóa
-                        </motion.span>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                </div>
+            <div className="mb-stack-lg flex justify-center md:justify-start">
+              <button onClick={() => setIsCreateOpen(true)} className="btn btn-accent px-8 py-4">
+                <span className="material-symbols-outlined">add_circle</span>
+                Gửi thêm bí mật
+              </button>
+            </div>
 
-                {/* Info side */}
-                <div className="w-full md:w-3/5">
-                  <h3 className="text-headline-lg font-headline-lg text-white mb-4">{featuredCapsule.title}</h3>
-                  <p className="text-body-lg font-body-lg text-white mb-8 max-w-lg">
-                    {featuredCapsule.description}
-                  </p>
-
-                  {/* Countdown */}
-                  <div className="flex items-center justify-center md:justify-start gap-2 sm:gap-3 mb-10 flex-wrap sm:flex-nowrap">
-                    {[
-                      { label: "Ngày", value: pad(countdown.days) },
-                      { label: "Giờ", value: pad(countdown.hours) },
-                      { label: "Phút", value: pad(countdown.minutes) },
-                      { label: "Giây", value: pad(countdown.seconds) },
-                    ].map(({ label, value }, idx) => (
-                      <div key={label} className="flex items-center gap-2 sm:gap-3 shrink-0">
-                        <div
-                          className={`rounded-xl sm:rounded-2xl px-3 py-2 sm:px-5 sm:py-3 text-center border transition-colors duration-300 min-w-[52px] sm:min-w-[72px] ${isCountdownDone
-                            ? "bg-emerald-500/15 border-emerald-400/20"
-                            : "bg-white/10 border-white/5"
-                            }`}
-                        >
-                          <span className={`block text-lg sm:text-headline-md font-headline-md tabular-nums leading-tight transition-colors duration-300 ${isCountdownDone ? "text-emerald-300" : "text-white"
-                            }`}>
-                            {value}
-                          </span>
-                          <span className={`text-[10px] sm:text-label-sm font-label-sm transition-colors duration-300 ${isCountdownDone ? "text-emerald-300/70" : "text-white"
-                            }`}>
-                            {label}
-                          </span>
-                        </div>
-                        {idx < 3 && (
-                          <span className={`text-lg sm:text-xl font-bold transition-colors duration-300 ${isCountdownDone ? "text-emerald-400/50" : "text-white/30"
-                            }`}>:</span>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-
-                  <button
-                    onClick={() => setIsCreatePopupOpen(true)}
-                    className="w-full md:w-auto justify-center bg-surface-accent text-on-secondary-container px-8 py-4 rounded-xl font-headline-sm flex items-center gap-3 transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-surface-accent/20"
-                  >
-                    <span className="material-symbols-outlined">add_circle</span>
-                    Gửi thêm bí mật
-                  </button>
-                </div>
-              </div>
-            </section>
-
-            {/* ── Pending / Waiting to Unlock ── */}
-            {lockedNotes.length > 0 && (
-              <section className="mb-stack-lg">
-                <h3 className="text-headline-sm font-headline-sm text-ink-primary mb-4 flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary">schedule</span>
-                  Đang chờ mở khóa
-                </h3>
-                <div
-                  className="flex gap-4 overflow-x-auto pb-4 md:grid md:grid-cols-2 lg:grid-cols-3 md:overflow-visible"
-                  style={{ scrollbarWidth: "none" }}
-                >
-                  {lockedNotes.map((note) => (
-                    <div
-                      key={note.id}
-                      onClick={() => setEditingLockedNote(note)}
-                      className="min-w-[280px] bg-white/40 backdrop-blur-sm p-5 rounded-2xl border border-white/20 flex flex-col gap-3 cursor-pointer hover:-translate-y-1 transition-transform duration-300"
-                      style={{ boxShadow: "0 4px 15px rgba(37,53,88,0.08)" }}
-                    >
-                      <div className="flex justify-between items-start">
-                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                          <span className="material-symbols-outlined text-primary text-xl">
-                            {note.icon ?? "lock"}
-                          </span>
-                        </div>
-                        <span className="text-label-sm font-label-sm text-primary bg-white/60 px-2 py-1 rounded-lg">
-                          {note.unlockDate}
-                        </span>
-                      </div>
-                      <div>
-                        <h4 className="font-headline-sm text-body-md">{note.title}</h4>
-                        <p className="text-body-sm text-primary/70 line-clamp-1">{note.previewText}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* ── Search & Filter ── */}
-            <section className="flex flex-col md:flex-row justify-between items-center gap-4 mb-stack-md bg-white/10 p-4 rounded-2xl border border-white/20">
+            {/* ── Search & sort ── */}
+            <section className="sheet mb-stack-md flex flex-col items-center justify-between gap-4 p-4 md:flex-row">
               <div className="relative w-full md:w-96">
-                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary">
+                <span className="material-symbols-outlined pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-primary">
                   search
                 </span>
                 <input
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full bg-white/80 border-none rounded-xl pl-12 pr-4 py-3 focus:ring-2 focus:ring-surface-accent transition-all text-body-md placeholder:text-primary/40"
-                  placeholder="Tìm kiếm kỷ niệm..."
+                  className="field pl-12"
+                  placeholder="Tìm theo tiêu đề hoặc lời gợi ý..."
+                  aria-label="Tìm hộp bí mật"
                 />
               </div>
               <div className="flex items-center gap-3 self-end md:self-auto">
-                <span className="text-label-md font-label-md text-primary">Sắp xếp:</span>
-                <select className="bg-white/80 border-none rounded-xl px-4 py-3 text-label-md font-label-md text-ink-primary focus:ring-2 focus:ring-surface-accent">
-                  <option>Mới nhất</option>
-                  <option>Cũ nhất</option>
-                  <option>A - Z</option>
+                <label className="font-label-md text-label-md text-primary" htmlFor="secret-sort">
+                  Sắp xếp:
+                </label>
+                {/* Wired up. It had three options, no value and no handler, so
+                    picking one changed nothing at all. */}
+                <select
+                  id="secret-sort"
+                  className="field w-auto cursor-pointer"
+                  value={sort}
+                  onChange={(e) => setSort(e.target.value as SortKey)}
+                >
+                  {SORTS.map((s) => (
+                    <option key={s.key} value={s.key}>
+                      {s.label}
+                    </option>
+                  ))}
                 </select>
               </div>
             </section>
 
-            {/* ── Unlocked Memories (Masonry Grid) ── */}
-            <section className="mb-stack-lg">
-              <h3 className="text-headline-sm font-headline-sm text-ink-primary mb-6 flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary">auto_awesome</span>
-                Kỷ niệm đã mở
-              </h3>
-              <div className="masonry-grid">
-                {unlockedNotes.map((note) => (
-                  <div
-                    key={note.id}
-                    onClick={() => setSelectedNote(note)}
-                    className="masonry-item bg-surface-text-container rounded-2xl overflow-hidden hover:-translate-y-1 transition-transform duration-300 cursor-pointer"
-                    style={{ boxShadow: "0 4px 15px rgba(37,53,88,0.08)" }}
-                  >
-                    {/* Cover image — tall variant for sn-6, standard h-48 for others */}
-                    {note.coverImage && note.id === "sn-6" && (
-                      <div className="h-64 w-full relative">
-                        <img
-                          src={note.coverImage}
-                          alt={note.coverImageAlt ?? note.title}
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute bottom-4 right-4 bg-ink-primary/80 backdrop-blur-sm px-3 py-1 rounded-lg">
-                          <p className="text-label-sm font-label-sm text-white">{note.unlockDate}</p>
-                        </div>
-                      </div>
-                    )}
-                    {note.coverImage && note.id !== "sn-6" && (
-                      <div className="h-48 w-full relative">
-                        <img
-                          src={note.coverImage}
-                          alt={note.coverImageAlt ?? note.title}
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-lg">
-                          <p className="text-label-sm font-label-sm text-ink-primary">{note.unlockDate}</p>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Text-only with icon badge */}
-                    {note.isTextOnly && note.icon && (
-                      <div className="p-6 pb-0">
-                        <div className="flex items-center gap-3 mb-4">
-                          <div className="w-8 h-8 rounded-full bg-surface-accent flex items-center justify-center">
-                            <span className="material-symbols-outlined text-white text-sm">{note.icon}</span>
-                          </div>
-                          <p className="text-label-sm font-label-sm text-primary/60">{note.unlockDate}</p>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Text-only without icon */}
-                    {note.isTextOnly && !note.icon && (
-                      <div className="p-6 pb-0">
-                        <div className="mb-4 flex justify-between items-start">
-                          <div className="bg-surface-accent/20 p-2 rounded-lg">
-                            <span className="material-symbols-outlined text-surface-accent">history_edu</span>
-                          </div>
-                          <p className="text-label-sm font-label-sm text-primary/60">{note.unlockDate}</p>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* No image and no explicit icon (gradient placeholder) */}
-                    {!note.coverImage && !note.isTextOnly && (
-                      <div className="h-40 w-full bg-gradient-to-br from-surface-accent/20 to-primary/10 flex items-center justify-center">
-                        <span className="material-symbols-outlined text-6xl text-primary/20">auto_stories</span>
-                      </div>
-                    )}
-
-                    {/* Card body */}
-                    <div className="p-6">
-                      <h4 className="text-headline-sm font-headline-sm mb-2">{note.title}</h4>
-                      <p className="text-body-sm text-primary/80 line-clamp-3">{note.previewText}</p>
-
-                      {note.tags && note.tags.length > 0 && (
-                        <div className="mt-6 flex gap-2 flex-wrap">
-                          {note.tags.map((tag) => (
-                            <span
-                              key={tag}
-                              className="bg-primary/5 text-primary text-[10px] px-2 py-1 rounded-full"
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-
-                      {note.coverImage && !note.id.includes("sn-6") && (
-                        <div className="mt-4 flex items-center gap-2 text-surface-accent">
-                          <span className="material-symbols-outlined text-sm">visibility</span>
-                          <span className="text-label-sm font-label-sm">Xem chi tiết</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
+            {searching && matched === 0 && (
+              <div className="card card-dashed flex flex-col items-center gap-2 p-10 text-center">
+                <span className="material-symbols-outlined text-4xl text-primary/50">
+                  search_off
+                </span>
+                <p className="font-label-md text-label-md text-ink-primary">
+                  Không có hộp nào khớp với &ldquo;{search.trim()}&rdquo;
+                </p>
+                <button type="button" onClick={() => setSearch("")} className="btn btn-sm mt-2">
+                  Xoá tìm kiếm
+                </button>
               </div>
-            </section>
+            )}
+
+            {waiting.length > 0 && (
+              <section className="mb-stack-lg">
+                <h3 className="font-headline-sm text-headline-sm mb-4 flex items-center gap-2 text-ink-primary">
+                  <span className="material-symbols-outlined text-primary">schedule</span>
+                  Đang chờ mở khóa
+                </h3>
+                <div className="flex gap-4 overflow-x-auto pb-4 [scrollbar-width:none] md:grid md:grid-cols-2 md:overflow-visible lg:grid-cols-3">
+                  {waiting.map((note, i) => (
+                    <WaitingCard
+                      key={note.id}
+                      note={note}
+                      now={now}
+                      tilted={i % 2 === 1}
+                      onOpen={() => openBox(note)}
+                      onDelete={() => setPendingDelete(note)}
+                    />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {opened.length > 0 && (
+              <section className="mb-stack-lg">
+                <h3 className="font-headline-sm text-headline-sm mb-6 flex items-center gap-2 text-ink-primary">
+                  <span className="material-symbols-outlined text-primary">auto_awesome</span>
+                  Kỷ niệm đã mở
+                </h3>
+                <div className="masonry-grid">
+                  {opened.map((note, i) => (
+                    <OpenedCard
+                      key={note.id}
+                      note={note}
+                      tilted={i % 2 === 1}
+                      onRead={() => setReading(note)}
+                      onDelete={() => setPendingDelete(note)}
+                    />
+                  ))}
+                </div>
+              </section>
+            )}
           </>
-        ) : (
-          /* Empty State */
-          <section className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-48 h-48 bg-white/20 rounded-full flex items-center justify-center mb-8">
-              <span className="material-symbols-outlined text-primary text-6xl opacity-40">auto_stories</span>
-            </div>
-            <h3 className="text-headline-md font-headline-md text-ink-primary mb-3">Chưa có điều bí mật nào</h3>
-            <p className="text-body-lg font-body-lg text-on-primary-container max-w-md mx-auto mb-10">
-              Hãy bắt đầu viết xuống những tâm tư, lời nhắn nhủ hay những kỷ niệm sắp tới để gửi cho nhau trong tương lai.
-            </p>
-            <button className="bg-secondary-container text-on-secondary-container px-10 py-4 rounded-xl font-label-md shadow-lg hover:scale-105 transition-transform">
-              Tạo hộp thư đầu tiên
-            </button>
-          </section>
         )}
       </main>
 
-      {/* Synchronized Sidebar */}
       <NavBar activeHref="/secrets" />
 
-      {/* Masonry CSS + custom styles */}
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          .masonry-grid {
-            column-count: 1;
-            column-gap: 1.5rem;
-          }
-          @media (min-width: 768px) { .masonry-grid { column-count: 2; } }
-          @media (min-width: 1024px) { .masonry-grid { column-count: 3; } }
-          .masonry-item {
-            break-inside: avoid;
-            margin-bottom: 1.5rem;
-          }
-        `
-      }} />
-
-      {isCreatePopupOpen && (
-        <CreateSecretBoxPopup
-          onClose={() => setIsCreatePopupOpen(false)}
-          onSuccess={(data) => {
-            setIsCreatePopupOpen(false);
-            const parts = data.unlockDate ? data.unlockDate.split("-") : [];
-            const formattedDate = parts.length === 3 ? `${parts[2]}.${parts[1]}.${parts[0]}` : "Hôm nay";
-            const newNote = {
-              id: `sn-new-${Date.now()}`,
-              title: data.title,
-              previewText: data.content,
-              unlockDate: formattedDate,
-              isLocked: true,
-              icon: "lock_clock",
-              tags: ["Mới", "Đang khóa"],
-              progressPercent: 20,
-              category: "Tình cảm",
-            };
-            setLocalNotes([newNote, ...localNotes]);
-          }}
-        />
-      )}
-
-      {isPasswordPopupOpen && (
-        <Portal>
-          <SecretBoxPasswordPopup
-            noteTitle={featuredCapsule.title}
-            onClose={() => setIsPasswordPopupOpen(false)}
-            onSuccess={() => {
-              setIsPasswordPopupOpen(false);
-              setIsUnlockSuccessOpen(true);
-              if (onUnlockSuccess) {
-                onUnlockSuccess();
-              }
+      {/* ---------- Overlays ---------- */}
+      <AnimatePresence>
+        {isCreateOpen && (
+          <CreateSecretBoxPopup
+            onClose={() => setIsCreateOpen(false)}
+            onSuccess={(note) => {
+              addSecretNote(note);
+              setIsCreateOpen(false);
             }}
           />
-        </Portal>
-      )}
+        )}
+      </AnimatePresence>
 
-      {isUnlockSuccessOpen && (
+      <AnimatePresence>
+        {unlockTarget && (
+          <SecretBoxPasswordPopup
+            noteTitle={unlockTarget.title}
+            passcode={unlockTarget.passcode}
+            onClose={() => setUnlockTarget(null)}
+            onSuccess={() => handleUnlocked(unlockTarget)}
+          />
+        )}
+      </AnimatePresence>
+
+      {justOpened && (
         <Portal>
-          <div className="fixed inset-0 z-[200]">
-            <SecretBoxUnlockSuccess onBack={handleUnlockSave} />
+          <div className="fixed inset-0 z-[200] overflow-y-auto bg-background-main">
+            <SecretBoxUnlockSuccess note={justOpened} onBack={() => setJustOpenedId(null)} />
           </div>
         </Portal>
       )}
 
-      {selectedNote && (
-        <SecretBoxDetailModal
-          note={selectedNote}
-          onClose={() => setSelectedNote(null)}
-        />
-      )}
+      <AnimatePresence>
+        {reading && <SecretBoxDetailModal note={reading} onClose={() => setReading(null)} />}
+      </AnimatePresence>
 
-      {editingLockedNote && (
-        <LockedNoteEditPopup
-          note={editingLockedNote}
-          onClose={() => setEditingLockedNote(null)}
-          onSend={(updatedData) => {
-            setLocalNotes((prev) =>
-              prev.map((n) =>
-                n.id === editingLockedNote.id
-                  ? { ...n, title: updatedData.title, previewText: updatedData.content, category: updatedData.category }
-                  : n
-              )
-            );
-            setEditingLockedNote(null);
-          }}
-        />
-      )}
+      <AnimatePresence>
+        {editing && (
+          <LockedNoteEditPopup
+            note={editing}
+            onClose={() => setEditing(null)}
+            onSave={(patch) => {
+              updateSecretNote(editing.id, patch);
+              setEditing(null);
+            }}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {pendingDelete && (
+          <ConfirmDialog
+            title="Xoá hộp bí mật này?"
+            subject={pendingDelete.title}
+            body={
+              pendingDelete.openedAt
+                ? "Lá thư đã mở này sẽ bị gỡ khỏi hộp bí mật."
+                : "Hộp này chưa từng được mở. Nội dung bên trong sẽ mất mà không ai đọc được."
+            }
+            confirmLabel="Xoá hộp"
+            onConfirm={() => {
+              removeSecretNote(pendingDelete.id);
+              setPendingDelete(null);
+            }}
+            onClose={() => setPendingDelete(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
-};
+}
+
+/* ---------------- pieces ---------------- */
+
+function FeaturedBox({
+  note,
+  now,
+  onOpen,
+}: {
+  note: SecretNote;
+  now: number;
+  onOpen: () => void;
+}) {
+  const status = statusOf(note, now);
+  const left = timeUntil(note, now);
+  const due = status !== "locked";
+
+  return (
+    <section className="card card-ink card-flat mb-stack-lg p-8">
+      <div className="relative flex flex-col items-center gap-8 md:flex-row md:gap-12">
+        <div className="flex w-full flex-col items-center md:w-2/5">
+          <button onClick={onOpen} className="group relative" aria-label={`Mở khóa: ${note.title}`}>
+            <span
+              className={`flex h-48 w-48 items-center justify-center rounded-full border-[2.6px] transition-all duration-500 hover:scale-105 md:h-64 md:w-64 ${
+                due ? "border-mint bg-mint/15" : "border-surface-accent bg-paper/10"
+              }`}
+            >
+              <span
+                className={`material-symbols-outlined ${due ? "text-mint" : "text-surface-accent"}`}
+                style={{ fontSize: "100px", fontVariationSettings: "'FILL' 1" }}
+                suppressHydrationWarning
+              >
+                {due ? "lock_open" : "lock"}
+              </span>
+            </span>
+          </button>
+
+          <div className="mt-8 text-center">
+            {/* Three states, not two. "Đã đến hạn" is not the same as "đã mở",
+                and the old screen showed "Đã mở khóa ✨" over a box that still
+                demanded a passcode. */}
+            <span
+              className={
+                status === "opened"
+                  ? "chip border-mint bg-mint/20 text-paper"
+                  : status === "ready"
+                    ? "chip chip-accent"
+                    : "chip chip-accent"
+              }
+            >
+              {status === "opened" ? "Đã mở" : status === "ready" ? "Đã đến hạn" : "Đang khóa"}
+            </span>
+          </div>
+        </div>
+
+        <div className="w-full md:w-3/5">
+          <h3 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-4 -rotate-[0.6deg] text-paper">
+            {note.title}
+          </h3>
+          <p className="font-body-lg text-body-lg mb-8 max-w-lg text-primary-fixed">
+            {note.preview}
+          </p>
+
+          {left ? (
+            <div className="mb-2 flex flex-wrap items-center justify-center gap-2 sm:flex-nowrap sm:gap-3 md:justify-start">
+              {[
+                { label: "Ngày", value: pad(left.days) },
+                { label: "Giờ", value: pad(left.hours) },
+                { label: "Phút", value: pad(left.minutes) },
+                { label: "Giây", value: pad(left.seconds) },
+              ].map(({ label, value }, idx) => (
+                <div key={label} className="flex shrink-0 items-center gap-2 sm:gap-3">
+                  <div
+                    className={`min-w-[52px] rounded-[var(--radius-wobble-sm)] border-[2.2px] border-paper/40 bg-paper/10 px-3 py-2 text-center sm:min-w-[72px] sm:px-5 sm:py-3 ${
+                      idx % 2 ? "rotate-[1deg]" : "-rotate-[1.2deg]"
+                    }`}
+                  >
+                    <span
+                      className="font-headline block text-lg font-bold leading-tight tabular-nums text-paper sm:text-2xl"
+                      /* Seeded on the server, corrected a tick after hydration:
+                         the seconds are the one thing that cannot match. */
+                      suppressHydrationWarning
+                    >
+                      {value}
+                    </span>
+                    <span className="font-headline text-[0.54rem] font-semibold uppercase tracking-[0.2em] text-primary-fixed">
+                      {label}
+                    </span>
+                  </div>
+                  {idx < 3 && (
+                    <span className="font-headline text-lg font-bold text-paper/40 sm:text-xl">
+                      :
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="font-body-md text-body-md mb-2 text-primary-fixed">
+              {status === "opened"
+                ? `Đã mở ngày ${formatUnlockDate(note.openedAt ?? note.unlockAt)}.`
+                : "Đã tới ngày hẹn. Nhập mật mã để mở."}
+            </p>
+          )}
+
+          <p className="font-label-sm text-label-sm mt-4 text-primary-fixed">
+            Hẹn mở: {formatUnlockDate(note.unlockAt)}
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function WaitingCard({
+  note,
+  now,
+  tilted,
+  onOpen,
+  onDelete,
+}: {
+  note: SecretNote;
+  now: number;
+  tilted: boolean;
+  onOpen: () => void;
+  onDelete: () => void;
+}) {
+  const due = statusOf(note, now) === "ready";
+
+  return (
+    <div className="relative min-w-[280px] flex-none md:min-w-0">
+      <button
+        onClick={onOpen}
+        className={`card flex h-full w-full flex-col gap-3 p-5 text-left transition-transform duration-300 hover:-translate-y-1 ${
+          tilted ? "card-tilt-r" : ""
+        }`}
+      >
+        <div className="flex items-start justify-between gap-3">
+          <span className="flex h-10 w-10 flex-none items-center justify-center rounded-[var(--radius-wobble-sm)] border-[2.2px] border-ink-primary bg-background-main">
+            <span className="material-symbols-outlined text-xl text-ink-primary">
+              {note.icon ?? "lock"}
+            </span>
+          </span>
+          <span className={`chip ${due ? "chip-accent" : "chip-soft"} mr-11`}>
+            {due ? "Đã đến hạn" : formatUnlockDate(note.unlockAt)}
+          </span>
+        </div>
+        <div className="min-w-0">
+          <h4 className="font-headline-sm text-headline-sm text-ink-primary">{note.title}</h4>
+          {/* The teaser, never `content`. This line is why the two fields are
+              separate: the old card printed the secret on the outside of the box. */}
+          <p className="font-body-sm text-body-sm line-clamp-2 text-primary">{note.preview}</p>
+        </div>
+      </button>
+
+      <button
+        type="button"
+        onClick={onDelete}
+        className="absolute right-2 top-2 z-10 flex h-9 w-9 items-center justify-center rounded-full border-[2.2px] border-ink-primary bg-paper shadow-[0_2px_0_var(--color-ink-primary)] transition-transform hover:-translate-y-0.5"
+        aria-label={`Xoá hộp bí mật: ${note.title}`}
+        title="Xoá hộp bí mật"
+      >
+        <span className="material-symbols-outlined text-[17px] text-ink-primary">delete</span>
+      </button>
+    </div>
+  );
+}
+
+function OpenedCard({
+  note,
+  tilted,
+  onRead,
+  onDelete,
+}: {
+  note: SecretNote;
+  tilted: boolean;
+  onRead: () => void;
+  onDelete: () => void;
+}) {
+  return (
+    <div className="masonry-item relative">
+      <button
+        onClick={onRead}
+        className={`card block w-full overflow-hidden text-left transition-transform duration-300 hover:-translate-y-1 ${
+          tilted ? "card-tilt-r" : ""
+        }`}
+      >
+        {note.coverImage ? (
+          <div className="relative w-full">
+            {/* Height came from `note.id === "sn-6" ? "h-64" : "h-48"`, so the
+                layout was pinned to one row of the sample data. */}
+            <img
+              src={note.coverImage}
+              alt={note.coverImageAlt ?? note.title}
+              loading="lazy"
+              decoding="async"
+              onError={onImageError}
+              className="h-48 w-full object-cover"
+            />
+            <span className="chip absolute left-4 top-4">
+              {formatUnlockDate(note.openedAt ?? note.unlockAt)}
+            </span>
+          </div>
+        ) : (
+          <div className="flex items-center justify-between gap-3 px-6 pt-6">
+            <span className="flex h-10 w-10 flex-none items-center justify-center rounded-[var(--radius-wobble-sm)] border-[2.2px] border-ink-primary bg-surface-accent">
+              <span className="material-symbols-outlined text-base text-ink-primary">
+                {note.icon ?? "history_edu"}
+              </span>
+            </span>
+            <span className="chip chip-soft mr-11">
+              {formatUnlockDate(note.openedAt ?? note.unlockAt)}
+            </span>
+          </div>
+        )}
+
+        <div className="p-6">
+          <h4 className="font-headline-sm text-headline-sm mb-2 text-ink-primary">{note.title}</h4>
+          <div className="ruled">
+            <p className="line-clamp-3 text-ink-primary">{note.content}</p>
+          </div>
+
+          {note.tags && note.tags.length > 0 && (
+            <div className="mt-5 flex flex-wrap gap-2">
+              {note.tags.map((tag) => (
+                <span key={tag} className="chip chip-blue">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+
+          <hr className="rule my-4" />
+          <span className="font-label-sm text-label-sm flex items-center gap-2 text-primary">
+            <span className="material-symbols-outlined text-base">visibility</span>
+            Xem chi tiết
+          </span>
+        </div>
+      </button>
+
+      <button
+        type="button"
+        onClick={onDelete}
+        className="absolute right-2 top-2 z-10 flex h-9 w-9 items-center justify-center rounded-full border-[2.2px] border-ink-primary bg-paper shadow-[0_2px_0_var(--color-ink-primary)] transition-transform hover:-translate-y-0.5"
+        aria-label={`Xoá hộp bí mật: ${note.title}`}
+        title="Xoá hộp bí mật"
+      >
+        <span className="material-symbols-outlined text-[17px] text-ink-primary">delete</span>
+      </button>
+    </div>
+  );
+}
 
 export default SecretBoxManagement;

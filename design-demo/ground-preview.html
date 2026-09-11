@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nền Duyên — Xem thử</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+<style>
+  /* ===========================================================
+     Bản sao nguyên văn phần nền trong
+     couple-space/src/app/globals.css — để xem thử mà không cần
+     chạy Next.js. Sửa ở đây thì nhớ sửa cả bên kia.
+     =========================================================== */
+  :root {
+    --color-background-main: #b2ccec;
+    --color-surface-accent: #f5c7c7;
+    --color-ink-primary: #253558;
+    --color-primary: #47607c;
+    --color-paper: #fcfbf8;
+    --ink-20: #25355833;
+    --ink-08: #25355814;
+    --ink-05: #2535580d;
+    --radius-wobble: 255px 16px 226px 18px / 18px 224px 16px 252px;
+    --radius-wobble-sm: 130px 8px 116px 10px / 10px 114px 9px 128px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    padding: 48px 24px 80px;
+    background-color: var(--color-background-main);
+    color: var(--color-ink-primary);
+    font-family: "Be Vietnam Pro", sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* --- Lớp 1: vệt sáng trôi rất chậm --- */
+  body::after {
+    content: "";
+    position: fixed;
+    top: -25%;
+    left: -25%;
+    width: 150%;
+    height: 150%;
+    z-index: -2;
+    pointer-events: none;
+    background-image:
+      radial-gradient(38% 34% at 84% 12%, #f5c7c759, transparent 70%),
+      radial-gradient(42% 38% at 8% 34%, #ffffff4d, transparent 72%),
+      radial-gradient(40% 36% at 96% 82%, #f5c7c74d, transparent 68%),
+      radial-gradient(46% 40% at 26% 96%, #d0e4ff66, transparent 70%);
+    animation: ground-drift 54s ease-in-out infinite alternate;
+    will-change: transform;
+  }
+
+  @keyframes ground-drift {
+    from { transform: translate3d(-1.6%, -1.2%, 0) scale(1); }
+    to   { transform: translate3d(1.6%, 1.4%, 0) scale(1.04); }
+  }
+
+  /* --- Lớp 2: mặt bàn giấy --- */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 104 58'%3E%3Cpath d='M5 40c9-22 21 14 31-4s21 16 31-3 21 10 31-6' fill='none' stroke='%23253558' stroke-width='2.6' stroke-linecap='round' opacity='.22'/%3E%3C/svg%3E"),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 72 72'%3E%3Cpath d='M36 62C14 45 6 34 10 23c4-11 20-10 26 2 6-12 22-13 26-2 4 11-4 22-26 39z' fill='none' stroke='%23253558' stroke-width='2.6' stroke-linejoin='round' opacity='.2'/%3E%3C/svg%3E"),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 58 58'%3E%3Cpath d='M29 4c2 14 11 23 25 25-14 2-23 11-25 25-2-14-11-23-25-25 14-2 23-11 25-25z' fill='none' stroke='%23253558' stroke-width='2.4' stroke-linejoin='round' opacity='.2'/%3E%3C/svg%3E"),
+      radial-gradient(var(--ink-08) 1.1px, transparent 1.6px),
+      linear-gradient(var(--ink-05) 1px, transparent 1px),
+      linear-gradient(90deg, var(--ink-05) 1px, transparent 1px),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23g)' opacity='.28'/%3E%3C/svg%3E"),
+      radial-gradient(120% 90% at 50% 45%, transparent 58%, #25355814 100%);
+    background-position:
+      left 7% top 15%, right 9% top 40%, left 13% bottom 17%,
+      0 0, 0 0, 0 0, 0 0, 0 0;
+    background-size:
+      104px 58px, 72px 72px, 58px 58px,
+      22px 22px, 88px 88px, 88px 88px, 200px 200px, 100% 100%;
+    background-repeat:
+      no-repeat, no-repeat, no-repeat,
+      repeat, repeat, repeat, repeat, no-repeat;
+  }
+
+  @media (max-width: 640px) {
+    body::before {
+      background-image:
+        radial-gradient(var(--ink-08) 1.1px, transparent 1.6px),
+        linear-gradient(var(--ink-05) 1px, transparent 1px),
+        linear-gradient(90deg, var(--ink-05) 1px, transparent 1px),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23g)' opacity='.28'/%3E%3C/svg%3E"),
+        radial-gradient(120% 90% at 50% 45%, transparent 58%, #25355814 100%);
+      background-position: 0 0, 0 0, 0 0, 0 0, 0 0;
+      background-size: 22px 22px, 88px 88px, 88px 88px, 200px 200px, 100% 100%;
+      background-repeat: repeat, repeat, repeat, repeat, no-repeat;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    body::after { animation: none; transform: none; }
+  }
+
+  /* --- vài bề mặt mẫu đặt lên nền, để so sánh --- */
+  .page { max-width: 880px; margin: 0 auto; }
+  h1 {
+    margin: 0 0 6px;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.7rem, 6vw, 2rem);
+    letter-spacing: -0.02em;
+    transform: rotate(-0.6deg);
+  }
+  .kicker {
+    margin: 0;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 600;
+    font-size: 0.68rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    transform: rotate(-2deg);
+  }
+  .sub { margin: 10px 0 32px; max-width: 52ch; color: var(--color-primary); }
+
+  .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 18px; }
+
+  .sheet {
+    background: var(--color-paper);
+    border-radius: 28px;
+    box-shadow: 0 24px 44px -18px #2535582e;
+    padding: 22px;
+  }
+  .card {
+    background: var(--color-paper);
+    border: 2.2px solid var(--color-ink-primary);
+    border-radius: var(--radius-wobble);
+    box-shadow: 0 15px 30px -10px #25355814;
+    padding: 20px;
+    transform: rotate(-0.4deg);
+  }
+  .card.r { transform: rotate(0.5deg); }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 13px 6px;
+    border: 2.2px solid var(--color-ink-primary);
+    border-radius: var(--radius-wobble-sm);
+    background: var(--color-surface-accent);
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 600;
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  h3 { margin: 12px 0 6px; font-family: "Plus Jakarta Sans", sans-serif; font-weight: 600; font-size: 1.25rem; }
+  .meta { margin: 0; color: var(--color-primary); font-size: 0.9rem; }
+  .rule { height: 1px; border: 0; margin: 14px 0; background: repeating-linear-gradient(90deg, var(--ink-20) 0 6px, transparent 6px 12px); }
+  .ruled {
+    background-image: repeating-linear-gradient(to bottom, transparent 0 29px, var(--ink-08) 29px 30px);
+    border-left: 2px solid #f5c7c7cc;
+    padding: 6px 0 2px 16px;
+  }
+  .ruled p { margin: 0; line-height: 30px; }
+
+  .note {
+    margin: 34px 0 0;
+    padding: 16px 18px;
+    border: 2.2px dashed var(--ink-20);
+    border-radius: var(--radius-wobble);
+    background: #f4f7fc;
+    font-size: 0.9rem;
+    color: var(--color-primary);
+  }
+  .note b { color: var(--color-ink-primary); }
+  .spacer { height: 70vh; }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <p class="kicker">Duyên · Xem thử nền</p>
+  <h1>Nền vẫn màu cũ,<br>thêm chiều sâu</h1>
+  <p class="sub">
+    Màu nền vẫn là <strong>#b2ccec</strong> như cũ. Phần thêm vào nằm ở hai lớp phía sau nội dung:
+    vệt sáng trôi rất chậm, và mặt bàn giấy kẻ ô có hạt giấy cùng vài nét bút vẽ tay.
+  </p>
+
+  <div class="row">
+    <div class="sheet">
+      <span class="chip">Sheet</span>
+      <h3>Giấy của trang</h3>
+      <p class="meta">Không viền, không nghiêng. Dùng cho khung của một mục.</p>
+      <hr class="rule">
+      <div class="ruled"><p>Chữ nằm đúng trên dòng kẻ.</p></div>
+    </div>
+
+    <div class="card">
+      <span class="chip">Card</span>
+      <h3>Thứ đặt lên giấy</h3>
+      <p class="meta">Viền mực 2.2px, bo góc lệch tay, nghiêng nửa độ.</p>
+    </div>
+
+    <div class="card r">
+      <span class="chip">Card</span>
+      <h3>Nghiêng ngược lại</h3>
+      <p class="meta">Xen kẽ để một cột thẻ không trông như máy xếp.</p>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>Cuộn thử trang này.</b> Hai lớp nền đều <code>position: fixed</code> — nội dung cuộn, mặt bàn
+    đứng yên. Vệt sáng mất 54 giây cho một lượt trôi, nên gần như không bắt mắt; nếu máy bật
+    “giảm chuyển động” thì nó dừng hẳn. Nét vẽ tay tự ẩn khi màn hình hẹp hơn 640px.
+  </div>
+
+  <div class="spacer"></div>
+
+  <div class="note">Cuối trang — mặt bàn vẫn ở nguyên chỗ cũ.</div>
+</div>
+
+</body>
+</html>
