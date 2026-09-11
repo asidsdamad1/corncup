@@ -61,11 +61,38 @@ export interface Memory {
 export interface SecretNote {
   id: string;
   title: string;
-  previewText: string;
-  unlockDate: string;
-  isLocked: boolean;
-  progressPercent: number;
+  /**
+   * Safe to read while the box is still shut - a hint, never the secret.
+   * Split from `content` because the old single `previewText` was printed
+   * on the waiting-list card, which gave the whole thing away.
+   */
+  preview: string;
+  /** The secret itself. Must not be rendered until the note is open. */
+  content: string;
+  /**
+   * When the box becomes openable, ISO 8601.
+   *
+   * There is deliberately no `isLocked` flag: being locked is a fact about
+   * the clock, and a hand-set boolean drifts out of agreement with it. The
+   * old data had three notes marked locked whose dates passed in 2024.
+   */
+  unlockAt: string;
+  /**
+   * When the box was written, ISO 8601. Together with `unlockAt` it gives
+   * a real progress bar; the old `progressPercent` was a number typed in
+   * by hand that nothing ever recomputed - and nothing ever displayed.
+   */
+  createdAt: string;
+  /** Set the first time the passcode is accepted. Absent = never opened. */
+  openedAt?: string;
+  /** Chosen per note by whoever wrote it. */
+  passcode: string;
   category: string;
+  /**
+   * The one box the screen leads with. A deliberate mark, like a featured
+   * memory - not the soonest or the newest.
+   */
+  featured?: boolean;
   icon?: string;
   coverImage?: string;
   coverImageAlt?: string;
@@ -73,113 +100,137 @@ export interface SecretNote {
   isTextOnly?: boolean;
 }
 
-export interface FeaturedCapsule {
-  title: string;
-  description: string;
-  countdownDays: number;
-  countdownHours: number;
-  countdownMinutes: number;
-}
-
-export const featuredCapsule: FeaturedCapsule = {
-  title: "Món quà kỷ niệm 5 năm",
-  description:
-    "Một bức thư tay và những tấm ảnh bí mật chúng mình chụp trong chuyến đi Phú Quốc, dành riêng cho Minh của năm 2026.",
-  countdownDays: 14,
-  countdownHours: 22,
-  countdownMinutes: 56,
-};
-
 // SECRET NOTES
 export const secretNotes: SecretNote[] = [
-  // Pending / Locked
+  // Still shut
+  {
+    id: "sn-0",
+    title: "Món quà kỷ niệm 5 năm",
+    preview:
+      "Một bức thư tay và những tấm ảnh bí mật chúng mình chụp trong chuyến đi Phú Quốc.",
+    content:
+      "Năm năm. Anh vẫn nhớ cái ngày em nói đồng ý, trời Phú Quốc hôm ấy nắng đến mức "
+      + "anh phải che mắt mới nhìn rõ em cười. Mấy tấm ảnh trong hộp này anh giấu suốt, "
+      + "chờ đúng hôm nay mới đưa. Cảm ơn em vì đã ở lại lâu đến thế.",
+    unlockAt: "2026-09-26T20:00:00+07:00",
+    createdAt: "2026-08-01T21:00:00+07:00",
+    passcode: "0514",
+    category: "Tình cảm",
+    featured: true,
+    icon: "card_giftcard",
+    tags: ["Kỷ niệm", "Phú Quốc"],
+  },
   {
     id: "sn-1",
     title: "Lời hứa cho tương lai",
-    previewText: "Gửi gắm một lời hứa nhỏ...",
-    unlockDate: "12.04.2024",
-    isLocked: true,
-    progressPercent: 80,
+    preview: "Gửi gắm một lời hứa nhỏ...",
+    content:
+      "Anh hứa sẽ học nấu ăn cho tử tế, để em không phải là người vào bếp mỗi tối nữa. "
+      + "Hứa thật đấy, không phải hứa cho vui đâu.",
+    unlockAt: "2026-10-12T09:00:00+07:00",
+    createdAt: "2026-06-15T22:10:00+07:00",
+    passcode: "1204",
     category: "Tình cảm",
     icon: "favorite",
   },
   {
     id: "sn-2",
     title: "Chuyến đi trong mơ",
-    previewText: "Ước mơ về Thụy Sĩ cùng anh...",
-    unlockDate: "30.06.2024",
-    isLocked: true,
-    progressPercent: 40,
+    preview: "Ước mơ về Thụy Sĩ cùng anh...",
+    content:
+      "Anh đã để dành được một phần ba rồi. Thụy Sĩ, mùa hè, và em - đúng thứ tự đó.",
+    unlockAt: "2026-12-30T09:00:00+07:00",
+    createdAt: "2026-05-20T20:40:00+07:00",
+    passcode: "3006",
     category: "Du lịch",
     icon: "flight",
   },
   {
     id: "sn-3",
     title: "Ngôi nhà nhỏ",
-    previewText: "Màu sơn chúng mình từng chọn...",
-    unlockDate: "15.09.2024",
-    isLocked: true,
-    progressPercent: 60,
+    preview: "Màu sơn chúng mình từng chọn...",
+    content:
+      "Xanh bạc hà cho phòng khách, vì hôm đó em đứng rất lâu trước bảng màu ấy mà "
+      + "không nói gì. Anh nhớ.",
+    unlockAt: "2027-03-15T09:00:00+07:00",
+    createdAt: "2026-09-01T19:15:00+07:00",
+    passcode: "1509",
     category: "Tương lai",
     icon: "home",
   },
-  // Unlocked memories
+  // Already opened
   {
     id: "sn-4",
     title: "Valentine Đầu Tiên",
-    previewText:
-      "Anh nhớ mãi buổi tối hôm đó, cơn mưa bất chợt khiến chúng mình phải trú tạm dưới mái hiên cũ. Đó là lúc anh nhận ra...",
-    unlockDate: "14.02.2023",
-    isLocked: false,
-    progressPercent: 100,
-    category: "Đã mở",
+    preview: "Cơn mưa bất chợt và một mái hiên cũ.",
+    content:
+      "Anh nhớ mãi buổi tối hôm đó, cơn mưa bất chợt khiến chúng mình phải trú tạm "
+      + "dưới mái hiên cũ. Đó là lúc anh nhận ra mình không muốn trú mưa với ai khác.",
+    unlockAt: "2023-02-14T19:00:00+07:00",
+    createdAt: "2023-01-20T23:00:00+07:00",
+    openedAt: "2023-02-14T19:30:00+07:00",
+    passcode: "1402",
+    category: "Tình cảm",
     coverImage:
       "https://lh3.googleusercontent.com/aida-public/AB6AXuCgokIbzGBbwNPpFQYoLir7zjEuOPiI1knClUMCM6K3ZsJ864uWG5jgnuAyfvFCZjurBq5xJx5B-NNogE8a7P5bpgDHEiOvBQH-YDTnf_X5KSZKIaiKKlkAkKqj_na60suPI8nwZdrtNRrkKxoZe2pdARDewR0PXKzvyrofQEXeWJyyJWgwdDcCtxElgguZ0P9hcUkjfyPubngCrmwCKB10pcpWFxwzqv2aG0E51AejdL4S1XgBvW0w1DnrFhno1XomqmZBr9FusHI",
-    coverImageAlt: "A warm overhead shot of a polaroid photo next to a cup of coffee",
+    coverImageAlt: "Ảnh polaroid đặt cạnh tách cà phê, chụp từ trên xuống",
   },
   {
     id: "sn-5",
     title: "Lời chúc New Year",
-    previewText:
-      '"Năm nay sẽ là năm tuyệt vời nhất vì có em bên cạnh. Anh muốn chúng mình sẽ cùng nhau đi hết bản đồ Việt Nam này..."',
-    unlockDate: "01.01.2023",
-    isLocked: false,
-    progressPercent: 100,
-    category: "Đã mở",
+    preview: "Một lời chúc đầu năm.",
+    content:
+      "Năm nay sẽ là năm tuyệt vời nhất vì có em bên cạnh. Anh muốn chúng mình sẽ "
+      + "cùng nhau đi hết bản đồ Việt Nam này.",
+    unlockAt: "2023-01-01T00:00:00+07:00",
+    createdAt: "2022-12-20T22:30:00+07:00",
+    openedAt: "2023-01-01T00:05:00+07:00",
+    passcode: "0101",
+    category: "Tương lai",
     isTextOnly: true,
     tags: ["#Travel", "#NewYear"],
   },
   {
     id: "sn-6",
     title: "Kỷ niệm 1 năm",
-    previewText: "Bó hoa hồng 99 đóa và lời tỏ tình vụng về ở hồ Tây...",
-    unlockDate: "20.10.2022",
-    isLocked: false,
-    progressPercent: 100,
-    category: "Đã mở",
+    preview: "Hồ Tây, một buổi chiều tháng Mười.",
+    content:
+      "Bó hoa hồng 99 đóa nặng hơn anh tưởng, và lời tỏ tình thì vụng hơn anh tập. "
+      + "Nhưng em vẫn gật đầu.",
+    unlockAt: "2022-10-20T18:00:00+07:00",
+    createdAt: "2022-09-30T21:45:00+07:00",
+    openedAt: "2022-10-20T18:20:00+07:00",
+    passcode: "2010",
+    category: "Kỷ niệm",
     coverImage:
       "https://lh3.googleusercontent.com/aida-public/AB6AXuD7e5cuhG3OX1TfSHdu8RNDdnn4tVKgR5cb6QwcV9iUyTGUxqnI7XTp1v7jXr3CNPZa2aNE_ZJPy8bi_9KxMcjlQodsJG9Ba3UiWIk9GUtK6dYrtorR3RHaj5_KZC-e1UzBQw5JTjm29yQLDau2257auqO5N3Aw90Kqwttxxmj80Xh5BMlsPYi2Zzh79O3cfutK0h5v1iZu2eZvJP5-4PfPZghGOCNXP2VocWt3hD8KF4GbiDhV9PoJ31xh2YtLNEd1bkVidfLw3Gg",
-    coverImageAlt: "A serene sunset beach with two silhouettes walking hand in hand",
+    coverImageAlt: "Hoàng hôn trên biển với hai bóng người nắm tay nhau",
   },
   {
     id: "sn-7",
     title: "Bài hát của đôi ta",
-    previewText: '"Cứ thế này thôi, bình yên qua những ngày bão giông..."',
-    unlockDate: "15.08.2022",
-    isLocked: false,
-    progressPercent: 100,
-    category: "Đã mở",
+    preview: "Một câu hát cứ hát mãi.",
+    content: "Cứ thế này thôi, bình yên qua những ngày bão giông.",
+    unlockAt: "2022-08-15T21:00:00+07:00",
+    createdAt: "2022-08-01T20:00:00+07:00",
+    openedAt: "2022-08-15T21:10:00+07:00",
+    passcode: "1508",
+    category: "Kỷ niệm",
     isTextOnly: true,
     icon: "music_note",
   },
   {
     id: "sn-8",
     title: "Nhật ký bí mật #1",
-    previewText: "Lần đầu tiên em nấu ăn cho anh, dù mặn nhưng anh vẫn ăn hết sạch...",
-    unlockDate: "01.06.2022",
-    isLocked: false,
-    progressPercent: 100,
-    category: "Đã mở",
+    preview: "Bữa cơm đầu tiên em nấu.",
+    content:
+      "Lần đầu tiên em nấu ăn cho anh, dù mặn nhưng anh vẫn ăn hết sạch. Em hỏi có "
+      + "ngon không, anh bảo ngon. Anh không nói dối đâu.",
+    unlockAt: "2022-06-01T12:00:00+07:00",
+    createdAt: "2022-05-15T19:20:00+07:00",
+    openedAt: "2022-06-01T12:30:00+07:00",
+    passcode: "0106",
+    category: "Kỷ niệm",
   },
 ];
 

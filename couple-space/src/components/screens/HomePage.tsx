@@ -5,6 +5,9 @@ import { motion } from "framer-motion";
 import { memories } from "@/data/mockData";
 import NavBar from "@/components/ui/NavBar";
 import Meter from "@/components/ui/Meter";
+import Link from "next/link";
+import { useSecretNotes } from "@/lib/secretStore";
+import { daysUntil, progressOf, statusOf } from "@/lib/secretBox";
 
 interface HomePageProps {
   readonly userName?: string;
@@ -14,6 +17,14 @@ export const HomePage: React.FC<HomePageProps> = ({ userName = "Anh Thư" }) => 
   const [activeEmotionTab, setActiveEmotionTab] = useState<"me" | "you" | "us">("me");
   const [selectedEmotion, setSelectedEmotion] = useState<string | null>(null);
   const latestMemory = memories[0];
+
+  /* The teaser used to read "Cần 3 ngày nữa" and "Tiến trình: 80%" as
+     plain text, tied to nothing. It now shows whichever box opens next. */
+  const secretNotes = useSecretNotes();
+  const [now] = useState(() => Date.now());
+  const nextSecret = secretNotes
+    .filter((n) => !n.openedAt)
+    .sort((a, b) => Date.parse(a.unlockAt) - Date.parse(b.unlockAt))[0];
 
   const emotionIcons = [
     { icon: "sentiment_very_satisfied", label: "Hạnh phúc" },
@@ -202,8 +213,11 @@ export const HomePage: React.FC<HomePageProps> = ({ userName = "Anh Thư" }) => 
           </section>
 
           {/* ---------- Secret Note Teaser ---------- */}
-          <section className="card card-ink col-span-12 flex flex-col items-center justify-center p-stack-md text-center lg:col-span-3">
-            <span className="mb-4 flex h-16 w-16 items-center justify-center rounded-[var(--radius-wobble-sm)] border-[2.2px] border-paper/40 bg-paper/10 -rotate-3">
+          <Link
+            href="/secrets"
+            className="card card-ink col-span-12 flex flex-col items-center justify-center p-stack-md text-center transition-transform duration-300 hover:-translate-y-1 lg:col-span-3"
+          >
+            <span className="mb-4 flex h-16 w-16 -rotate-3 items-center justify-center rounded-[var(--radius-wobble-sm)] border-[2.2px] border-paper/40 bg-paper/10">
               <span
                 className="material-symbols-outlined text-3xl text-surface-accent"
                 style={{ fontVariationSettings: "'FILL' 1" }}
@@ -213,14 +227,31 @@ export const HomePage: React.FC<HomePageProps> = ({ userName = "Anh Thư" }) => 
               </span>
             </span>
             <h3 className="font-headline-sm text-headline-sm mb-2 text-paper">Hộp bí mật</h3>
-            <p className="font-body-sm text-body-sm mb-6 text-primary-fixed">
-              Cần 3 ngày nữa để mở khóa lá thư từ quá khứ.
-            </p>
-            <Meter value={80} showValue={false} curve={1} label="Tiến trình mở khóa" className="w-full" />
-            <p className="font-headline mt-3 text-[0.58rem] font-semibold uppercase tracking-[0.2em] text-paper/60">
-              Tiến trình: 80%
-            </p>
-          </section>
+
+            {nextSecret ? (
+              <>
+                <p className="font-body-sm text-body-sm mb-6 text-primary-fixed">
+                  {statusOf(nextSecret, now) === "ready"
+                    ? `"${nextSecret.title}" đã tới ngày mở.`
+                    : `Còn ${daysUntil(nextSecret, now)} ngày nữa để mở "${nextSecret.title}".`}
+                </p>
+                <Meter
+                  value={progressOf(nextSecret, now)}
+                  showValue={false}
+                  curve={1}
+                  label="Tiến trình mở khóa"
+                  className="w-full"
+                />
+                <p className="font-headline mt-3 text-[0.58rem] font-semibold uppercase tracking-[0.2em] text-paper/60">
+                  Tiến trình: {progressOf(nextSecret, now)}%
+                </p>
+              </>
+            ) : (
+              <p className="font-body-sm text-body-sm text-primary-fixed">
+                Chưa có hộp nào đang chờ. Viết một điều gì đó cho mai sau?
+              </p>
+            )}
+          </Link>
         </div>
       </main>
 

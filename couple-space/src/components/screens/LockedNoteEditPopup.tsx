@@ -1,54 +1,55 @@
 "use client";
 
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+import { motion } from "framer-motion";
 import { Portal } from "@/components/ui/Portal";
-
-interface LockedNote {
-  readonly id: string;
-  readonly title: string;
-  readonly previewText: string;
-  readonly unlockDate: string;
-  readonly icon?: string;
-  readonly category?: string;
-  readonly tags?: readonly string[];
-}
+import { useModalKeys } from "@/lib/useModalKeys";
+import { formatUnlockDate, fromDateInput, toDateInput, todayInput } from "@/lib/secretBox";
+import type { SecretNote } from "@/data/mockData";
 
 interface LockedNoteEditPopupProps {
-  readonly note: LockedNote;
+  readonly note: SecretNote;
   readonly onClose: () => void;
-  readonly onSend: (updatedNote: {
-    title: string;
-    content: string;
-    unlockDate: string;
-    category: string;
-  }) => void;
+  readonly onSave: (
+    patch: Pick<SecretNote, "title" | "preview" | "content" | "unlockAt" | "category">
+  ) => void;
 }
 
-export const LockedNoteEditPopup: React.FC<Readonly<LockedNoteEditPopupProps>> = ({
-  note,
-  onClose,
-  onSend,
-}) => {
+const CATEGORIES = ["Tình cảm", "Du lịch", "Tương lai", "Kỷ niệm", "Lời hứa"];
+
+/**
+ * Edit a box that has not opened yet. Reached only after the passcode, the
+ * same as opening one — otherwise the lock would mean nothing, which is
+ * precisely what it used to mean: the waiting list opened this dialog on a
+ * single click and handed over the whole text.
+ */
+export function LockedNoteEditPopup({ note, onClose, onSave }: LockedNoteEditPopupProps) {
   const [title, setTitle] = useState(note.title);
-  const [content, setContent] = useState(note.previewText);
-  const [unlockDate, setUnlockDate] = useState(note.unlockDate);
-  const [category, setCategory] = useState(note.category ?? "Tình cảm");
-  const [isSending, setIsSending] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [preview, setPreview] = useState(note.preview);
+  const [content, setContent] = useState(note.content);
+  const [unlockDate, setUnlockDate] = useState(toDateInput(note.unlockAt));
+  const [category, setCategory] = useState(
+    CATEGORIES.includes(note.category) ? note.category : CATEGORIES[0]
+  );
+  const { dialogRef, onKeyDown } = useModalKeys(onClose);
 
-  const handleSend = () => {
-    setIsSending(true);
-    setTimeout(() => {
-      setIsSending(false);
-      setShowSuccess(true);
-      setTimeout(() => {
-        onSend({ title, content, unlockDate, category });
-      }, 1200);
-    }, 800);
+  const [today] = useState(() => todayInput(Date.now()));
+  const canSave = title.trim() !== "" && content.trim() !== "" && unlockDate >= today;
+
+  /* Saves straight away. The previous version faked 800ms of "sending" and
+     then another 1200ms of celebration with bare setTimeouts — closing the
+     dialog in between did not cancel them, so a cancelled edit still landed
+     two seconds later. */
+  const handleSave = () => {
+    if (!canSave) return;
+    onSave({
+      title: title.trim(),
+      preview: preview.trim(),
+      content: content.trim(),
+      unlockAt: fromDateInput(unlockDate),
+      category,
+    });
   };
-
-  const categories = ["Tình cảm", "Du lịch", "Tương lai", "Kỷ niệm", "Lời hứa"];
 
   return (
     <Portal>
@@ -74,55 +75,12 @@ export const LockedNoteEditPopup: React.FC<Readonly<LockedNoteEditPopupProps>> =
           exit={{ opacity: 0, scale: 0.96, y: 24 }}
           transition={{ type: "spring", damping: 28, stiffness: 320 }}
           className="modal custom-scrollbar mt-auto max-w-2xl md:mt-0"
+          ref={dialogRef}
+          onKeyDown={onKeyDown}
         >
-          {/* ---------- Success overlay ---------- */}
-          <AnimatePresence>
-            {showSuccess && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-3 bg-paper/97"
-                role="status"
-                aria-live="polite"
-              >
-                <motion.span
-                  initial={{ scale: 0, rotate: -180 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ type: "spring", damping: 12, stiffness: 200 }}
-                  className="flex h-20 w-20 items-center justify-center rounded-[var(--radius-wobble-sm)] border-[2.4px] border-ink-primary bg-mint/25 -rotate-3"
-                >
-                  <span
-                    className="material-symbols-outlined text-ink-primary"
-                    style={{ fontSize: "40px", fontVariationSettings: "'FILL' 1" }}
-                    suppressHydrationWarning
-                  >
-                    check_circle
-                  </span>
-                </motion.span>
-                <motion.p
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="font-headline-sm text-headline-sm text-ink-primary -rotate-[0.5deg]"
-                >
-                  Đã gửi thành công!
-                </motion.p>
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.4 }}
-                  className="font-body-sm text-body-sm text-primary"
-                >
-                  Bí mật của bạn đã được cập nhật và gửi đi
-                </motion.p>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
           <div className="modal-head md:px-8">
             <div className="flex min-w-0 items-center gap-3">
-              <span className="flex h-12 w-12 flex-none items-center justify-center rounded-[var(--radius-wobble-sm)] border-[2.2px] border-ink-primary bg-background-main -rotate-3">
+              <span className="flex h-12 w-12 flex-none -rotate-3 items-center justify-center rounded-[var(--radius-wobble-sm)] border-[2.2px] border-ink-primary bg-background-main">
                 <span
                   className="material-symbols-outlined text-2xl text-ink-primary"
                   style={{ fontVariationSettings: "'FILL' 1" }}
@@ -149,12 +107,11 @@ export const LockedNoteEditPopup: React.FC<Readonly<LockedNoteEditPopupProps>> =
           </div>
 
           <div className="modal-body md:px-8">
-            {/* Status notice */}
             <div className="toast toast-warn mb-6">
               <span className="material-symbols-outlined text-[18px]">info</span>
               <p className="font-label-sm text-label-sm text-ink-primary">
-                Bạn có thể chỉnh sửa nội dung trước khi gửi cho người ấy. Hộp sẽ mở vào{" "}
-                <strong>{note.unlockDate}</strong>.
+                Hộp này vẫn chưa tới ngày mở. Bạn có thể sửa nội dung, hoặc dời ngày mở.
+                Hiện đang hẹn <strong>{formatUnlockDate(note.unlockAt)}</strong>.
               </p>
             </div>
 
@@ -170,6 +127,20 @@ export const LockedNoteEditPopup: React.FC<Readonly<LockedNoteEditPopupProps>> =
                   onChange={(e) => setTitle(e.target.value)}
                   className="field"
                   placeholder="Nhập tiêu đề..."
+                />
+              </div>
+
+              <div>
+                <label className="field-label" htmlFor="note-preview">
+                  Lời gợi ý <span className="text-primary">(hiện ra khi hộp còn khóa)</span>
+                </label>
+                <input
+                  id="note-preview"
+                  type="text"
+                  value={preview}
+                  onChange={(e) => setPreview(e.target.value)}
+                  className="field"
+                  placeholder="Một câu bâng quơ, đủ để tò mò mà chưa lộ gì"
                 />
               </div>
 
@@ -195,41 +166,34 @@ export const LockedNoteEditPopup: React.FC<Readonly<LockedNoteEditPopupProps>> =
                   <label className="field-label" htmlFor="note-date">
                     Ngày mở khóa
                   </label>
-                  <div className="relative">
-                    <span className="material-symbols-outlined pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-xl text-primary/50">
-                      event
-                    </span>
-                    <input
-                      id="note-date"
-                      type="text"
-                      value={unlockDate}
-                      onChange={(e) => setUnlockDate(e.target.value)}
-                      className="field pl-12"
-                    />
-                  </div>
+                  {/* A real date picker. It was a free-text box, so "Hôm nay"
+                      or anything else could be typed in and nothing checked it. */}
+                  <input
+                    id="note-date"
+                    type="date"
+                    value={unlockDate}
+                    min={today}
+                    onChange={(e) => setUnlockDate(e.target.value)}
+                    className="field appearance-none"
+                  />
                 </div>
 
                 <div>
                   <label className="field-label" htmlFor="note-category">
                     Danh mục
                   </label>
-                  <div className="relative">
-                    <select
-                      id="note-category"
-                      value={category}
-                      onChange={(e) => setCategory(e.target.value)}
-                      className="field cursor-pointer appearance-none pr-10"
-                    >
-                      {categories.map((cat) => (
-                        <option key={cat} value={cat}>
-                          {cat}
-                        </option>
-                      ))}
-                    </select>
-                    <span className="material-symbols-outlined pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-2xl text-primary/50">
-                      arrow_drop_down
-                    </span>
-                  </div>
+                  <select
+                    id="note-category"
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className="field cursor-pointer"
+                  >
+                    {CATEGORIES.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
@@ -254,30 +218,15 @@ export const LockedNoteEditPopup: React.FC<Readonly<LockedNoteEditPopupProps>> =
             <button onClick={onClose} className="btn flex-1 py-4">
               Hủy bỏ
             </button>
-            <button
-              onClick={handleSend}
-              disabled={isSending || !title.trim() || !content.trim()}
-              className="btn btn-accent flex-1 py-4"
-            >
-              {isSending ? (
-                <>
-                  <span className="material-symbols-outlined animate-spin text-base">
-                    progress_activity
-                  </span>
-                  Đang gửi...
-                </>
-              ) : (
-                <>
-                  <span className="material-symbols-outlined text-base">send</span>
-                  Gửi cho người ấy
-                </>
-              )}
+            <button onClick={handleSave} disabled={!canSave} className="btn btn-accent flex-1 py-4">
+              <span className="material-symbols-outlined text-base">save</span>
+              Lưu lại
             </button>
           </div>
         </motion.div>
       </div>
     </Portal>
   );
-};
+}
 
 export default LockedNoteEditPopup;

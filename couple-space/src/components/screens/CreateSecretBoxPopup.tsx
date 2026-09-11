@@ -1,43 +1,65 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Portal } from "@/components/ui/Portal";
+import { useModalKeys } from "@/lib/useModalKeys";
+import {
+  PASSCODE_LENGTH,
+  fromDateInput,
+  isValidPasscode,
+  todayInput,
+} from "@/lib/secretBox";
+import type { SecretNote } from "@/data/mockData";
 
 interface CreateSecretBoxPopupProps {
   readonly onClose: () => void;
-  readonly onSuccess: (data: {
-    title: string;
-    content: string;
-    unlockDate: string;
-    passcode: string;
-  }) => void;
+  readonly onSuccess: (note: SecretNote) => void;
 }
 
-export const CreateSecretBoxPopup: React.FC<Readonly<CreateSecretBoxPopupProps>> = ({
-  onClose,
-  onSuccess,
-}) => {
+/** Offered categories. "Đã mở" is not among them — that is a state, not a kind. */
+const CATEGORIES = ["Tình cảm", "Du lịch", "Tương lai", "Kỷ niệm", "Lời hứa"] as const;
+
+export function CreateSecretBoxPopup({ onClose, onSuccess }: CreateSecretBoxPopupProps) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [preview, setPreview] = useState("");
   const [passcode, setPasscode] = useState("");
   const [unlockDate, setUnlockDate] = useState("");
+  const [category, setCategory] = useState<string>(CATEGORIES[0]);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { dialogRef, onKeyDown } = useModalKeys(onClose);
+
+  const [today] = useState(() => todayInput(Date.now()));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title || !content || !passcode || !unlockDate) {
-      setError("Vui lòng điền đầy đủ thông tin.");
-      return;
-    }
+    /* Each rule says which field is wrong. The old check was one blanket
+       "điền đầy đủ thông tin", which passed a 1-digit passcode under a label
+       that promised four, and accepted an unlock date in the past. */
+    if (!title.trim()) return setError("Hãy đặt một tiêu đề cho hộp.");
+    if (!content.trim()) return setError("Hộp chưa có lời nhắn nào bên trong.");
+    if (!isValidPasscode(passcode)) return setError(`Mật mã phải đúng ${PASSCODE_LENGTH} chữ số.`);
+    if (!unlockDate) return setError("Hãy chọn ngày mở khóa.");
+    if (unlockDate < today) return setError("Ngày mở khóa phải từ hôm nay trở đi.");
     setError(null);
     setIsSuccessModalOpen(true);
   };
 
   const handleFinish = () => {
     setIsSuccessModalOpen(false);
-    onSuccess({ title, content, unlockDate, passcode });
+    onSuccess({
+      id: `sn-new-${Date.now()}`,
+      title: title.trim(),
+      preview: preview.trim() || "Một điều thầm kín đang chờ ngày mở.",
+      content: content.trim(),
+      unlockAt: fromDateInput(unlockDate),
+      createdAt: new Date().toISOString(),
+      passcode,
+      category,
+      icon: "lock_clock",
+    });
   };
 
   return (
@@ -48,16 +70,28 @@ export const CreateSecretBoxPopup: React.FC<Readonly<CreateSecretBoxPopupProps>>
         aria-modal="true"
         aria-labelledby="create-secret-title"
       >
+        <motion.button
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="absolute inset-0 cursor-default"
+          onClick={onClose}
+          aria-label="Đóng"
+          tabIndex={-1}
+        />
+
         <motion.div
           initial={{ opacity: 0, scale: 0.97, y: 24 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.97, y: 24 }}
           transition={{ type: "spring", damping: 25, stiffness: 300 }}
           className="modal custom-scrollbar max-w-2xl"
+          ref={dialogRef}
+          onKeyDown={onKeyDown}
         >
           <div className="modal-head md:px-8">
             <div className="flex min-w-0 items-center gap-3">
-              <span className="flex h-12 w-12 flex-none items-center justify-center rounded-[var(--radius-wobble-sm)] border-[2.2px] border-ink-primary bg-surface-accent -rotate-3">
+              <span className="flex h-12 w-12 flex-none -rotate-3 items-center justify-center rounded-[var(--radius-wobble-sm)] border-[2.2px] border-ink-primary bg-surface-accent">
                 <span className="material-symbols-outlined text-ink-primary">lock_open</span>
               </span>
               <div className="min-w-0">
@@ -106,16 +140,33 @@ export const CreateSecretBoxPopup: React.FC<Readonly<CreateSecretBoxPopupProps>>
               />
             </div>
 
+            {/* The teaser exists so the waiting-list card has something to show.
+                Without it the card would have to print the secret, which is
+                exactly what the old screen did. */}
+            <div>
+              <label className="field-label" htmlFor="preview">
+                Lời gợi ý <span className="text-primary">(hiện ra khi hộp còn khóa)</span>
+              </label>
+              <input
+                className="field"
+                id="preview"
+                value={preview}
+                onChange={(e) => setPreview(e.target.value)}
+                placeholder="Một câu bâng quơ, đủ để tò mò mà chưa lộ gì"
+                type="text"
+              />
+            </div>
+
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
                 <label className="field-label" htmlFor="passcode">
-                  Thiết lập mật mã (4 số)
+                  Thiết lập mật mã ({PASSCODE_LENGTH} số)
                 </label>
                 <div className="relative">
                   <input
                     className="field font-headline text-center tracking-[0.6em]"
                     id="passcode"
-                    maxLength={4}
+                    maxLength={PASSCODE_LENGTH}
                     value={passcode}
                     onChange={(e) => setPasscode(e.target.value.replace(/\D/g, ""))}
                     placeholder="••••"
@@ -138,8 +189,27 @@ export const CreateSecretBoxPopup: React.FC<Readonly<CreateSecretBoxPopupProps>>
                   value={unlockDate}
                   onChange={(e) => setUnlockDate(e.target.value)}
                   type="date"
+                  min={today}
                 />
               </div>
+            </div>
+
+            <div>
+              <label className="field-label" htmlFor="create-category">
+                Danh mục
+              </label>
+              <select
+                id="create-category"
+                className="field cursor-pointer"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              >
+                {CATEGORIES.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {error && (
@@ -177,7 +247,7 @@ export const CreateSecretBoxPopup: React.FC<Readonly<CreateSecretBoxPopupProps>>
                 transition={{ type: "spring", damping: 24, stiffness: 300 }}
                 className="card card-flat w-full max-w-sm p-8 text-center"
               >
-                <span className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-[var(--radius-wobble-sm)] border-[2.4px] border-ink-primary bg-surface-accent -rotate-3">
+                <span className="mx-auto mb-6 flex h-20 w-20 -rotate-3 items-center justify-center rounded-[var(--radius-wobble-sm)] border-[2.4px] border-ink-primary bg-surface-accent">
                   <span className="material-symbols-outlined text-4xl text-ink-primary">
                     lock_clock
                   </span>
@@ -189,9 +259,9 @@ export const CreateSecretBoxPopup: React.FC<Readonly<CreateSecretBoxPopupProps>>
                   &ldquo;{title}&rdquo; đã được khóa!
                 </h4>
                 <p className="font-body-md text-body-md mb-8 text-primary">
-                  Điều thầm kín của bạn đã được lưu giữ an toàn cho đến ngày hẹn.
+                  Điều thầm kín của bạn đã được lưu giữ cho đến ngày hẹn.
                 </p>
-                <button className="btn btn-ink w-full py-4" onClick={handleFinish}>
+                <button className="btn btn-ink w-full py-4" onClick={handleFinish} autoFocus>
                   Tuyệt vời
                 </button>
               </motion.div>
@@ -201,6 +271,6 @@ export const CreateSecretBoxPopup: React.FC<Readonly<CreateSecretBoxPopupProps>>
       </div>
     </Portal>
   );
-};
+}
 
 export default CreateSecretBoxPopup;

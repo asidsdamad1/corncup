@@ -1,17 +1,31 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { onImageError } from "@/lib/image";
+import { formatUnlockDate } from "@/lib/secretBox";
+import type { SecretNote } from "@/data/mockData";
 
 interface SecretBoxUnlockSuccessProps {
-  readonly onBack?: () => void;
+  /**
+   * The box that was just opened.
+   *
+   * This screen used to hold one letter written directly into the JSX —
+   * "Những điều anh chưa nói", a hard-coded hero image and two Đà Lạt tags —
+   * so every box, whichever you opened, revealed the same words.
+   */
+  readonly note: SecretNote;
+  readonly onBack: () => void;
 }
 
-const HERO =
-  'url("https://lh3.googleusercontent.com/aida-public/AB6AXuB_LYSljqnhT2XTv0YCVaG3a6CwNbfV-XT3Sw3cCWCeZw2wJLpDwPOHMF-rkO_L4gFMB5bzUowTlphGlTWdiy4w5d-JNm565HLI5V2DVMHmltZRgYnY0_aRSDETcz-rLDJ36aBGNOMwFMHQS3gccl1Ed9v3pjk5nBKZsxxH716YEj-5xxT5XxrkMKNZdzSNI4_PdjFUELXeoMMnnDfbAvIYJ2ApwqNsDEEWIl1MbU3kVgzfcmbtNSX9EWCP6dI5EacE2cnc4qo4J-U")';
-
-export const SecretBoxUnlockSuccess: React.FC<SecretBoxUnlockSuccessProps> = ({ onBack }) => {
+export function SecretBoxUnlockSuccess({ note, onBack }: SecretBoxUnlockSuccessProps) {
   const [showOverlay, setShowOverlay] = useState(true);
+  const [sparks] = useState(() =>
+    Array.from({ length: 12 }, () => ({
+      x: (Math.random() - 0.5) * 400,
+      y: (Math.random() - 0.5) * 400 - 100,
+    }))
+  );
 
   useEffect(() => {
     const timer = setTimeout(() => setShowOverlay(false), 1800);
@@ -23,7 +37,6 @@ export const SecretBoxUnlockSuccess: React.FC<SecretBoxUnlockSuccessProps> = ({ 
       <div className="flex flex-1 justify-center px-4 py-5 md:px-20 lg:px-40">
         <div className="flex max-w-[960px] flex-1 flex-col">
           <main className="mt-10 flex flex-1 flex-col gap-6 md:mt-0">
-            {/* ---------- Top App Bar ---------- */}
             <header className="sheet flex flex-wrap items-center justify-between gap-4 px-4 py-4 md:flex-nowrap md:px-6">
               <div className="flex min-w-0 items-center gap-3 text-ink-primary">
                 <button onClick={onBack} className="btn btn-icon" aria-label="Quay lại">
@@ -34,22 +47,13 @@ export const SecretBoxUnlockSuccess: React.FC<SecretBoxUnlockSuccessProps> = ({ 
                   Hộp thư bí mật
                 </h2>
               </div>
-              <div className="flex gap-2">
-                <button className="btn btn-icon" aria-label="Thông báo">
-                  <span className="material-symbols-outlined">notifications</span>
-                </button>
-                <button className="btn btn-icon" aria-label="Tài khoản">
-                  <span className="material-symbols-outlined">account_circle</span>
-                </button>
-              </div>
             </header>
 
-            {/* ---------- Section Header ---------- */}
             <div className="flex flex-col gap-1 px-1">
-              <p className="font-headline text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-primary -rotate-2">
+              <p className="font-headline -rotate-2 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-primary">
                 Hộp bí mật · Đã giải mã
               </p>
-              <h1 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-ink-primary -rotate-[0.6deg]">
+              <h1 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg -rotate-[0.6deg] text-ink-primary">
                 Mở khóa thành công
               </h1>
               <p className="font-body-md text-body-md text-primary">
@@ -57,97 +61,90 @@ export const SecretBoxUnlockSuccess: React.FC<SecretBoxUnlockSuccessProps> = ({ 
               </p>
             </div>
 
-            {/* ---------- The letter ---------- */}
             <div className="sheet overflow-hidden">
-              {/* Hero */}
-              <div
-                className="relative h-64 w-full bg-cover bg-center bg-no-repeat"
-                style={{ backgroundImage: HERO }}
-              >
-                <div className="absolute inset-0 flex items-end bg-gradient-to-t from-ink-primary/80 to-transparent p-6">
-                  <div className="min-w-0 text-paper">
-                    <h3 className="font-headline-md text-headline-md -rotate-[0.5deg]">
-                      Những điều anh chưa nói
-                    </h3>
-                    <p className="font-body-sm text-body-sm mt-1 flex flex-wrap items-center gap-2 text-paper/85">
-                      <span className="material-symbols-outlined text-[14px]">calendar_today</span>
-                      Ngày khóa: 14 Tháng 2, 2023 • Ngày mở: Hôm nay
-                    </p>
+              {note.coverImage ? (
+                <div className="relative h-64 w-full overflow-hidden">
+                  <img
+                    src={note.coverImage}
+                    alt={note.coverImageAlt ?? note.title}
+                    loading="eager"
+                    decoding="async"
+                    onError={onImageError}
+                    className="h-full w-full object-cover"
+                  />
+                  <div className="absolute inset-0 flex items-end bg-gradient-to-t from-ink-primary/80 to-transparent p-6">
+                    <div className="min-w-0 text-paper">
+                      <h3 className="font-headline-md text-headline-md -rotate-[0.5deg]">
+                        {note.title}
+                      </h3>
+                      <p className="font-body-sm text-body-sm mt-1 flex flex-wrap items-center gap-2 text-paper/85">
+                        <span className="material-symbols-outlined text-[14px]">calendar_today</span>
+                        Hẹn mở: {formatUnlockDate(note.unlockAt)}
+                      </p>
+                    </div>
                   </div>
+                  <span className="chip chip-accent absolute right-4 top-4">
+                    <span className="material-symbols-outlined">lock_open</span>
+                    Đã giải mã
+                  </span>
                 </div>
-                <span className="chip chip-accent absolute right-4 top-4">
-                  <span className="material-symbols-outlined">lock_open</span>
-                  Đã giải mã
-                </span>
-              </div>
+              ) : (
+                /* A box with no photo gets a plain ink panel rather than a
+                   borrowed stock image that belongs to somebody else's note. */
+                <div className="card-ink relative flex flex-col gap-2 p-6">
+                  <span className="chip chip-accent absolute right-4 top-4">
+                    <span className="material-symbols-outlined">lock_open</span>
+                    Đã giải mã
+                  </span>
+                  <h3 className="font-headline-md text-headline-md -rotate-[0.5deg] pr-32 text-paper">
+                    {note.title}
+                  </h3>
+                  <p className="font-body-sm text-body-sm flex items-center gap-2 text-primary-fixed">
+                    <span className="material-symbols-outlined text-[14px]">calendar_today</span>
+                    Hẹn mở: {formatUnlockDate(note.unlockAt)}
+                  </p>
+                </div>
+              )}
 
-              {/* Body — the letter itself, on ruled paper */}
               <div className="flex flex-col gap-6 p-6 md:p-8">
                 <span className="chip chip-soft">
                   <span className="material-symbols-outlined">edit_note</span>
-                  Bản ghi cảm xúc
+                  {note.category}
                 </span>
 
                 <div className="ruled">
-                  <p>
-                    Gửi em, khi em đọc được những dòng này, có lẽ chúng ta đã cùng nhau đi qua thêm
-                    một chặng đường dài. Anh viết những dòng này vào một buổi chiều mưa của năm
-                    ngoái, lúc em đang say giấc nồng.
-                  </p>
-                  <p>
-                    Anh muốn nói rằng mỗi khoảnh khắc bên em đều là một món quà vô giá mà cuộc đời
-                    đã dành tặng anh. Có những lúc anh vụng về chẳng thể diễn tả hết bằng lời, nên
-                    anh gửi gắm vào đây — một &quot;Hộp bí mật&quot; chờ ngày em tự tay mở ra.
-                  </p>
-                  <p>
-                    Cảm ơn em đã kiên nhẫn, đã yêu thương và đã là bến đỗ bình yên nhất của anh. Anh
-                    yêu em nhiều hơn những gì anh có thể nói.
-                  </p>
+                  <p className="whitespace-pre-wrap">{note.content}</p>
                 </div>
 
-                <hr className="rule" />
-
-                <div className="flex flex-wrap gap-3">
-                  <span className="chip chip-blue">
-                    <span className="material-symbols-outlined">sentiment_very_satisfied</span>
-                    Xúc động
-                  </span>
-                  <span className="chip chip-blue">
-                    <span className="material-symbols-outlined">church</span>
-                    Kỷ niệm Đà Lạt
-                  </span>
-                </div>
+                {note.tags && note.tags.length > 0 && (
+                  <>
+                    <hr className="rule" />
+                    <div className="flex flex-wrap gap-3">
+                      {note.tags.map((tag) => (
+                        <span key={tag} className="chip chip-blue">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
 
-              {/* Footer actions */}
-              <div className="flex flex-col items-center justify-between gap-4 border-t-[1.6px] border-dashed border-[var(--ink-20)] bg-surface-text-container p-6 sm:flex-row">
-                <div className="flex w-full flex-wrap gap-2 sm:w-auto">
-                  <button className="btn btn-ink flex-1 sm:flex-none">
-                    <span className="material-symbols-outlined">auto_awesome</span>
-                    Lưu vào Hành trình
-                  </button>
-                  <button className="btn flex-1 sm:flex-none">
-                    <span className="material-symbols-outlined">share</span>
-                    Chia sẻ
-                  </button>
-                </div>
-                <button onClick={onBack} className="btn btn-sm">
-                  <span className="material-symbols-outlined">lock_reset</span>
-                  Khóa lại vào hộp
+              {/* One action, and it does what it says. The old footer offered
+                  "Lưu vào Hành trình" and "Chia sẻ", neither wired to anything,
+                  plus a "Khóa lại vào hộp" that actually created a new opened
+                  note — the opposite of locking anything. */}
+              <div className="flex justify-end border-t-[1.6px] border-dashed border-[var(--ink-20)] bg-surface-text-container p-6">
+                <button onClick={onBack} className="btn btn-ink">
+                  <span className="material-symbols-outlined">arrow_back</span>
+                  Về Hộp bí mật
                 </button>
               </div>
             </div>
-
-            <footer className="flex justify-center py-4">
-              <p className="font-label-sm text-label-sm text-primary">
-                Digital Sanctuary © 2024 • Private &amp; Encrypted
-              </p>
-            </footer>
           </main>
         </div>
       </div>
 
-      {/* ---------- Unlock celebration overlay ---------- */}
       <AnimatePresence>
         {showOverlay && (
           <motion.div
@@ -182,16 +179,15 @@ export const SecretBoxUnlockSuccess: React.FC<SecretBoxUnlockSuccessProps> = ({ 
               BÍ MẬT ĐÃ MỞ
             </motion.h2>
 
-            {/* sparks */}
-            {[...Array(12)].map((_, i) => (
+            {sparks.map((spark, i) => (
               <motion.span
                 key={i}
                 initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
                 animate={{
                   opacity: [0, 1, 0],
                   scale: [0, 1.5, 0.5],
-                  x: (Math.random() - 0.5) * 400,
-                  y: (Math.random() - 0.5) * 400 - 100,
+                  x: spark.x,
+                  y: spark.y,
                 }}
                 transition={{ duration: 1.2, ease: "easeOut", delay: 0.1 }}
                 className="absolute h-3 w-3 rounded-full bg-surface-accent"
@@ -202,6 +198,6 @@ export const SecretBoxUnlockSuccess: React.FC<SecretBoxUnlockSuccessProps> = ({ 
       </AnimatePresence>
     </div>
   );
-};
+}
 
 export default SecretBoxUnlockSuccess;

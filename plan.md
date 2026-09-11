@@ -3,6 +3,18 @@
 Phạm vi: `/secrets`, `/secrets/new`, và mọi thành phần `SecretBox*` / `LockedNote*`.
 Ngày rà soát: 2026-09-11. Đối chiếu với `DESIGN.MD` và code đang chạy.
 
+> **Tình trạng: Giai đoạn 1-6 đã làm xong** (2026-09-11). Giai đoạn 7 — lưu trữ thật —
+> chưa làm, và cho tới khi làm thì hộp bí mật vẫn là mô hình trình diễn: nội dung của
+> hộp chưa mở nằm sẵn trong gói JavaScript gửi về trình duyệt. Nó **không** còn nằm trong
+> HTML và không còn hiện trên màn hình, nhưng mở DevTools vẫn đọc được.
+
+> Quyết định đã chọn cho §4, vì chúng chặn việc thi công:
+> **1.** Xoá `/secrets/new` và `CreateSecretBox.tsx`.
+> **2.** Gỡ toàn bộ nút chết thay vì nối tạm.
+> **3.** Hoãn Giai đoạn 7, chờ bạn quyết.
+> **4.** `featuredCapsule` trở thành một ghi chú gắn cờ `featured`, giống hệt cách màn
+> Kỷ niệm đánh dấu kỷ niệm nổi bật; kiểu `FeaturedCapsule` bị xoá.
+
 ---
 
 ## 1. Quy tắc code hiện hành — bắt buộc tuân thủ
@@ -112,7 +124,7 @@ Khuôn chuẩn (xem `AddMomentModal.tsx`, `ConfirmDialog.tsx`):
 | A5 | **Mật mã người dùng đặt lúc tạo bị vứt đi.** `CreateSecretBoxPopup` trả `passcode` qua `onSuccess`, nhưng `SecretBoxManagement` không hề đọc nó. Mở khoá luôn dùng hằng số `"1234"` dùng chung cho mọi hộp. | `CreateSecretBoxPopup.tsx:13` vs `SecretBoxManagement.tsx:463-477`; `SecretBoxPasswordPopup.tsx:18` |
 | A6 | **Thông báo lỗi in luôn mật mã ra màn hình**: *"Mật mã không chính xác. Thử lại với "1234""*. | `SecretBoxPasswordPopup.tsx:97` |
 | A7 | Không giới hạn số lần thử, không trễ, không khoá tạm. | `SecretBoxPasswordPopup.tsx:27-38` |
-| A8 | Chân trang tuyên bố *"Private & Encrypted"* — **không có mã hoá nào cả**. Kèm sai thương hiệu ("Digital Sanctuary") và sai năm (2024). | `SecretBoxUnlockSuccess.tsx:143` |
+| A8 | Chân trang tuyên bố *"Private & Encrypted"* — **không có mã hoá nào cả**, kèm năm 2024 đã cũ. ~~Và sai thương hiệu ("Digital Sanctuary")~~ — **ghi nhận sai**: đó là tên sản phẩm, dùng ở `NavBar.tsx:40` và `HomePage.tsx:43`. | `SecretBoxUnlockSuccess.tsx:143` |
 
 > Ghi chú bảo mật: kể cả sau khi sửa, **kiểm tra mật mã ở client chỉ là trang trí**. Cổng thật phải là
 > Server Action, và nội dung ghi chú **không được rời server** trước khi server cho phép. Điều này đã
