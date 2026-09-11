@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duyên — Cảm xúc &amp; Tiết kiệm</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="craft.css">
+<style>
+  /* lưới chọn cảm xúc: mỗi ô là một con tem nhỏ */
+  .luoi-cx {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
+    gap: 10px;
+  }
+  .o-cx {
+    padding: 12px 6px 10px;
+    border: var(--stroke) solid var(--ink-20);
+    border-radius: var(--wobble-sm);
+    background: var(--paper);
+    cursor: pointer;
+    text-align: center;
+    font: inherit;
+    color: var(--ink);
+    transition: background .18s ease, border-color .18s ease, transform .14s ease;
+  }
+  .o-cx .e { display: block; font-size: 1.75rem; line-height: 1.1 }
+  .o-cx .n {
+    display: block; margin-top: 3px;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 600; font-size: .72rem;
+  }
+  .o-cx:hover { border-color: var(--ink); background: #f5c7c733 }
+  .o-cx[aria-pressed="true"] {
+    background: var(--accent);
+    border-color: var(--ink);
+    transform: rotate(-1.6deg);
+    box-shadow: 0 3px 0 var(--ink);
+  }
+
+  /* thẻ mục tiêu tiết kiệm ở dạng danh sách */
+  .muc-tieu { display: flex; flex-direction: column; gap: 14px }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <header class="hero">
+    <p class="label" style="margin:0;transform:rotate(-2.2deg)">Duyên · Emotion Engine &amp; Shared Future</p>
+    <h1 class="display">Cảm xúc<br>&amp; tiết kiệm chung</h1>
+    <p class="sub">Ghi lại tâm trạng hôm nay, rồi ngó qua xem hai đứa đã đi được bao xa với những mục tiêu chung.</p>
+  </header>
+
+  <!-- ============ 01 · daily emotion engine ============ -->
+  <section id="cam-xuc">
+    <div class="sec-head">
+      <span class="no">01</span>
+      <div class="tx">
+        <h2>Cảm xúc hôm nay</h2>
+        <p>Ba lớp riêng tư khác nhau — chọn lớp trước khi ghi.</p>
+      </div>
+    </div>
+
+    <div class="sheet">
+
+      <div class="tabs" role="tablist" aria-label="Lớp riêng tư">
+        <button class="tab" role="tab" aria-selected="true"  data-tab="toi">Riêng tôi</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="ban">Riêng bạn</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="chung">Với đối phương</button>
+      </div>
+
+      <!-- --- riêng tôi --- -->
+      <div class="khung" data-pane="toi">
+        <p class="meta" style="margin:16px 0 14px">
+          <span class="material-symbols-outlined" style="font-size:17px">visibility_off</span>
+          Chỉ mình bạn thấy. Linh sẽ không nhận được thông báo.
+        </p>
+
+        <div class="luoi-cx">
+          <button class="o-cx" aria-pressed="false"><span class="e">😊</span><span class="n">Hạnh phúc</span></button>
+          <button class="o-cx" aria-pressed="false"><span class="e">🤩</span><span class="n">Hào hứng</span></button>
+          <button class="o-cx" aria-pressed="true"><span class="e">😌</span><span class="n">Bình yên</span></button>
+          <button class="o-cx" aria-pressed="false"><span class="e">😔</span><span class="n">Buồn</span></button>
+          <button class="o-cx" aria-pressed="false"><span class="e">😠</span><span class="n">Bực bội</span></button>
+          <button class="o-cx" aria-pressed="false"><span class="e">🥰</span><span class="n">Yêu thương</span></button>
+          <button class="o-cx" aria-pressed="false"><span class="e">😴</span><span class="n">Mệt mỏi</span></button>
+          <button class="o-cx" aria-pressed="false"><span class="e">🤗</span><span class="n">Ấm áp</span></button>
+        </div>
+
+        <hr class="rule">
+
+        <label class="field-label" for="ghi-toi">Ghi thêm một câu</label>
+        <textarea class="field" id="ghi-toi" rows="3" placeholder="Hôm nay có gì muốn giữ lại cho riêng mình…"></textarea>
+
+        <button class="btn accent" style="margin-top:14px">
+          <span class="material-symbols-outlined">bookmark_add</span> Lưu vào ngày 25.05
+        </button>
+      </div>
+
+      <!-- --- riêng bạn --- -->
+      <div class="khung" data-pane="ban" hidden>
+        <p class="meta" style="margin:16px 0 14px">
+          <span class="material-symbols-outlined" style="font-size:17px">schedule</span>
+          Linh đã ghi lúc 08:40 sáng nay.
+        </p>
+
+        <div class="card wash" style="transform:none">
+          <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+            <span style="font-size:2.4rem;line-height:1">😌</span>
+            <div style="min-width:0">
+              <h3 class="headline-sm" style="margin:0">Bình yên</h3>
+              <p class="label" style="margin:2px 0 0">Cùng tâm trạng với bạn</p>
+            </div>
+            <span class="stamp" style="margin-left:auto;transform:rotate(6deg);background:var(--bg-main)">2<small>ngày liền</small></span>
+          </div>
+          <hr class="rule">
+          <div class="ruled">
+            <p>Ngủ đủ giấc, trời mát, không có gì phải lo. Vậy là đủ rồi.</p>
+          </div>
+        </div>
+
+        <button class="btn" style="margin-top:14px">
+          <span class="material-symbols-outlined">favorite</span> Gửi một cái ôm
+        </button>
+      </div>
+
+      <!-- --- với đối phương --- -->
+      <div class="khung" data-pane="chung" hidden>
+        <p class="meta" style="margin:16px 0 14px">
+          <span class="material-symbols-outlined" style="font-size:17px">group</span>
+          Lớp này mở khi cả hai đã ghi trong ngày. Hôm nay đã đủ.
+        </p>
+
+        <div class="card accent" style="transform:rotate(-0.6deg);text-align:center">
+          <span class="chip" style="background:var(--paper)">Trùng tâm trạng</span>
+          <p style="margin:14px 0 0;font-size:2.6rem;line-height:1">😌 😌</p>
+          <h3 class="headline" style="margin:8px 0 4px">Cả hai đều thấy bình yên</h3>
+          <p class="meta" style="margin:0 auto;max-width:34ch;color:var(--ink)">Đây là ngày thứ 2 liên tiếp. Ghi lại thành một kỷ niệm nhỏ chứ?</p>
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
+          <button class="btn accent"><span class="material-symbols-outlined">photo_album</span> Lưu thành kỷ niệm</button>
+          <button class="btn"><span class="material-symbols-outlined">close</span> Để sau</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ 02 · tiết kiệm chung ============ -->
+  <section id="tiet-kiem">
+    <div class="sec-head">
+      <span class="no">02</span>
+      <div class="tx">
+        <h2>Tiết kiệm chung</h2>
+        <p>Tổng đã góp: 105.500.000 ₫ trên 200.000.000 ₫.</p>
+      </div>
+    </div>
+
+    <!-- thanh tổng -->
+    <div class="sheet" style="margin-bottom:18px">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <p class="label" style="margin:0">Toàn bộ mục tiêu</p>
+        <span class="chip soft">3 mục tiêu đang chạy</span>
+      </div>
+      <div class="meter" data-pct="53" style="margin-top:14px">
+        <svg viewBox="0 0 240 16" aria-hidden="true">
+          <path class="tr" pathLength="100" d="M3 9 C 62 4, 122 14, 237 8"/>
+          <path class="fl" pathLength="100" d="M3 9 C 62 4, 122 14, 237 8"/>
+        </svg>
+        <span class="pct">53%</span>
+      </div>
+    </div>
+
+    <div class="muc-tieu">
+
+      <article class="card">
+        <div style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:10px">
+          <h3 class="headline-sm">🇯🇵 Du lịch Nhật Bản</h3>
+          <span class="chip accent">Ưu tiên cao</span>
+        </div>
+        <p class="meta" style="margin:4px 0 14px">32.000.000 / 50.000.000 ₫ · hạn 01.12.2026</p>
+        <div class="meter" data-pct="64">
+          <svg viewBox="0 0 240 16" aria-hidden="true">
+            <path class="tr" pathLength="100" d="M3 9 C 62 4, 122 14, 237 8"/>
+            <path class="fl" pathLength="100" d="M3 9 C 62 4, 122 14, 237 8"/>
+          </svg>
+          <span class="pct">64%</span>
+        </div>
+      </article>
+
+      <article class="card tilt-r">
+        <div style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:10px">
+          <h3 class="headline-sm">🚗 Mua xe mới</h3>
+          <span class="chip soft">Ưu tiên vừa</span>
+        </div>
+        <p class="meta" style="margin:4px 0 14px">45.000.000 / 120.000.000 ₫ · hạn 01.06.2027</p>
+        <div class="meter" data-pct="38">
+          <svg viewBox="0 0 240 16" aria-hidden="true">
+            <path class="tr" pathLength="100" d="M3 8 C 60 13, 130 3, 237 9"/>
+            <path class="fl" pathLength="100" d="M3 8 C 60 13, 130 3, 237 9"/>
+          </svg>
+          <span class="pct">38%</span>
+        </div>
+      </article>
+
+      <!-- gần xong: thước chuyển sang màu bạc hà -->
+      <article class="card">
+        <div style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:10px">
+          <h3 class="headline-sm">🏠 Sắm đồ cho nhà mới</h3>
+          <span class="chip soft">Ưu tiên thấp</span>
+        </div>
+        <p class="meta" style="margin:4px 0 14px">28.500.000 / 30.000.000 ₫ · hạn 01.08.2026</p>
+        <div class="meter" data-pct="95">
+          <svg viewBox="0 0 240 16" aria-hidden="true">
+            <path class="tr" pathLength="100" d="M3 9 C 70 5, 140 13, 237 8"/>
+            <path class="fl" pathLength="100" d="M3 9 C 70 5, 140 13, 237 8"/>
+          </svg>
+          <span class="pct">95%</span>
+        </div>
+        <hr class="rule">
+        <p class="meta" style="margin:0">Chỉ còn 1.500.000 ₫ nữa là xong. Góp nốt tháng này nhé?</p>
+      </article>
+
+      <div class="card dashed" style="text-align:center;padding:24px 20px">
+        <span class="material-symbols-outlined" style="font-size:30px;color:var(--primary);opacity:.6">savings</span>
+        <h3 class="headline-sm" style="margin:6px 0 4px;color:var(--primary)">Thêm mục tiêu mới</h3>
+        <p class="meta" style="margin:0 auto 14px;max-width:34ch">Một chuyến đi, một món đồ, hay chỉ là quỹ dự phòng cho hai đứa.</p>
+        <button class="btn accent"><span class="material-symbols-outlined">add</span> Tạo mục tiêu</button>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="foot">
+    <p style="margin:0">Duyên · bản dựng minh hoạ hệ thiết kế “Refined Craft”</p>
+  </footer>
+
+</div>
+
+<nav class="dock" aria-label="Điều hướng chính">
+  <a href="home.html"><span class="material-symbols-outlined">home</span>Trang chủ</a>
+  <a href="emotions-savings.html" class="on"><span class="material-symbols-outlined fill">favorite</span>Cảm xúc</a>
+  <a href="memories.html"><span class="material-symbols-outlined">photo_album</span>Kỷ niệm</a>
+  <a href="secrets.html"><span class="material-symbols-outlined">lock</span>Bí mật</a>
+  <a href="#" aria-disabled="true"><span class="material-symbols-outlined">calendar_month</span>Hẹn hò</a>
+  <a href="#tiet-kiem"><span class="material-symbols-outlined">savings</span>Tiết kiệm</a>
+</nav>
+
+<script>
+  // --- 3 lớp riêng tư ---
+  const tabs = [...document.querySelectorAll('.tab')];
+  const panes = [...document.querySelectorAll('.khung')];
+
+  tabs.forEach(t => t.addEventListener('click', () => {
+    tabs.forEach(x => x.setAttribute('aria-selected', String(x === t)));
+    panes.forEach(p => { p.hidden = p.dataset.pane !== t.dataset.tab; });
+    veThuoc();   // thước trong pane vừa mở cũng cần được vẽ
+  }));
+
+  // --- chọn cảm xúc: chỉ một ô được chọn ---
+  const oCx = [...document.querySelectorAll('.o-cx')];
+  oCx.forEach(o => o.addEventListener('click', () => {
+    oCx.forEach(x => x.setAttribute('aria-pressed', String(x === o)));
+  }));
+
+  // --- vẽ thước tiến độ ---
+  function veThuoc() {
+    document.querySelectorAll('.meter').forEach(m => {
+      const pct = Number(m.dataset.pct) || 0;
+      m.querySelector('.fl').style.strokeDashoffset = String(100 - pct);
+      if (pct >= 95) m.classList.add('done');
+    });
+  }
+  requestAnimationFrame(veThuoc);
+</script>
+
+</body>
+</html>

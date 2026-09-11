@@ -13,6 +13,16 @@ export interface MemoryPhoto {
   url: string;
   alt: string;
   caption?: string;
+  /**
+   * Intrinsic pixel size, captured at upload time.
+   *
+   * Two jobs: it lets the justified-row layout compute row heights without
+   * measuring the DOM, and it lets the browser reserve the right box before
+   * the bytes arrive, so the page does not jump. Optional because older
+   * records predate it — `aspectOf()` falls back to 3:2.
+   */
+  width?: number;
+  height?: number;
 }
 
 export interface MemoryMoment {
@@ -36,6 +46,13 @@ export interface Memory {
   tags: string[];
   rating: number;
   category: MemoryCategory;
+  /**
+   * Marked by hand as one of "our" memories.
+   *
+   * Deliberately NOT derived from date or rating: which trips matter is the
+   * couple's call, not something the app should score on their behalf.
+   */
+  featured?: boolean;
   photos: MemoryPhoto[];
   moments: MemoryMoment[];
   participants: string[];
@@ -166,26 +183,6 @@ export const secretNotes: SecretNote[] = [
   },
 ];
 
-export interface DatePlan {
-  id: string;
-  title: string;
-  date: string;
-  location: string;
-  status: "upcoming" | "completed" | "pending";
-  rating?: number;
-  emotionAfter?: string;
-}
-
-export interface SavingGoal {
-  id: string;
-  title: string;
-  targetAmount: number;
-  currentAmount: number;
-  deadline: string;
-  priority: "high" | "medium" | "low";
-  emoji: string;
-}
-
 // EMOTIONS
 export const emotions: Emotion[] = [
   { emoji: "😊", label: "Hạnh phúc", value: "happy" },
@@ -213,13 +210,14 @@ export const memories: Memory[] = [
     quote: "Giữa mây ngàn Hà Giang, ta thấy cả thế giới trong mắt nhau.",
     tags: ["Du lịch", "Thiên nhiên", "Lãng mạn"],
     rating: 5,
+    featured: true,
     participants: ["Anh", "Em"],
     photos: [
-      { id: "p1-1", url: "https://lh3.googleusercontent.com/aida-public/AB6AXuBmGZOIJuXayxaoC_cqksAufZucXAxKfjrb9dHF7o8_7uyqWp8IciWXR9_0xXW4agqWo7lYMfkTrvgQJJPLx9tlO6Hy1jN2sYIUDO-OMEobSCZelWyh3dovCIAtxiVjGWwGys3xobFJOuAET-jgLEQXz_wXZqM8jSA-5Vc1fq32oBGanOwDfolHsraiPEkULsaAvTC-Fl1UQfWoYINxx_cWqiz-Eh4-8NHqdCE0lnjj0TN4wqDIbWF8ylzGC334tfCwjt3rrZ5wryY", alt: "Đỉnh Mã Pì Lèng lúc bình minh", caption: "Bình minh trên đèo Mã Pì Lèng" },
-      { id: "p1-2", url: "https://lh3.googleusercontent.com/aida-public/AB6AXuCJNcOaeliKdddYfqSV91QB-vLYNEsjZTAPEp_J0jyVdyaQFjoxzht3z_syn2Mh42ZzsJdTy5JwKQrl7OcsoyLOfzBer2yfiRlks4pz9F2vs8YSvvKUJMMQHhZM8BQ3MLyifgM47uC1KyAcS8JOW6Vt1pZg3dsovzzoAdZvogtY5Ua1bvnTix_a8SPjL1h9HdE5YCiK_dw7DR9fSr1lrQPpWtK4WL535Ee9MwCa59iAD4OXj-h507zkVCSyFR3IaWxmFb6XR2lcZnM", alt: "Nắm tay nhau trên đường đèo", caption: "Cung đường tay áo" },
-      { id: "p1-3", url: "https://lh3.googleusercontent.com/aida-public/AB6AXuCGgMDnsbl1OY9wDM_CT5ioALzbuWAY2jvbtyOg12ksoGPNfwnuvhaQaVFbC8lF0QSEp8uFn0h1JV5Kf-1CHazDli1oCU1R3dQ-zZ17k_GBPJ3pjWB2sOA3aEXaR8IkOv5wQ6dY4c5umvBP6T3wjxeov9dD1YCdtAhLYIuSdrwYzxbS4vbBS0UGcCln1o83eFOZlM1a0Gc9oU1kywmgdz1-BckxrCDo3wSmmdPaPWVPMVha5-DBVx6mkWKzUZlvgacJUIsF3RKZPlA", alt: "Homestay view", caption: "View từ cửa sổ homestay" },
-      { id: "p1-4", url: "https://lh3.googleusercontent.com/aida-public/AB6AXuAL6PCxi6tjhK3tAdbYWmbnadHBXHPZ8aDM6p0Zn4e0x3Ui9S0KZFsej5WdiXnXBugZRdJ1kBmcF2FFeOZGl2ZYSCSVCOrcUG0qQ5E_Bim87gVkVICMKhl_w0m7mM2eCPkwjqXQpsCykGJamcNUzcyQGEH-pLfL1NVfOh4jLRgyhNLKt3UtMLVxpBArbr5zmJL_ifSlUOCu7BV4sRnST3-LyTI3O4fGz23jL1wAPLORDXYOimdFZ9rq5kjp5ZIPI-qUTS-nW2lGOAo", alt: "Sunset cocktail", caption: "Hoàng hôn trên cao nguyên đá" },
-      { id: "p1-5", url: "https://lh3.googleusercontent.com/aida-public/AB6AXuDDNQg16pjwGZmzRMg0mx7EyzXqx5T9bZ9OY44-vVoQlGpHfyMeQaWiwPLkS0iz4OcmQ7_hBL-8VFh-H8QmI_y0zhHsPGdmd6lp-s6xJWaPw5tFitMxX2SVv4KxjjANUySyhjZFLheuSmjgDlCqWvHExHxgHK-gk6rW7o4H5Qd9AQWaiAfnxidkVTJ3bxkNhiXGBLTSvieaM5wWVKt3Cn1xG3jSQyNZdqTlpUJ7cg6PYnO9FWaWxccmFRrLc_oQ_v4ikyoyIjZRy1I", alt: "Beach palm trees", caption: "Biển chiều Cát Bà" },
+      { id: "p1-1", url: "https://lh3.googleusercontent.com/aida-public/AB6AXuBmGZOIJuXayxaoC_cqksAufZucXAxKfjrb9dHF7o8_7uyqWp8IciWXR9_0xXW4agqWo7lYMfkTrvgQJJPLx9tlO6Hy1jN2sYIUDO-OMEobSCZelWyh3dovCIAtxiVjGWwGys3xobFJOuAET-jgLEQXz_wXZqM8jSA-5Vc1fq32oBGanOwDfolHsraiPEkULsaAvTC-Fl1UQfWoYINxx_cWqiz-Eh4-8NHqdCE0lnjj0TN4wqDIbWF8ylzGC334tfCwjt3rrZ5wryY", alt: "Đỉnh Mã Pì Lèng lúc bình minh", caption: "Bình minh trên đèo Mã Pì Lèng", width: 2400, height: 1600 },
+      { id: "p1-2", url: "https://lh3.googleusercontent.com/aida-public/AB6AXuCJNcOaeliKdddYfqSV91QB-vLYNEsjZTAPEp_J0jyVdyaQFjoxzht3z_syn2Mh42ZzsJdTy5JwKQrl7OcsoyLOfzBer2yfiRlks4pz9F2vs8YSvvKUJMMQHhZM8BQ3MLyifgM47uC1KyAcS8JOW6Vt1pZg3dsovzzoAdZvogtY5Ua1bvnTix_a8SPjL1h9HdE5YCiK_dw7DR9fSr1lrQPpWtK4WL535Ee9MwCa59iAD4OXj-h507zkVCSyFR3IaWxmFb6XR2lcZnM", alt: "Nắm tay nhau trên đường đèo", caption: "Cung đường tay áo", width: 1600, height: 2400 },
+      { id: "p1-3", url: "https://lh3.googleusercontent.com/aida-public/AB6AXuCGgMDnsbl1OY9wDM_CT5ioALzbuWAY2jvbtyOg12ksoGPNfwnuvhaQaVFbC8lF0QSEp8uFn0h1JV5Kf-1CHazDli1oCU1R3dQ-zZ17k_GBPJ3pjWB2sOA3aEXaR8IkOv5wQ6dY4c5umvBP6T3wjxeov9dD1YCdtAhLYIuSdrwYzxbS4vbBS0UGcCln1o83eFOZlM1a0Gc9oU1kywmgdz1-BckxrCDo3wSmmdPaPWVPMVha5-DBVx6mkWKzUZlvgacJUIsF3RKZPlA", alt: "Homestay view", caption: "View từ cửa sổ homestay", width: 2000, height: 1333 },
+      { id: "p1-4", url: "https://lh3.googleusercontent.com/aida-public/AB6AXuAL6PCxi6tjhK3tAdbYWmbnadHBXHPZ8aDM6p0Zn4e0x3Ui9S0KZFsej5WdiXnXBugZRdJ1kBmcF2FFeOZGl2ZYSCSVCOrcUG0qQ5E_Bim87gVkVICMKhl_w0m7mM2eCPkwjqXQpsCykGJamcNUzcyQGEH-pLfL1NVfOh4jLRgyhNLKt3UtMLVxpBArbr5zmJL_ifSlUOCu7BV4sRnST3-LyTI3O4fGz23jL1wAPLORDXYOimdFZ9rq5kjp5ZIPI-qUTS-nW2lGOAo", alt: "Sunset cocktail", caption: "Hoàng hôn trên cao nguyên đá", width: 1800, height: 1800 },
+      { id: "p1-5", url: "https://lh3.googleusercontent.com/aida-public/AB6AXuDDNQg16pjwGZmzRMg0mx7EyzXqx5T9bZ9OY44-vVoQlGpHfyMeQaWiwPLkS0iz4OcmQ7_hBL-8VFh-H8QmI_y0zhHsPGdmd6lp-s6xJWaPw5tFitMxX2SVv4KxjjANUySyhjZFLheuSmjgDlCqWvHExHxgHK-gk6rW7o4H5Qd9AQWaiAfnxidkVTJ3bxkNhiXGBLTSvieaM5wWVKt3Cn1xG3jSQyNZdqTlpUJ7cg6PYnO9FWaWxccmFRrLc_oQ_v4ikyoyIjZRy1I", alt: "Beach palm trees", caption: "Biển chiều Cát Bà", width: 2400, height: 1350 },
     ],
     moments: [
       { id: "m1-1", time: "06:00", content: "Xuất phát từ Hà Nội, lòng đầy háo hức cho chuyến đi đầu tiên lên cực Bắc.", icon: "directions_car" },
@@ -241,11 +239,12 @@ export const memories: Memory[] = [
     quote: "Mỗi ngọn đèn lồng là một điều ước cho chúng mình.",
     tags: ["Du lịch", "Phố cổ", "Lãng mạn"],
     rating: 5,
+    featured: true,
     participants: ["Anh", "Em"],
     photos: [
-      { id: "p2-1", url: "https://lh3.googleusercontent.com/aida-public/AB6AXuCgokIbzGBbwNPpFQYoLir7zjEuOPiI1knClUMCM6K3ZsJ864uWG5jgnuAyfvFCZjurBq5xJx5B-NNogE8a7P5bpgDHEiOvBQH-YDTnf_X5KSZKIaiKKlkAkKqj_na60suPI8nwZdrtNRrkKxoZe2pdARDewR0PXKzvyrofQEXeWJyyJWgwdDcCtxElgguZ0P9hcUkjfyPubngCrmwCKB10pcpWFxwzqv2aG0E51AejdL4S1XgBvW0w1DnrFhno1XomqmZBr9FusHI", alt: "Đèn lồng Hội An", caption: "Phố cổ về đêm" },
-      { id: "p2-2", url: "https://lh3.googleusercontent.com/aida-public/AB6AXuD7e5cuhG3OX1TfSHdu8RNDdnn4tVKgR5cb6QwcV9iUyTGUxqnI7XTp1v7jXr3CNPZa2aNE_ZJPy8bi_9KxMcjlQodsJG9Ba3UiWIk9GUtK6dYrtorR3RHaj5_KZC-e1UzBQw5JTjm29yQLDau2257auqO5N3Aw90Kqwttxxmj80Xh5BMlsPYi2Zzh79O3cfutK0h5v1iZu2eZvJP5-4PfPZghGOCNXP2VocWt3hD8KF4GbiDhV9PoJ31xh2YtLNEd1bkVidfLw3Gg", alt: "Hoàng hôn biển Cửa Đại", caption: "Cửa Đại hoàng hôn" },
-      { id: "p2-3", url: "https://lh3.googleusercontent.com/aida-public/AB6AXuBmGZOIJuXayxaoC_cqksAufZucXAxKfjrb9dHF7o8_7uyqWp8IciWXR9_0xXW4agqWo7lYMfkTrvgQJJPLx9tlO6Hy1jN2sYIUDO-OMEobSCZelWyh3dovCIAtxiVjGWwGys3xobFJOuAET-jgLEQXz_wXZqM8jSA-5Vc1fq32oBGanOwDfolHsraiPEkULsaAvTC-Fl1UQfWoYINxx_cWqiz-Eh4-8NHqdCE0lnjj0TN4wqDIbWF8ylzGC334tfCwjt3rrZ5wryY", alt: "Chùa Cầu", caption: "Chùa Cầu biểu tượng" },
+      { id: "p2-1", url: "https://lh3.googleusercontent.com/aida-public/AB6AXuCgokIbzGBbwNPpFQYoLir7zjEuOPiI1knClUMCM6K3ZsJ864uWG5jgnuAyfvFCZjurBq5xJx5B-NNogE8a7P5bpgDHEiOvBQH-YDTnf_X5KSZKIaiKKlkAkKqj_na60suPI8nwZdrtNRrkKxoZe2pdARDewR0PXKzvyrofQEXeWJyyJWgwdDcCtxElgguZ0P9hcUkjfyPubngCrmwCKB10pcpWFxwzqv2aG0E51AejdL4S1XgBvW0w1DnrFhno1XomqmZBr9FusHI", alt: "Đèn lồng Hội An", caption: "Phố cổ về đêm", width: 1400, height: 2100 },
+      { id: "p2-2", url: "https://lh3.googleusercontent.com/aida-public/AB6AXuD7e5cuhG3OX1TfSHdu8RNDdnn4tVKgR5cb6QwcV9iUyTGUxqnI7XTp1v7jXr3CNPZa2aNE_ZJPy8bi_9KxMcjlQodsJG9Ba3UiWIk9GUtK6dYrtorR3RHaj5_KZC-e1UzBQw5JTjm29yQLDau2257auqO5N3Aw90Kqwttxxmj80Xh5BMlsPYi2Zzh79O3cfutK0h5v1iZu2eZvJP5-4PfPZghGOCNXP2VocWt3hD8KF4GbiDhV9PoJ31xh2YtLNEd1bkVidfLw3Gg", alt: "Hoàng hôn biển Cửa Đại", caption: "Cửa Đại hoàng hôn", width: 2400, height: 1600 },
+      { id: "p2-3", url: "https://lh3.googleusercontent.com/aida-public/AB6AXuBmGZOIJuXayxaoC_cqksAufZucXAxKfjrb9dHF7o8_7uyqWp8IciWXR9_0xXW4agqWo7lYMfkTrvgQJJPLx9tlO6Hy1jN2sYIUDO-OMEobSCZelWyh3dovCIAtxiVjGWwGys3xobFJOuAET-jgLEQXz_wXZqM8jSA-5Vc1fq32oBGanOwDfolHsraiPEkULsaAvTC-Fl1UQfWoYINxx_cWqiz-Eh4-8NHqdCE0lnjj0TN4wqDIbWF8ylzGC334tfCwjt3rrZ5wryY", alt: "Chùa Cầu", caption: "Chùa Cầu biểu tượng", width: 1920, height: 1280 },
     ],
     moments: [
       { id: "m2-1", time: "09:00", content: "Bay đến Đà Nẵng, thuê xe máy chạy thẳng về Hội An. Gió biển mát lịm.", icon: "flight" },
@@ -269,8 +268,8 @@ export const memories: Memory[] = [
     rating: 4,
     participants: ["Anh", "Em"],
     photos: [
-      { id: "p3-1", url: "https://lh3.googleusercontent.com/aida-public/AB6AXuAL6PCxi6tjhK3tAdbYWmbnadHBXHPZ8aDM6p0Zn4e0x3Ui9S0KZFsej5WdiXnXBugZRdJ1kBmcF2FFeOZGl2ZYSCSVCOrcUG0qQ5E_Bim87gVkVICMKhl_w0m7mM2eCPkwjqXQpsCykGJamcNUzcyQGEH-pLfL1NVfOh4jLRgyhNLKt3UtMLVxpBArbr5zmJL_ifSlUOCu7BV4sRnST3-LyTI3O4fGz23jL1wAPLORDXYOimdFZ9rq5kjp5ZIPI-qUTS-nW2lGOAo", alt: "Cà phê sáng", caption: "Ly café quen thuộc" },
-      { id: "p3-2", url: "https://lh3.googleusercontent.com/aida-public/AB6AXuCJNcOaeliKdddYfqSV91QB-vLYNEsjZTAPEp_J0jyVdyaQFjoxzht3z_syn2Mh42ZzsJdTy5JwKQrl7OcsoyLOfzBer2yfiRlks4pz9F2vs8YSvvKUJMMQHhZM8BQ3MLyifgM47uC1KyAcS8JOW6Vt1pZg3dsovzzoAdZvogtY5Ua1bvnTix_a8SPjL1h9HdE5YCiK_dw7DR9fSr1lrQPpWtK4WL535Ee9MwCa59iAD4OXj-h507zkVCSyFR3IaWxmFb6XR2lcZnM", alt: "Góc quán nhỏ", caption: "Quán quen của hai đứa" },
+      { id: "p3-1", url: "https://lh3.googleusercontent.com/aida-public/AB6AXuAL6PCxi6tjhK3tAdbYWmbnadHBXHPZ8aDM6p0Zn4e0x3Ui9S0KZFsej5WdiXnXBugZRdJ1kBmcF2FFeOZGl2ZYSCSVCOrcUG0qQ5E_Bim87gVkVICMKhl_w0m7mM2eCPkwjqXQpsCykGJamcNUzcyQGEH-pLfL1NVfOh4jLRgyhNLKt3UtMLVxpBArbr5zmJL_ifSlUOCu7BV4sRnST3-LyTI3O4fGz23jL1wAPLORDXYOimdFZ9rq5kjp5ZIPI-qUTS-nW2lGOAo", alt: "Cà phê sáng", caption: "Ly café quen thuộc", width: 1600, height: 1600 },
+      { id: "p3-2", url: "https://lh3.googleusercontent.com/aida-public/AB6AXuCJNcOaeliKdddYfqSV91QB-vLYNEsjZTAPEp_J0jyVdyaQFjoxzht3z_syn2Mh42ZzsJdTy5JwKQrl7OcsoyLOfzBer2yfiRlks4pz9F2vs8YSvvKUJMMQHhZM8BQ3MLyifgM47uC1KyAcS8JOW6Vt1pZg3dsovzzoAdZvogtY5Ua1bvnTix_a8SPjL1h9HdE5YCiK_dw7DR9fSr1lrQPpWtK4WL535Ee9MwCa59iAD4OXj-h507zkVCSyFR3IaWxmFb6XR2lcZnM", alt: "Góc quán nhỏ", caption: "Quán quen của hai đứa", width: 2000, height: 1333 },
     ],
     moments: [
       { id: "m3-1", time: "08:00", content: "Thức dậy, anh pha cà phê cho cả hai. Mùi cà phê quyện với nắng sớm.", icon: "coffee" },
@@ -291,8 +290,8 @@ export const memories: Memory[] = [
     rating: 5,
     participants: ["Anh", "Em"],
     photos: [
-      { id: "p4-1", url: "https://lh3.googleusercontent.com/aida-public/AB6AXuBo1xa7EHgqwvYw5z03ddfiqBKSIthtnBZ2qzjbkEGQR_m3lFnnLeNibohRVFp04n_E5c-W8rQLLrGZrfc3phKNiO549iKrXCXFCTfeG-w3Z2bD1Hh7PpUX8oJLOJ2x6UPMKyVzcdYPg8UzHf0GGgYbQJP0rcU30ZCZDcz04LAuF09MjQhY-Ozqniz-hVgYFwLwn3x84LhoVWHiUO5QtmnGgB6IhD3DjLm8Psau_lS9GWj8WHisyETKdgquHKSGccCarSgvws4yrQc", alt: "Rừng thông", caption: "Bình minh rừng thông" },
-      { id: "p4-2", url: "https://lh3.googleusercontent.com/aida-public/AB6AXuBmGZOIJuXayxaoC_cqksAufZucXAxKfjrb9dHF7o8_7uyqWp8IciWXR9_0xXW4agqWo7lYMfkTrvgQJJPLx9tlO6Hy1jN2sYIUDO-OMEobSCZelWyh3dovCIAtxiVjGWwGys3xobFJOuAET-jgLEQXz_wXZqM8jSA-5Vc1fq32oBGanOwDfolHsraiPEkULsaAvTC-Fl1UQfWoYINxx_cWqiz-Eh4-8NHqdCE0lnjj0TN4wqDIbWF8ylzGC334tfCwjt3rrZ5wryY", alt: "Hồ Tuyền Lâm", caption: "Hồ Tuyền Lâm êm đềm" }
+      { id: "p4-1", url: "https://lh3.googleusercontent.com/aida-public/AB6AXuBo1xa7EHgqwvYw5z03ddfiqBKSIthtnBZ2qzjbkEGQR_m3lFnnLeNibohRVFp04n_E5c-W8rQLLrGZrfc3phKNiO549iKrXCXFCTfeG-w3Z2bD1Hh7PpUX8oJLOJ2x6UPMKyVzcdYPg8UzHf0GGgYbQJP0rcU30ZCZDcz04LAuF09MjQhY-Ozqniz-hVgYFwLwn3x84LhoVWHiUO5QtmnGgB6IhD3DjLm8Psau_lS9GWj8WHisyETKdgquHKSGccCarSgvws4yrQc", alt: "Rừng thông", caption: "Bình minh rừng thông", width: 1500, height: 2000 },
+      { id: "p4-2", url: "https://lh3.googleusercontent.com/aida-public/AB6AXuBmGZOIJuXayxaoC_cqksAufZucXAxKfjrb9dHF7o8_7uyqWp8IciWXR9_0xXW4agqWo7lYMfkTrvgQJJPLx9tlO6Hy1jN2sYIUDO-OMEobSCZelWyh3dovCIAtxiVjGWwGys3xobFJOuAET-jgLEQXz_wXZqM8jSA-5Vc1fq32oBGanOwDfolHsraiPEkULsaAvTC-Fl1UQfWoYINxx_cWqiz-Eh4-8NHqdCE0lnjj0TN4wqDIbWF8ylzGC334tfCwjt3rrZ5wryY", alt: "Hồ Tuyền Lâm", caption: "Hồ Tuyền Lâm êm đềm", width: 2400, height: 1500 }
     ],
     moments: [
       { id: "m4-1", time: "05:30", content: "Dậy sớm săn mây ở đồi Đa Phú.", icon: "cloud" },
@@ -312,7 +311,7 @@ export const memories: Memory[] = [
     rating: 4,
     participants: ["Anh", "Em"],
     photos: [
-      { id: "p5-1", url: "https://lh3.googleusercontent.com/aida-public/AB6AXuAB28tTLNTsC-54Q88lQ1-p3iUTQS_px3WaE8veFLiJT_Fc6jKe8wyQInuujnYyi0LRdGL0HAQmQWaoLK2bzWUCLb99aFvrGppCY-WYT3MvemtXd5-Qa4w1MaHlZthvvOOSiqqToY3NZrWOOWrn2Y9PtQaIoKj-61uGeqQvFsYYMNK-ppvp6rCH2iRphBJn9cQ9MkLaSfs38lz1gziBg6MFm5a32Z9d8Ct-9uI14ZeBz3pqfLzn78VSa1Dx89MC3oDM7qLMj0N7V-w", alt: "Đồi chè", caption: "Đồi chè trái tim" }
+      { id: "p5-1", url: "https://lh3.googleusercontent.com/aida-public/AB6AXuAB28tTLNTsC-54Q88lQ1-p3iUTQS_px3WaE8veFLiJT_Fc6jKe8wyQInuujnYyi0LRdGL0HAQmQWaoLK2bzWUCLb99aFvrGppCY-WYT3MvemtXd5-Qa4w1MaHlZthvvOOSiqqToY3NZrWOOWrn2Y9PtQaIoKj-61uGeqQvFsYYMNK-ppvp6rCH2iRphBJn9cQ9MkLaSfs38lz1gziBg6MFm5a32Z9d8Ct-9uI14ZeBz3pqfLzn78VSa1Dx89MC3oDM7qLMj0N7V-w", alt: "Đồi chè", caption: "Đồi chè trái tim", width: 2400, height: 1600 }
     ],
     moments: [
       { id: "m5-1", time: "10:00", content: "Lạc giữa rừng mận lấp ló trong sương.", icon: "filter_hdr" }
@@ -342,72 +341,6 @@ export const memoryCategoryLabels: Record<MemoryCategory, string> = {
   daily: "Hằng ngày",
   romantic: "Lãng mạn",
 };
-
-export const memoryCategoryIcons: Record<MemoryCategory, string> = {
-  travel: "flight",
-  daily: "coffee",
-  romantic: "favorite",
-};
-
-
-
-// DATE PLANS
-export const datePlans: DatePlan[] = [
-  {
-    id: "dp-1",
-    title: "Xem phim và ăn tối",
-    date: "2026-05-25",
-    location: "Vincom Đồng Khởi",
-    status: "upcoming",
-  },
-  {
-    id: "dp-2",
-    title: "Dạo phố đêm Bến Nghé",
-    date: "2026-05-18",
-    location: "Quận 1, TP.HCM",
-    status: "completed",
-    rating: 5,
-    emotionAfter: "love",
-  },
-  {
-    id: "dp-3",
-    title: "Picnic công viên 23/9",
-    date: "2026-06-01",
-    location: "Công viên 23/9",
-    status: "pending",
-  },
-];
-
-// SAVING GOALS
-export const savingGoals: SavingGoal[] = [
-  {
-    id: "sg-1",
-    title: "Du lịch Nhật Bản",
-    targetAmount: 50000000,
-    currentAmount: 32000000,
-    deadline: "2026-12-01",
-    priority: "high",
-    emoji: "🇯🇵",
-  },
-  {
-    id: "sg-2",
-    title: "Mua xe mới",
-    targetAmount: 120000000,
-    currentAmount: 45000000,
-    deadline: "2027-06-01",
-    priority: "medium",
-    emoji: "🚗",
-  },
-  {
-    id: "sg-3",
-    title: "Sắm đồ cho nhà mới",
-    targetAmount: 30000000,
-    currentAmount: 28500000,
-    deadline: "2026-08-01",
-    priority: "low",
-    emoji: "🏠",
-  },
-];
 
 // NAV ITEMS
 export const navItems = [

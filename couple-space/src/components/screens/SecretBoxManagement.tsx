@@ -15,7 +15,9 @@ interface SecretBoxManagementProps {
   readonly onUnlockSuccess?: () => void;
 }
 
-export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> = ({ onUnlockSuccess }) => {
+export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> = ({
+  onUnlockSuccess,
+}) => {
   const [mounted, setMounted] = useState(false);
   const [localNotes, setLocalNotes] = useState(secretNotes);
   const [search, setSearch] = useState("");
@@ -37,16 +39,12 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
     countdown.minutes === 0 &&
     countdown.seconds === 0;
 
-  // Live countdown
   useEffect(() => {
     setMounted(true);
     const timer = setInterval(() => {
       setCountdown((prev) => {
         let { days, hours, minutes, seconds } = prev;
-        // Stop at zero
-        if (days === 0 && hours === 0 && minutes === 0 && seconds === 0) {
-          return prev;
-        }
+        if (days === 0 && hours === 0 && minutes === 0 && seconds === 0) return prev;
         if (seconds > 0) {
           seconds--;
         } else {
@@ -73,7 +71,6 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
   const unlockedNotes = localNotes.filter(
     (n) => !n.isLocked && n.title.toLowerCase().includes(search.toLowerCase())
   );
-
   const hasNotes = localNotes.length > 0;
 
   const handleUnlockSave = () => {
@@ -81,7 +78,8 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
     const newUnlockedNote = {
       id: `sn-new-${Date.now()}`,
       title: "Những điều anh chưa nói (Vừa mở)",
-      previewText: "Gửi em, khi em đọc được những dòng này, có lẽ chúng ta đã cùng nhau đi qua thêm một chặng đường dài...",
+      previewText:
+        "Gửi em, khi em đọc được những dòng này, có lẽ chúng ta đã cùng nhau đi qua thêm một chặng đường dài...",
       unlockDate: "Hôm nay",
       isLocked: false,
       icon: "sentiment_very_satisfied" as const,
@@ -93,16 +91,35 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
     setSelectedNote(newUnlockedNote);
   };
 
+  const pageHeader = (
+    <header className="mb-stack-lg flex items-center justify-between gap-4">
+      <div className="min-w-0">
+        <p className="font-headline text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-primary -rotate-2">
+          Duyên · Secret Locked Notes
+        </p>
+        <h2 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-ink-primary -rotate-[0.6deg]">
+          Hộp bí mật
+        </h2>
+        <p className="font-body-md text-body-md mt-2 max-w-[52ch] text-primary">
+          Gửi gắm những điều chưa nói cho tương lai của chúng ta.
+        </p>
+      </div>
+      <div className="flex flex-none items-center gap-2">
+        <button className="btn btn-icon" aria-label="Thông báo">
+          <span className="material-symbols-outlined">notifications</span>
+        </button>
+        <button className="btn btn-icon" aria-label="Yêu thích">
+          <span className="material-symbols-outlined">favorite</span>
+        </button>
+      </div>
+    </header>
+  );
+
   if (!mounted) {
     return (
-      <div className="min-h-screen bg-background-main font-body-md text-ink-primary overflow-x-hidden">
-        <div className="md:ml-64 min-h-screen px-margin-mobile md:px-margin-desktop py-10 pb-24 md:pb-10 flex-1">
-          <header className="flex justify-between items-center mb-stack-lg">
-            <div>
-              <h2 className="text-headline-md font-headline-md text-ink-primary">Secret Capsule Management</h2>
-              <p className="text-body-sm font-body-sm text-primary">Gửi gắm những điều chưa nói cho tương lai của chúng ta.</p>
-            </div>
-          </header>
+      <div className="min-h-screen overflow-x-hidden font-body-md text-ink-primary">
+        <div className="min-h-screen flex-1 px-margin-mobile py-10 pb-32 md:px-margin-desktop lg:ml-64 lg:pb-10">
+          {pageHeader}
         </div>
       </div>
     );
@@ -111,50 +128,32 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
   const pad = (n: number) => String(n).padStart(2, "0");
 
   return (
-    <div className="min-h-screen bg-background-main font-body-md text-ink-primary overflow-x-hidden">
-      {/* Main Content */}
-      <main className="md:ml-64 min-h-screen px-margin-mobile md:px-margin-desktop py-10 pb-24 md:pb-10 flex-1">
-
-        {/* Header Actions */}
-        <header className="flex justify-between items-center mb-stack-lg">
-          <div>
-            <h2 className="text-headline-md font-headline-md text-ink-primary">Secret Capsule Management</h2>
-            <p className="text-body-sm font-body-sm text-primary">Gửi gắm những điều chưa nói cho tương lai của chúng ta.</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <button
-              className="material-symbols-outlined p-2 text-primary hover:bg-white/30 rounded-full transition-colors"
-              aria-label="Thông báo"
-            >
-              notifications
-            </button>
-            <button
-              className="material-symbols-outlined p-2 text-primary hover:bg-white/30 rounded-full transition-colors"
-              aria-label="Yêu thích"
-            >
-              favorite
-            </button>
-          </div>
-        </header>
+    <div className="min-h-screen overflow-x-hidden font-body-md text-ink-primary">
+      {/* NOTE: offset is lg:ml-64 to match NavBar's `lg:flex` sidebar.
+          It was md:ml-64 before, which shifted content at md with no
+          sidebar actually present. */}
+      <main className="min-h-screen flex-1 px-margin-mobile py-10 pb-32 md:px-margin-desktop lg:ml-64 lg:pb-10">
+        {pageHeader}
 
         {hasNotes ? (
           <>
             {/* ── Hero: Featured Locked Capsule ── */}
-            <section
-              className="bg-ink-primary rounded-[2rem] p-8 mb-stack-lg relative overflow-hidden"
-              style={{ boxShadow: "0 4px 15px rgba(37,53,88,0.08)" }}
-            >
-              {/* Decorative glow */}
-              <div className="absolute top-0 right-0 w-full h-1/3 md:w-1/3 md:h-full bg-surface-accent/10 blur-[100px] pointer-events-none" />
-
-              <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-center relative">
-                {/* Lock Icon side */}
-                <div className="w-full md:w-2/5 flex flex-col items-center">
-                  <div
+            <section className="card card-ink card-flat mb-stack-lg p-8">
+              <div className="relative flex flex-col items-center gap-8 md:flex-row md:gap-12">
+                {/* Lock */}
+                <div className="flex w-full flex-col items-center md:w-2/5">
+                  <button
                     onClick={() => setIsPasswordPopupOpen(true)}
-                    className="relative group cursor-pointer">
-                    <div className={`absolute inset-0 rounded-full blur-2xl group-hover:blur-3xl transition-all duration-700 ${isCountdownDone ? "bg-emerald-400/30" : "bg-surface-accent/20"}`} />
-                    <div className={`w-48 h-48 md:w-64 md:h-64 rounded-full flex items-center justify-center backdrop-blur-md border relative transition-all duration-500 hover:scale-105 ${isCountdownDone ? "bg-emerald-500/10 border-emerald-400/30" : "bg-white/5 border-white/10"}`}>
+                    className="group relative"
+                    aria-label="Mở khóa hộp bí mật"
+                  >
+                    <span
+                      className={`flex h-48 w-48 items-center justify-center rounded-full border-[2.6px] transition-all duration-500 hover:scale-105 md:h-64 md:w-64 ${
+                        isCountdownDone
+                          ? "border-mint bg-mint/15"
+                          : "border-surface-accent bg-paper/10"
+                      }`}
+                    >
                       <AnimatePresence mode="wait">
                         {isCountdownDone ? (
                           <motion.span
@@ -162,7 +161,7 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
                             initial={{ scale: 0, rotate: -180, opacity: 0 }}
                             animate={{ scale: 1, rotate: 0, opacity: 1 }}
                             transition={{ type: "spring", damping: 12, stiffness: 200 }}
-                            className="material-symbols-outlined text-emerald-400"
+                            className="material-symbols-outlined text-mint"
                             style={{ fontSize: "100px", fontVariationSettings: "'FILL' 1" }}
                             suppressHydrationWarning
                           >
@@ -181,8 +180,9 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
                           </motion.span>
                         )}
                       </AnimatePresence>
-                    </div>
-                  </div>
+                    </span>
+                  </button>
+
                   <div className="mt-8 text-center">
                     <AnimatePresence mode="wait">
                       {isCountdownDone ? (
@@ -190,7 +190,7 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
                           key="badge-open"
                           initial={{ opacity: 0, y: 8 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="inline-block px-4 py-1.5 rounded-full bg-emerald-400/20 border border-emerald-400/30 text-emerald-300 text-label-md font-label-md uppercase tracking-widest"
+                          className="chip border-mint bg-mint/20 text-paper"
                         >
                           Đã mở khóa ✨
                         </motion.span>
@@ -198,7 +198,7 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
                         <motion.span
                           key="badge-locked"
                           exit={{ opacity: 0, y: -8 }}
-                          className="inline-block px-4 py-1.5 rounded-full bg-surface-accent/20 border border-surface-accent/30 text-surface-accent text-label-md font-label-md uppercase tracking-widest"
+                          className="chip chip-accent"
                         >
                           Đang khóa
                         </motion.span>
@@ -207,40 +207,54 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
                   </div>
                 </div>
 
-                {/* Info side */}
+                {/* Info */}
                 <div className="w-full md:w-3/5">
-                  <h3 className="text-headline-lg font-headline-lg text-white mb-4">{featuredCapsule.title}</h3>
-                  <p className="text-body-lg font-body-lg text-white mb-8 max-w-lg">
+                  <h3 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-4 text-paper -rotate-[0.6deg]">
+                    {featuredCapsule.title}
+                  </h3>
+                  <p className="font-body-lg text-body-lg mb-8 max-w-lg text-primary-fixed">
                     {featuredCapsule.description}
                   </p>
 
-                  {/* Countdown */}
-                  <div className="flex items-center justify-center md:justify-start gap-2 sm:gap-3 mb-10 flex-wrap sm:flex-nowrap">
+                  {/* Countdown — each unit is a stamped tile */}
+                  <div className="mb-10 flex flex-wrap items-center justify-center gap-2 sm:flex-nowrap sm:gap-3 md:justify-start">
                     {[
                       { label: "Ngày", value: pad(countdown.days) },
                       { label: "Giờ", value: pad(countdown.hours) },
                       { label: "Phút", value: pad(countdown.minutes) },
                       { label: "Giây", value: pad(countdown.seconds) },
                     ].map(({ label, value }, idx) => (
-                      <div key={label} className="flex items-center gap-2 sm:gap-3 shrink-0">
+                      <div key={label} className="flex shrink-0 items-center gap-2 sm:gap-3">
                         <div
-                          className={`rounded-xl sm:rounded-2xl px-3 py-2 sm:px-5 sm:py-3 text-center border transition-colors duration-300 min-w-[52px] sm:min-w-[72px] ${isCountdownDone
-                            ? "bg-emerald-500/15 border-emerald-400/20"
-                            : "bg-white/10 border-white/5"
-                            }`}
+                          className={`min-w-[52px] rounded-[var(--radius-wobble-sm)] border-[2.2px] px-3 py-2 text-center transition-colors duration-300 sm:min-w-[72px] sm:px-5 sm:py-3 ${
+                            isCountdownDone
+                              ? "border-mint bg-mint/15"
+                              : "border-paper/40 bg-paper/10"
+                          } ${idx % 2 ? "rotate-[1deg]" : "-rotate-[1.2deg]"}`}
                         >
-                          <span className={`block text-lg sm:text-headline-md font-headline-md tabular-nums leading-tight transition-colors duration-300 ${isCountdownDone ? "text-emerald-300" : "text-white"
-                            }`}>
+                          <span
+                            className={`font-headline block text-lg font-bold leading-tight tabular-nums sm:text-2xl ${
+                              isCountdownDone ? "text-mint" : "text-paper"
+                            }`}
+                          >
                             {value}
                           </span>
-                          <span className={`text-[10px] sm:text-label-sm font-label-sm transition-colors duration-300 ${isCountdownDone ? "text-emerald-300/70" : "text-white"
-                            }`}>
+                          <span
+                            className={`font-headline text-[0.54rem] font-semibold uppercase tracking-[0.2em] ${
+                              isCountdownDone ? "text-mint/80" : "text-primary-fixed"
+                            }`}
+                          >
                             {label}
                           </span>
                         </div>
                         {idx < 3 && (
-                          <span className={`text-lg sm:text-xl font-bold transition-colors duration-300 ${isCountdownDone ? "text-emerald-400/50" : "text-white/30"
-                            }`}>:</span>
+                          <span
+                            className={`font-headline text-lg font-bold sm:text-xl ${
+                              isCountdownDone ? "text-mint/50" : "text-paper/40"
+                            }`}
+                          >
+                            :
+                          </span>
                         )}
                       </div>
                     ))}
@@ -248,7 +262,7 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
 
                   <button
                     onClick={() => setIsCreatePopupOpen(true)}
-                    className="w-full md:w-auto justify-center bg-surface-accent text-on-secondary-container px-8 py-4 rounded-xl font-headline-sm flex items-center gap-3 transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-surface-accent/20"
+                    className="btn btn-accent w-full px-8 py-4 md:w-auto"
                   >
                     <span className="material-symbols-outlined">add_circle</span>
                     Gửi thêm bí mật
@@ -260,58 +274,59 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
             {/* ── Pending / Waiting to Unlock ── */}
             {lockedNotes.length > 0 && (
               <section className="mb-stack-lg">
-                <h3 className="text-headline-sm font-headline-sm text-ink-primary mb-4 flex items-center gap-2">
+                <h3 className="font-headline-sm text-headline-sm mb-4 flex items-center gap-2 text-ink-primary">
                   <span className="material-symbols-outlined text-primary">schedule</span>
                   Đang chờ mở khóa
                 </h3>
-                <div
-                  className="flex gap-4 overflow-x-auto pb-4 md:grid md:grid-cols-2 lg:grid-cols-3 md:overflow-visible"
-                  style={{ scrollbarWidth: "none" }}
-                >
-                  {lockedNotes.map((note) => (
-                    <div
+                <div className="flex gap-4 overflow-x-auto pb-4 [scrollbar-width:none] md:grid md:grid-cols-2 md:overflow-visible lg:grid-cols-3">
+                  {lockedNotes.map((note, i) => (
+                    <button
                       key={note.id}
                       onClick={() => setEditingLockedNote(note)}
-                      className="min-w-[280px] bg-white/40 backdrop-blur-sm p-5 rounded-2xl border border-white/20 flex flex-col gap-3 cursor-pointer hover:-translate-y-1 transition-transform duration-300"
-                      style={{ boxShadow: "0 4px 15px rgba(37,53,88,0.08)" }}
+                      className={`card flex min-w-[280px] flex-col gap-3 p-5 text-left transition-transform duration-300 hover:-translate-y-1 ${
+                        i % 2 ? "card-tilt-r" : ""
+                      }`}
                     >
-                      <div className="flex justify-between items-start">
-                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                          <span className="material-symbols-outlined text-primary text-xl">
+                      <div className="flex items-start justify-between gap-3">
+                        <span className="flex h-10 w-10 flex-none items-center justify-center rounded-[var(--radius-wobble-sm)] border-[2.2px] border-ink-primary bg-background-main">
+                          <span className="material-symbols-outlined text-xl text-ink-primary">
                             {note.icon ?? "lock"}
                           </span>
-                        </div>
-                        <span className="text-label-sm font-label-sm text-primary bg-white/60 px-2 py-1 rounded-lg">
-                          {note.unlockDate}
                         </span>
+                        <span className="chip chip-soft">{note.unlockDate}</span>
                       </div>
-                      <div>
-                        <h4 className="font-headline-sm text-body-md">{note.title}</h4>
-                        <p className="text-body-sm text-primary/70 line-clamp-1">{note.previewText}</p>
+                      <div className="min-w-0">
+                        <h4 className="font-headline-sm text-headline-sm text-ink-primary">
+                          {note.title}
+                        </h4>
+                        <p className="font-body-sm text-body-sm line-clamp-1 text-primary">
+                          {note.previewText}
+                        </p>
                       </div>
-                    </div>
+                    </button>
                   ))}
                 </div>
               </section>
             )}
 
-            {/* ── Search & Filter ── */}
-            <section className="flex flex-col md:flex-row justify-between items-center gap-4 mb-stack-md bg-white/10 p-4 rounded-2xl border border-white/20">
+            {/* ── Search & Sort ── */}
+            <section className="sheet mb-stack-md flex flex-col items-center justify-between gap-4 p-4 md:flex-row">
               <div className="relative w-full md:w-96">
-                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary">
+                <span className="material-symbols-outlined pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-primary">
                   search
                 </span>
                 <input
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full bg-white/80 border-none rounded-xl pl-12 pr-4 py-3 focus:ring-2 focus:ring-surface-accent transition-all text-body-md placeholder:text-primary/40"
+                  className="field pl-12"
                   placeholder="Tìm kiếm kỷ niệm..."
+                  aria-label="Tìm kiếm kỷ niệm"
                 />
               </div>
               <div className="flex items-center gap-3 self-end md:self-auto">
-                <span className="text-label-md font-label-md text-primary">Sắp xếp:</span>
-                <select className="bg-white/80 border-none rounded-xl px-4 py-3 text-label-md font-label-md text-ink-primary focus:ring-2 focus:ring-surface-accent">
+                <span className="font-label-md text-label-md text-primary">Sắp xếp:</span>
+                <select className="field w-auto" aria-label="Sắp xếp">
                   <option>Mới nhất</option>
                   <option>Cũ nhất</option>
                   <option>A - Z</option>
@@ -319,89 +334,76 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
               </div>
             </section>
 
-            {/* ── Unlocked Memories (Masonry Grid) ── */}
+            {/* ── Unlocked Memories (Masonry) ── */}
             <section className="mb-stack-lg">
-              <h3 className="text-headline-sm font-headline-sm text-ink-primary mb-6 flex items-center gap-2">
+              <h3 className="font-headline-sm text-headline-sm mb-6 flex items-center gap-2 text-ink-primary">
                 <span className="material-symbols-outlined text-primary">auto_awesome</span>
                 Kỷ niệm đã mở
               </h3>
+
               <div className="masonry-grid">
-                {unlockedNotes.map((note) => (
-                  <div
+                {unlockedNotes.map((note, i) => (
+                  <button
                     key={note.id}
                     onClick={() => setSelectedNote(note)}
-                    className="masonry-item bg-surface-text-container rounded-2xl overflow-hidden hover:-translate-y-1 transition-transform duration-300 cursor-pointer"
-                    style={{ boxShadow: "0 4px 15px rgba(37,53,88,0.08)" }}
+                    className={`masonry-item card block w-full overflow-hidden text-left transition-transform duration-300 hover:-translate-y-1 ${
+                      i % 2 ? "card-tilt-r" : ""
+                    }`}
                   >
-                    {/* Cover image — tall variant for sn-6, standard h-48 for others */}
-                    {note.coverImage && note.id === "sn-6" && (
-                      <div className="h-64 w-full relative">
+                    {/* Cover */}
+                    {note.coverImage && (
+                      <div className="relative w-full">
                         <img
                           src={note.coverImage}
                           alt={note.coverImageAlt ?? note.title}
-                          className="w-full h-full object-cover"
+                          className={`w-full object-cover ${
+                            note.id === "sn-6" ? "h-64" : "h-48"
+                          }`}
                         />
-                        <div className="absolute bottom-4 right-4 bg-ink-primary/80 backdrop-blur-sm px-3 py-1 rounded-lg">
-                          <p className="text-label-sm font-label-sm text-white">{note.unlockDate}</p>
-                        </div>
-                      </div>
-                    )}
-                    {note.coverImage && note.id !== "sn-6" && (
-                      <div className="h-48 w-full relative">
-                        <img
-                          src={note.coverImage}
-                          alt={note.coverImageAlt ?? note.title}
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-lg">
-                          <p className="text-label-sm font-label-sm text-ink-primary">{note.unlockDate}</p>
-                        </div>
+                        <span
+                          className={`chip absolute ${
+                            note.id === "sn-6" ? "bottom-4 right-4" : "left-4 top-4"
+                          }`}
+                        >
+                          {note.unlockDate}
+                        </span>
                       </div>
                     )}
 
-                    {/* Text-only with icon badge */}
-                    {note.isTextOnly && note.icon && (
-                      <div className="p-6 pb-0">
-                        <div className="flex items-center gap-3 mb-4">
-                          <div className="w-8 h-8 rounded-full bg-surface-accent flex items-center justify-center">
-                            <span className="material-symbols-outlined text-white text-sm">{note.icon}</span>
-                          </div>
-                          <p className="text-label-sm font-label-sm text-primary/60">{note.unlockDate}</p>
-                        </div>
+                    {/* Text-only header */}
+                    {note.isTextOnly && (
+                      <div className="flex items-center justify-between gap-3 px-6 pt-6">
+                        <span className="flex h-10 w-10 flex-none items-center justify-center rounded-[var(--radius-wobble-sm)] border-[2.2px] border-ink-primary bg-surface-accent">
+                          <span className="material-symbols-outlined text-base text-ink-primary">
+                            {note.icon ?? "history_edu"}
+                          </span>
+                        </span>
+                        <span className="chip chip-soft">{note.unlockDate}</span>
                       </div>
                     )}
 
-                    {/* Text-only without icon */}
-                    {note.isTextOnly && !note.icon && (
-                      <div className="p-6 pb-0">
-                        <div className="mb-4 flex justify-between items-start">
-                          <div className="bg-surface-accent/20 p-2 rounded-lg">
-                            <span className="material-symbols-outlined text-surface-accent">history_edu</span>
-                          </div>
-                          <p className="text-label-sm font-label-sm text-primary/60">{note.unlockDate}</p>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* No image and no explicit icon (gradient placeholder) */}
+                    {/* Placeholder */}
                     {!note.coverImage && !note.isTextOnly && (
-                      <div className="h-40 w-full bg-gradient-to-br from-surface-accent/20 to-primary/10 flex items-center justify-center">
-                        <span className="material-symbols-outlined text-6xl text-primary/20">auto_stories</span>
+                      <div className="flex h-40 w-full items-center justify-center bg-gradient-to-br from-surface-accent/40 to-background-main/40">
+                        <span className="material-symbols-outlined text-6xl text-primary/40">
+                          auto_stories
+                        </span>
                       </div>
                     )}
 
-                    {/* Card body */}
+                    {/* Body */}
                     <div className="p-6">
-                      <h4 className="text-headline-sm font-headline-sm mb-2">{note.title}</h4>
-                      <p className="text-body-sm text-primary/80 line-clamp-3">{note.previewText}</p>
+                      <h4 className="font-headline-sm text-headline-sm mb-2 text-ink-primary">
+                        {note.title}
+                      </h4>
+                      <div className="ruled">
+                        <p className="line-clamp-3 text-ink-primary">{note.previewText}</p>
+                      </div>
 
                       {note.tags && note.tags.length > 0 && (
-                        <div className="mt-6 flex gap-2 flex-wrap">
+                        <div className="mt-5 flex flex-wrap gap-2">
                           {note.tags.map((tag) => (
-                            <span
-                              key={tag}
-                              className="bg-primary/5 text-primary text-[10px] px-2 py-1 rounded-full"
-                            >
+                            <span key={tag} className="chip chip-blue">
                               {tag}
                             </span>
                           ))}
@@ -409,123 +411,123 @@ export const SecretBoxManagement: React.FC<Readonly<SecretBoxManagementProps>> =
                       )}
 
                       {note.coverImage && !note.id.includes("sn-6") && (
-                        <div className="mt-4 flex items-center gap-2 text-surface-accent">
-                          <span className="material-symbols-outlined text-sm">visibility</span>
-                          <span className="text-label-sm font-label-sm">Xem chi tiết</span>
-                        </div>
+                        <>
+                          <hr className="rule my-4" />
+                          <span className="font-label-sm text-label-sm flex items-center gap-2 text-primary">
+                            <span className="material-symbols-outlined text-base">visibility</span>
+                            Xem chi tiết
+                          </span>
+                        </>
                       )}
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             </section>
           </>
         ) : (
-          /* Empty State */
+          /* ── Empty State ── */
           <section className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-48 h-48 bg-white/20 rounded-full flex items-center justify-center mb-8">
-              <span className="material-symbols-outlined text-primary text-6xl opacity-40">auto_stories</span>
+            <div className="card-dashed mb-8 flex h-48 w-48 items-center justify-center rounded-full">
+              <span className="material-symbols-outlined text-6xl text-primary/50">
+                auto_stories
+              </span>
             </div>
-            <h3 className="text-headline-md font-headline-md text-ink-primary mb-3">Chưa có điều bí mật nào</h3>
-            <p className="text-body-lg font-body-lg text-on-primary-container max-w-md mx-auto mb-10">
-              Hãy bắt đầu viết xuống những tâm tư, lời nhắn nhủ hay những kỷ niệm sắp tới để gửi cho nhau trong tương lai.
+            <h3 className="font-headline-md text-headline-md mb-3 text-ink-primary -rotate-[0.5deg]">
+              Chưa có điều bí mật nào
+            </h3>
+            <p className="font-body-lg text-body-lg mx-auto mb-10 max-w-md text-primary">
+              Hãy bắt đầu viết xuống những tâm tư, lời nhắn nhủ hay những kỷ niệm sắp tới để gửi cho
+              nhau trong tương lai.
             </p>
-            <button className="bg-secondary-container text-on-secondary-container px-10 py-4 rounded-xl font-label-md shadow-lg hover:scale-105 transition-transform">
+            <button onClick={() => setIsCreatePopupOpen(true)} className="btn btn-accent px-10 py-4">
+              <span className="material-symbols-outlined">add_circle</span>
               Tạo hộp thư đầu tiên
             </button>
           </section>
         )}
       </main>
 
-      {/* Synchronized Sidebar */}
       <NavBar activeHref="/secrets" />
 
-      {/* Masonry CSS + custom styles */}
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          .masonry-grid {
-            column-count: 1;
-            column-gap: 1.5rem;
-          }
-          @media (min-width: 768px) { .masonry-grid { column-count: 2; } }
-          @media (min-width: 1024px) { .masonry-grid { column-count: 3; } }
-          .masonry-item {
-            break-inside: avoid;
-            margin-bottom: 1.5rem;
-          }
-        `
-      }} />
+      {/* ---------- Overlays ---------- */}
+      <AnimatePresence>
+        {isCreatePopupOpen && (
+          <CreateSecretBoxPopup
+            onClose={() => setIsCreatePopupOpen(false)}
+            onSuccess={(data) => {
+              setIsCreatePopupOpen(false);
+              const parts = data.unlockDate ? data.unlockDate.split("-") : [];
+              const formattedDate =
+                parts.length === 3 ? `${parts[2]}.${parts[1]}.${parts[0]}` : "Hôm nay";
+              const newNote = {
+                id: `sn-new-${Date.now()}`,
+                title: data.title,
+                previewText: data.content,
+                unlockDate: formattedDate,
+                isLocked: true,
+                icon: "lock_clock",
+                tags: ["Mới", "Đang khóa"],
+                progressPercent: 20,
+                category: "Tình cảm",
+              };
+              setLocalNotes([newNote, ...localNotes]);
+            }}
+          />
+        )}
+      </AnimatePresence>
 
-      {isCreatePopupOpen && (
-        <CreateSecretBoxPopup
-          onClose={() => setIsCreatePopupOpen(false)}
-          onSuccess={(data) => {
-            setIsCreatePopupOpen(false);
-            const parts = data.unlockDate ? data.unlockDate.split("-") : [];
-            const formattedDate = parts.length === 3 ? `${parts[2]}.${parts[1]}.${parts[0]}` : "Hôm nay";
-            const newNote = {
-              id: `sn-new-${Date.now()}`,
-              title: data.title,
-              previewText: data.content,
-              unlockDate: formattedDate,
-              isLocked: true,
-              icon: "lock_clock",
-              tags: ["Mới", "Đang khóa"],
-              progressPercent: 20,
-              category: "Tình cảm",
-            };
-            setLocalNotes([newNote, ...localNotes]);
-          }}
-        />
-      )}
-
-      {isPasswordPopupOpen && (
-        <Portal>
+      <AnimatePresence>
+        {isPasswordPopupOpen && (
           <SecretBoxPasswordPopup
             noteTitle={featuredCapsule.title}
             onClose={() => setIsPasswordPopupOpen(false)}
             onSuccess={() => {
               setIsPasswordPopupOpen(false);
               setIsUnlockSuccessOpen(true);
-              if (onUnlockSuccess) {
-                onUnlockSuccess();
-              }
+              onUnlockSuccess?.();
             }}
           />
-        </Portal>
-      )}
+        )}
+      </AnimatePresence>
 
       {isUnlockSuccessOpen && (
         <Portal>
-          <div className="fixed inset-0 z-[200]">
+          <div className="fixed inset-0 z-[200] overflow-y-auto bg-background-main">
             <SecretBoxUnlockSuccess onBack={handleUnlockSave} />
           </div>
         </Portal>
       )}
 
-      {selectedNote && (
-        <SecretBoxDetailModal
-          note={selectedNote}
-          onClose={() => setSelectedNote(null)}
-        />
-      )}
+      <AnimatePresence>
+        {selectedNote && (
+          <SecretBoxDetailModal note={selectedNote} onClose={() => setSelectedNote(null)} />
+        )}
+      </AnimatePresence>
 
-      {editingLockedNote && (
-        <LockedNoteEditPopup
-          note={editingLockedNote}
-          onClose={() => setEditingLockedNote(null)}
-          onSend={(updatedData) => {
-            setLocalNotes((prev) =>
-              prev.map((n) =>
-                n.id === editingLockedNote.id
-                  ? { ...n, title: updatedData.title, previewText: updatedData.content, category: updatedData.category }
-                  : n
-              )
-            );
-            setEditingLockedNote(null);
-          }}
-        />
-      )}
+      <AnimatePresence>
+        {editingLockedNote && (
+          <LockedNoteEditPopup
+            note={editingLockedNote}
+            onClose={() => setEditingLockedNote(null)}
+            onSend={(updatedData) => {
+              setLocalNotes((prev) =>
+                prev.map((n) =>
+                  n.id === editingLockedNote.id
+                    ? {
+                        ...n,
+                        title: updatedData.title,
+                        previewText: updatedData.content,
+                        category: updatedData.category,
+                      }
+                    : n
+                )
+              );
+              setEditingLockedNote(null);
+            }}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

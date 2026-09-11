@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duyên — Kỷ niệm</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="craft.css">
+</head>
+<body>
+
+<div class="page">
+
+  <header class="hero">
+    <p class="label" style="margin:0;transform:rotate(-2.2deg)">Duyên · Memory Timeline</p>
+    <h1 class="display">Dòng thời gian<br>của chúng mình</h1>
+    <p class="sub">14 chặng đã đi qua. Bấm vào một chặng để mở note đặc sắc, ấn tượng và album ảnh.</p>
+  </header>
+
+  <section>
+    <div class="sec-head">
+      <span class="no">01</span>
+      <div class="tx">
+        <h2>Năm 2026</h2>
+        <p>Ba chuyến đi, một chặng đang diễn ra.</p>
+      </div>
+    </div>
+
+    <div class="timeline">
+
+      <!-- ---------- chặng đang mở ---------- -->
+      <article class="tl-item here">
+        <div class="card" style="transform:rotate(-0.5deg)">
+          <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px">
+            <span class="chip accent">HG 04/2026</span>
+            <button class="node-btn" aria-expanded="true" aria-controls="chi-tiet-hg">
+              <span class="label">Thu gọn</span>
+              <span class="material-symbols-outlined">expand_less</span>
+            </button>
+          </div>
+          <h3 class="headline" style="margin:12px 0 3px">Hà Giang 04/2026</h3>
+          <p class="meta" style="margin:0">
+            <span class="material-symbols-outlined" style="font-size:16px">place</span>
+            Hà Giang, Việt Nam · 12.04.2026 · ★★★★★
+          </p>
+        </div>
+
+        <!-- chi tiết chặng -->
+        <div id="chi-tiet-hg" class="sheet" style="margin-top:14px">
+
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <span class="chip blue">Du lịch</span>
+            <span class="chip blue">Thiên nhiên</span>
+            <span class="chip blue">Lãng mạn</span>
+          </div>
+
+          <hr class="rule">
+
+          <p class="label" style="margin:0 0 8px">Note đặc sắc</p>
+          <div class="ruled">
+            <p>Giữa mây ngàn Hà Giang, ta thấy cả thế giới trong mắt nhau.</p>
+            <p>Đêm ở Đồng Văn lạnh hơn tưởng tượng. Hai đứa ngồi ngoài sân đắp chung một cái chăn mỏng, đếm sao tới gần 1 giờ sáng mà không ai muốn vào.</p>
+          </div>
+
+          <hr class="rule">
+
+          <p class="label" style="margin:0 0 10px">Ấn tượng · 5 mốc trong ngày</p>
+          <ol style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px">
+            <li class="card dashed" style="transform:none;display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:start;padding:12px 14px">
+              <span class="chip soft" style="flex:none">06:00</span>
+              <span style="font-size:.95rem">Xuất phát từ Hà Nội, lòng đầy háo hức cho chuyến đi đầu tiên lên cực Bắc.</span>
+            </li>
+            <li class="card dashed" style="transform:none;display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:start;padding:12px 14px">
+              <span class="chip soft" style="flex:none">12:30</span>
+              <span style="font-size:.95rem">Đến Đồng Văn, check-in homestay nhỏ xinh nằm giữa thung lũng. View cực đẹp!</span>
+            </li>
+            <li class="card dashed" style="transform:none;display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:start;padding:12px 14px">
+              <span class="chip soft" style="flex:none">15:00</span>
+              <span style="font-size:.95rem">Khám phá Cột cờ Lũng Cú — chụp ảnh cùng lá cờ đỏ sao vàng trên đỉnh núi.</span>
+            </li>
+            <li class="card dashed" style="transform:none;display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:start;padding:12px 14px">
+              <span class="chip soft" style="flex:none">19:00</span>
+              <span style="font-size:.95rem">Ăn tối tại nhà hàng địa phương, thử món thắng cố và rượu ngô.</span>
+            </li>
+            <li class="card dashed" style="transform:none;display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:start;padding:12px 14px">
+              <span class="chip soft" style="flex:none">21:00</span>
+              <span style="font-size:.95rem">Ngắm sao trời cao nguyên đá, giữa yên bình tuyệt đối. Đêm đáng nhớ nhất.</span>
+            </li>
+          </ol>
+
+          <hr class="rule">
+
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:12px">
+            <p class="label" style="margin:0">Album · 12 ảnh</p>
+            <button class="btn sm"><span class="material-symbols-outlined">add_photo_alternate</span> Thêm ảnh</button>
+          </div>
+
+          <!-- ảnh dán lên giấy kẻ ô, mỗi tấm lệch một chút -->
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:16px">
+            <div class="mat" style="transform:rotate(-1.2deg)"><div class="ph"><span class="material-symbols-outlined">landscape</span></div></div>
+            <div class="mat" style="transform:rotate(1deg)"><div class="ph"><span class="material-symbols-outlined">photo_camera</span></div></div>
+            <div class="mat" style="transform:rotate(-0.6deg)"><div class="ph"><span class="material-symbols-outlined">flag</span></div></div>
+            <div class="mat" style="transform:rotate(1.4deg)"><div class="ph"><span class="material-symbols-outlined">nights_stay</span></div></div>
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:18px;flex-wrap:wrap">
+            <span class="chip"><span class="material-symbols-outlined">group</span> Anh &amp; Em</span>
+            <span class="stamp" style="transform:rotate(5deg)">12.04<small>2026</small></span>
+          </div>
+        </div>
+      </article>
+
+      <!-- ---------- các chặng đã qua ---------- -->
+      <article class="tl-item done">
+        <div class="card tilt-r">
+          <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px">
+            <span class="chip blue">HA 12/2025</span>
+            <button class="node-btn" aria-expanded="false">
+              <span class="label">Mở</span>
+              <span class="material-symbols-outlined">expand_more</span>
+            </button>
+          </div>
+          <h3 class="headline" style="margin:12px 0 3px">Hội An lúc hoàng hôn</h3>
+          <p class="meta" style="margin:0 0 10px">Hội An, Quảng Nam · 25.12.2025 · ★★★★★</p>
+          <p style="margin:0;font-size:.95rem">“Mỗi ngọn đèn lồng là một điều ước cho chúng mình.”</p>
+        </div>
+      </article>
+
+      <article class="tl-item done">
+        <div class="card">
+          <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px">
+            <span class="chip blue">Thường ngày</span>
+            <button class="node-btn" aria-expanded="false">
+              <span class="label">Mở</span>
+              <span class="material-symbols-outlined">expand_more</span>
+            </button>
+          </div>
+          <h3 class="headline" style="margin:12px 0 3px">Cà phê thứ Bảy</h3>
+          <p class="meta" style="margin:0">Quận 3, TP.HCM · mỗi tuần · ★★★★☆</p>
+        </div>
+      </article>
+
+      <!-- ---------- chặng chưa có gì ---------- -->
+      <article class="tl-item">
+        <div class="card dashed" style="text-align:center;padding:26px 20px">
+          <span class="material-symbols-outlined" style="font-size:32px;color:var(--primary);opacity:.6">add_location_alt</span>
+          <h3 class="headline-sm" style="margin:6px 0 4px;color:var(--primary)">Chặng tiếp theo còn trống</h3>
+          <p class="meta" style="margin:0 auto 14px;max-width:36ch">Thêm một chuyến đi hoặc một buổi thường ngày đáng nhớ vào đây.</p>
+          <button class="btn accent"><span class="material-symbols-outlined">add</span> Thêm kỷ niệm</button>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <footer class="foot">
+    <p style="margin:0">Duyên · bản dựng minh hoạ hệ thiết kế “Refined Craft”</p>
+  </footer>
+
+</div>
+
+<nav class="dock" aria-label="Điều hướng chính">
+  <a href="home.html"><span class="material-symbols-outlined">home</span>Trang chủ</a>
+  <a href="emotions-savings.html"><span class="material-symbols-outlined">favorite</span>Cảm xúc</a>
+  <a href="memories.html" class="on"><span class="material-symbols-outlined fill">photo_album</span>Kỷ niệm</a>
+  <a href="secrets.html"><span class="material-symbols-outlined">lock</span>Bí mật</a>
+  <a href="#" aria-disabled="true"><span class="material-symbols-outlined">calendar_month</span>Hẹn hò</a>
+  <a href="emotions-savings.html#tiet-kiem"><span class="material-symbols-outlined">savings</span>Tiết kiệm</a>
+</nav>
+
+<script>
+  // Collapse/expand the one detail panel. The other nodes are static in
+  // this mockup — a real screen would render a panel for each of them.
+  const openBtn = document.querySelector('[aria-controls="chi-tiet-hg"]');
+  const panel = document.getElementById('chi-tiet-hg');
+
+  openBtn.addEventListener('click', () => {
+    const willOpen = openBtn.getAttribute('aria-expanded') !== 'true';
+    openBtn.setAttribute('aria-expanded', String(willOpen));
+    panel.hidden = !willOpen;
+    openBtn.querySelector('.label').textContent = willOpen ? 'Thu gọn' : 'Mở';
+    openBtn.querySelector('.material-symbols-outlined').textContent =
+      willOpen ? 'expand_less' : 'expand_more';
+  });
+</script>
+
+</body>
+</html>

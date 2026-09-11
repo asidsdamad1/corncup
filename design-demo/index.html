@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duyên — Bản dựng hệ thiết kế</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="craft.css">
+</head>
+<body style="padding-bottom:60px">
+
+<div class="page">
+
+  <header class="hero">
+    <p class="label" style="margin:0;transform:rotate(-2.2deg)">Duyên · Design System Preview</p>
+    <h1 class="display">Refined Craft</h1>
+    <p class="sub">
+      Bốn màn hình minh hoạ cho hệ thiết kế trong
+      <a href="../DESIGN.MD" style="color:var(--ink)">DESIGN.MD</a>.
+      Dùng đúng hai font của corncup — Plus Jakarta Sans và Be Vietnam Pro — không có font viết tay.
+    </p>
+  </header>
+
+  <section>
+    <div class="sec-head">
+      <span class="no">01</span>
+      <div class="tx">
+        <h2>Các màn hình</h2>
+        <p>Mở trực tiếp bằng trình duyệt, không cần chạy server.</p>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px">
+
+      <a href="home.html" style="text-decoration:none;color:inherit">
+        <article class="card" style="height:100%">
+          <span class="chip accent"><span class="material-symbols-outlined">home</span> Trang chủ</span>
+          <h3 class="headline-sm" style="margin:12px 0 4px">Tổng quan trong ngày</h3>
+          <p class="meta" style="margin:0">Hero + con tem ngày, cảm xúc hai người, buổi hẹn kế tiếp, thước tiết kiệm.</p>
+        </article>
+      </a>
+
+      <a href="memories.html" style="text-decoration:none;color:inherit">
+        <article class="card tilt-r" style="height:100%">
+          <span class="chip blue"><span class="material-symbols-outlined">photo_album</span> Kỷ niệm</span>
+          <h3 class="headline-sm" style="margin:12px 0 4px">Dòng thời gian</h3>
+          <p class="meta" style="margin:0">Xương sống nét đứt, node mực, một chặng mở sẵn với note trên giấy kẻ và ảnh dán trên giấy ô.</p>
+        </article>
+      </a>
+
+      <a href="secrets.html" style="text-decoration:none;color:inherit">
+        <article class="card" style="height:100%">
+          <span class="chip accent"><span class="material-symbols-outlined">lock</span> Hộp bí mật</span>
+          <h3 class="headline-sm" style="margin:12px 0 4px">Note khoá bằng mã</h3>
+          <p class="meta" style="margin:0">Tấm che giấy nhám, 4 ô nhập mã, mở ra bằng chuyển động <em>reveal</em>. Mã minh hoạ: 1402.</p>
+        </article>
+      </a>
+
+      <a href="emotions-savings.html" style="text-decoration:none;color:inherit">
+        <article class="card tilt-r" style="height:100%">
+          <span class="chip blue"><span class="material-symbols-outlined">favorite</span> Cảm xúc &amp; Tiết kiệm</span>
+          <h3 class="headline-sm" style="margin:12px 0 4px">Ba lớp riêng tư + thước</h3>
+          <p class="meta" style="margin:0">Emotion Engine 3 tab, lưới tem cảm xúc, và thước tiến độ vẽ dần theo đường cong tay.</p>
+        </article>
+      </a>
+
+      <a href="map.html" style="text-decoration:none;color:inherit">
+        <article class="card" style="height:100%">
+          <span class="chip accent"><span class="material-symbols-outlined">travel_explore</span> Bản đồ</span>
+          <h3 class="headline-sm" style="margin:12px 0 4px">Tỉnh thành suy từ dữ liệu</h3>
+          <p class="meta" style="margin:0">Bản đồ vẽ tay, ghim đặt theo toạ độ thật. Con số tỉnh thành tính từ trường <code>location</code> thay vì ghi cứng.</p>
+        </article>
+      </a>
+
+      <a href="ground-preview.html" style="text-decoration:none;color:inherit">
+        <article class="card tilt-r" style="height:100%">
+          <span class="chip blue"><span class="material-symbols-outlined">layers</span> Nền</span>
+          <h3 class="headline-sm" style="margin:12px 0 4px">Hai lớp mặt bàn</h3>
+          <p class="meta" style="margin:0">Vệt sáng trôi chậm phía sau, mặt giấy kẻ ô đứng yên. Bản sao nguyên văn phần nền trong <code>globals.css</code>.</p>
+        </article>
+      </a>
+
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <span class="no">02</span>
+      <div class="tx">
+        <h2>Năm động tác tạo nên style</h2>
+        <p>Toàn bộ nằm trong <code>craft.css</code>.</p>
+      </div>
+    </div>
+
+    <div class="sheet">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px">
+
+        <div>
+          <p class="label" style="margin:0 0 8px">1 · Viền lệch tay</p>
+          <div class="card" style="transform:rotate(-1.2deg);padding:14px 16px">
+            <p style="margin:0;font-size:.9rem"><code>--wobble</code> cho bán kính bốn góc khác nhau.</p>
+          </div>
+        </div>
+
+        <div>
+          <p class="label" style="margin:0 0 8px">2 · Giấy kẻ dòng</p>
+          <div class="ruled" style="background-color:var(--paper);border-radius:8px">
+            <p>Chữ ngồi đúng trên dòng kẻ.</p>
+          </div>
+        </div>
+
+        <div>
+          <p class="label" style="margin:0 0 8px">3 · Gạch nét đứt</p>
+          <p style="margin:0;font-size:.9rem">Thay cho <code>border-bottom</code> đặc.</p>
+          <hr class="rule">
+          <p style="margin:0;font-size:.9rem">Nhẹ hơn, đỡ cứng hơn.</p>
+        </div>
+
+        <div>
+          <p class="label" style="margin:0 0 8px">4 · Con tem &amp; nhãn</p>
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+            <span class="chip accent">Nhãn</span>
+            <span class="stamp">25<small>Th 5</small></span>
+          </div>
+        </div>
+
+        <div>
+          <p class="label" style="margin:0 0 8px">5 · Ảnh dán trên giấy ô</p>
+          <div class="mat" style="transform:rotate(-1.4deg)">
+            <div class="ph"><span class="material-symbols-outlined">image</span></div>
+          </div>
+        </div>
+
+        <div>
+          <p class="label" style="margin:0 0 8px">Vòng focus</p>
+          <p style="margin:0 0 10px;font-size:.9rem">Bấm <kbd>Tab</kbd> để thấy nét đứt màu mực.</p>
+          <button class="btn sm">Thử focus</button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <p style="margin:0">Duyên · bản dựng minh hoạ hệ thiết kế “Refined Craft”</p>
+  </footer>
+
+</div>
+
+</body>
+</html>
